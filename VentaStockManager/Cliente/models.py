@@ -5,16 +5,23 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+
 class Cliente(models.Model):
     """
     A model representing a client.
     """
+    GENERO_CHOICES = [
+        ('M', 'Masculino'),
+        ('F', 'Femenino'),
+    ]
     nombre = models.TextField()
     apellido = models.TextField(blank=False)
     perfil = models.OneToOneField(User, on_delete=models.CASCADE)
     cuil = models.IntegerField(blank=False)
     telefono = models.TextField(blank=False)
     edad = models.IntegerField()
+    sexo = models.CharField(max_length=1, choices=GENERO_CHOICES)
+
 
     def clean(self):
         """
