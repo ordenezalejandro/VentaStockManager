@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from Cliente.models import Cliente
 from django.http import HttpResponse
+from django.contrib.auth.models import User
 
 
 #Cliente/cliente/ Create your views here.
@@ -22,3 +23,34 @@ def mostrar_todos_los_clientes(request):
     return render(request, 'clientes.html', {'clientes': clientes})
 
 
+def procesar_nuevo_cliente(request):
+    # process
+    if request.method == 'POST':
+        # saco los datos del formulario
+        nombre = request.POST.get('nombre')
+        apellido = request.POST.get('apellido')
+        contrasena = request.POST.get('contrasena')
+        cuil = request.POST.get('cuil')
+        telefono = request.POST.get('telefono')
+        edad = request.POST.get('edad')
+        genero = request.POST.get('genero') 
+        email = request.POST.get('email')
+        # creo el usuario     
+        perfil = User(email=email, password=contrasena, username=email)
+        perfil.save()
+        new_cliente = Cliente(
+            nombre=nombre,
+            apellido=apellido,
+            cuil=cuil,
+            telefono=telefono,
+            sexo=genero,
+            perfil=perfil,
+            edad=edad
+        )
+        try:
+            new_cliente.save()
+        except ValidationError as e:
+            return HttpResponse('error en validadtion de dato.')
+
+    else:
+        return render(request, 'formulario_cliente.html')
