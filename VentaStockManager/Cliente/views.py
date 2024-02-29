@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from Cliente.models import Cliente
+from cliente.models import Cliente
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 
