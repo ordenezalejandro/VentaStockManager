@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "Cliente.apps.ClienteConfig",
     "Pedido.apps.PedidoConfig",
-    "producto.apps.ProductoConfig",
+    "articulo.apps.ArticuloConfig",
+    "compra.apps.CompraConfig",
 
 ]
 
