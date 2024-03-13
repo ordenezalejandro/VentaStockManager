@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 django = "*"
+ipdb = "*"
+django-material-admin = "*"
 
 [dev-packages]
 
