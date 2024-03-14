@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplo de Formulario HTML</title>
+</head>
+<body>
+
+<h2>Formulario de Registro</h2>
+
+<form action="http://127.0.0.1:8000/clientes/procesar_nuevo_cliente/" method="post">
+    <!-- Campo de texto para el nombre -->
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" required>
+    {% csrf_token %}
+    <label for="apellido">Apellido:</label>
+    <input type="text" id="apellido" name="apellido" required>
+
+    <!-- Campo de correo electrónico -->
+    <label for="email">Correo electrónico:</label>
+    <input type="email" id="email" name="email" required>
+
+    <!-- Campo de contraseña -->
+    <label for="contrasena">Contraseña:</label>
+    <input type="password" id="contrasena" name="contrasena" required>
+
+      <!-- Campo de contraseña -->
+      <label for="cuil">cuil:</label>
+      <input type="text" id="cuil" name="cuil" required>
+  
+      <label for="telefono">telefono:</label>
+      <input type="text" id="telefono" name="telefono" required>
+  
+      <label for="edad">edad:</label>
+      <input type="text" id="edad" name="edad" required>
+  
+    <!-- Menú desplegable para seleccionar una opción -->
+    <label for="genero">Genero:</label>
+    <select id="genero" name="genero">
+        <option value="F">Femenino</option>
+        <option value="M">Masculino</option>
+        
+    </select>
+
+    
+    <!-- Botón de envío del formulario -->
+    <button type="submit">Enviar</button>
+</form>
+
+</body>
+</html>
