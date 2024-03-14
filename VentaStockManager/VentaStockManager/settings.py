@@ -30,7 +30,7 @@ SECRET_KEY = "django-insecure-n(&88i1@5enum3s3g@-3k9!hgl=l6330&pm$uto4sd1ju1@4*9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["venta-manager-osvaldo-c336f4585c1d.herokuapp.com", "127.0.0.1"]
 
 
 # Application definition
