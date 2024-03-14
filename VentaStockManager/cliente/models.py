@@ -33,8 +33,8 @@ class Cliente(models.Model):
         """
         Meta class for the Cliente model.
         """
-        verbose_name = _("Cliente")
-        verbose_name_plural = _("Clientes")
+        verbose_name = _("cliente")
+        verbose_name_plural = _("clientes")
 
         # def get_latest_by(self):
         #     pass
@@ -49,4 +49,4 @@ class Cliente(models.Model):
         """
         Get the absolute URL for the client detail view.
         """
-        return reverse("Cliente_detail", kwargs={"pk": self.pk})
+        return reverse("cliente_detail", kwargs={"pk": self.pk})
