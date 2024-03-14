@@ -43,7 +43,7 @@ class Cliente(models.Model):
         #     pass
 
     def __str__(self):
-        return f"Cliente:" + self.nombre + " " + self.apellido + f" ({self.edad} años)"
+        return f"Cliente:" + self.nombre + "  " + self.apellido + f" ({self.edad} años)"
 
     def get_absolute_url(self):
         """
