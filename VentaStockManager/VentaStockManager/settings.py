@@ -144,7 +144,7 @@ STATICFILES_DIRS = (
 )
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-
+DATABASE_URL = ''
 DATABASES['default'].update(db_from_env)
 
 # DATABASES = {
