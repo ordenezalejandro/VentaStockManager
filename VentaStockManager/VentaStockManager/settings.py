@@ -76,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "VentaStockManager.wsgi.application"
+WSGI_APPLICATION = "VentaStockManager.VentaStockManager.wsgi.application"
 
 
 # Database
