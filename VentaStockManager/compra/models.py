@@ -44,3 +44,5 @@ class DetalleCompra(models.Model):
         
     def __str__(self):
         return f"{self.cantidad} unidades de {self.articulo} en la compra {self.compra}"
+    
+ 
