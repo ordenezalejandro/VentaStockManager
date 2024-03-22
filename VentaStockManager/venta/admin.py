@@ -28,3 +28,4 @@ class VentaAdmin(admin.ModelAdmin):
     search_fields = ['cliente__nombre', 'cliente__apellido']
         
 admin.site.register(Venta, VentaAdmin)
+
