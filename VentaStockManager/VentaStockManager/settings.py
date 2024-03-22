@@ -133,8 +133,8 @@ USE_L10N = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Heroku: Actualice la configuración de la base de datos desde $DATABASE_URL.
 
-import dj_database_url
-db_from_env = dj_database_url.config(conn_max_age=500)
+# import dj_database_url
+# db_from_env = dj_database_url.config(conn_max_age=500)
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATIC_URL = '/static/'

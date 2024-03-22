@@ -42,7 +42,7 @@ class Vendedor(models.Model):
         #     pass
 
     def __str__(self):
-        return f"Vendedor:" + self.nombre + " " + self.apellido + f" ({self.edad} años)"
+        return self.nombre + " " + self.apellido + f" ({self.edad} años)"
 
     def get_absolute_url(self):
         """
