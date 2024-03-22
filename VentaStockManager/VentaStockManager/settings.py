@@ -76,7 +76,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "VentaStockManager.VentaStockManager.wsgi.application"
+
+# WSGI_APPLICATION = "VentaStockManager.VentaStockManager.wsgi.application"
 
 
 # Database
@@ -143,9 +144,9 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-DATABASE_URL = 'postgres://uer3gcrj0vd76q:p2f4b3a1bc978591f71d00126f50b534013c6a5575bcc216fdd5901395ead803b@ceu9lmqblp8t3q.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d67e8fclmob063'
-DATABASES['default'].update(db_from_env)
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# DATABASE_URL = 'postgres://uer3gcrj0vd76q:p2f4b3a1bc978591f71d00126f50b534013c6a5575bcc216fdd5901395ead803b@ceu9lmqblp8t3q.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d67e8fclmob063'
+# DATABASES['default'].update(db_from_env)
 
 # DATABASES = {
 #     'default': dj_database_url.config(
