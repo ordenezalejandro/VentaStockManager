@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
+from django.db import models
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-
-class Cliente(models.Model):
+# Create your models here.
+class Vendedor(models.Model):
     """
     A model representing a client.
     """
@@ -16,7 +16,6 @@ class Cliente(models.Model):
     ]
     nombre = models.TextField()
     apellido = models.TextField(blank=False)
-    perfil = models.OneToOneField(User, on_delete=models.CASCADE)
     cuil = models.IntegerField(blank=False)
     telefono = models.TextField(blank=False)
     edad = models.IntegerField()
@@ -33,8 +32,8 @@ class Cliente(models.Model):
         """
         Meta class for the Cliente model.
         """
-        verbose_name = _("cliente")
-        verbose_name_plural = _("clientes")
+        verbose_name = _("Vendedor")
+        verbose_name_plural = _("Vendedores")
 
         # def get_latest_by(self):
         #     pass
@@ -43,10 +42,10 @@ class Cliente(models.Model):
         #     pass
 
     def __str__(self):
-        return f"Cliente:" + self.nombre + "  " + self.apellido + f" ({self.edad} años)"
+        return f"Vendedor:" + self.nombre + " " + self.apellido + f" ({self.edad} años)"
 
     def get_absolute_url(self):
         """
         Get the absolute URL for the client detail view.
         """
-        return reverse("cliente_detail", kwargs={"pk": self.pk})
+        return reverse("Cliente_detail", kwargs={"pk": self.pk})
