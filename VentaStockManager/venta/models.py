@@ -4,11 +4,15 @@ from django.db import models
 from django.db import models
 from cliente.models import Cliente
 from articulo.models import Articulo
+from vendedor.models import Vendedor
+
 
 class Venta(models.Model):
     fecha_compra = models.DateField()
     fecha_entrega = models.DateField()
-    cliente = models.ForeignKey(Cliente, related_name='ventas', on_delete=models.CASCADE)
+    cliente = models.ForeignKey(Cliente, related_name='compras', on_delete=models.CASCADE)
+    vendedor = models.ForeignKey(Vendedor, related_name='ventas', on_delete=models.CASCADE)
+
 
     @property
     def precio_total(self):
