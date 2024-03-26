@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "articulo.apps.ArticuloConfig",
     "compra.apps.CompraConfig",
     "vendedor.apps.VendedorConfig",
+   
 
 ]
 
