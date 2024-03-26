@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "articulo.apps.ArticuloConfig",
     "vendedor.apps.VendedorConfig",
     "compra.apps.CompraConfig",
-    # VendedorConfig(AppConfig),
+    "vendedor.apps.VendedorConfig",
 
 ]
 
@@ -82,7 +82,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "VentaStockManager.wsgi.application"
+
+# WSGI_APPLICATION = "VentaStockManager.VentaStockManager.wsgi.application"
 
 
 # Database
