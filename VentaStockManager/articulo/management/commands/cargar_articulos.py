@@ -9,8 +9,8 @@ class Command(BaseCommand):
         articulos_data = [
             {
                 'codigo': 1,
-                'nombre': 'Artículo 1',
-                'descripcion': 'Descripción del Artículo 1',
+                'nombre': 'galletas',
+                'descripcion': 'galletas de chocolate',
                 'precio_compra': 10.50,
                 'precio_venta': 15.00,
                 'stock': 100,
@@ -20,8 +20,8 @@ class Command(BaseCommand):
             },
             {
                 'codigo': 2,
-                'nombre': 'Artículo 2',
-                'descripcion': 'Descripción del Artículo 2',
+                'nombre': 'alfajores',
+                'descripcion': 'alfajor 3 tapas',
                 'precio_compra': 15.25,
                 'precio_venta': 20.00,
                 'stock': 50,
@@ -31,8 +31,8 @@ class Command(BaseCommand):
             },
             {
                 'codigo': 3,
-                'nombre': 'Artículo 3',
-                'descripcion': 'Descripción del Artículo 3',
+                'nombre': 'cupetin',
+                'descripcion': 'chupetin con chicle',
                 'precio_compra': 20.00,
                 'precio_venta': 25.00,
                 'stock': 80,
@@ -42,8 +42,8 @@ class Command(BaseCommand):
             },
             {
                 'codigo': 4,
-                'nombre': 'Artículo 4',
-                'descripcion': 'Descripción del Artículo 4',
+                'nombre': 'caramelos',
+                'descripcion': 'caramelos masticables',
                 'precio_compra': 8.75,
                 'precio_venta': 12.00,
                 'stock': 120,
@@ -53,8 +53,8 @@ class Command(BaseCommand):
             },
             {
                 'codigo': 5,
-                'nombre': 'Artículo 5',
-                'descripcion': 'Descripción del Artículo 5',
+                'nombre': 'jugos',
+                'descripcion': 'jugos tang',
                 'precio_compra': 12.00,
                 'precio_venta': 18.00,
                 'stock': 60,

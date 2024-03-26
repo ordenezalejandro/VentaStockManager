@@ -1,4 +1,4 @@
-import datetime
+`import datetime
 from django.core.management.base import BaseCommand
 from venta.models import Venta, ArticuloVenta, Cliente, Vendedor, Articulo
 
@@ -54,3 +54,4 @@ class Command(BaseCommand):
                 )
 
         self.stdout.write(self.style.SUCCESS('Se han cargado las ventas correctamente.'))
+`

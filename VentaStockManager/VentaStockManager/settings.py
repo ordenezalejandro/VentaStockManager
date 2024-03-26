@@ -141,8 +141,19 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Heroku: Actualice la configuración de la base de datos desde $DATABASE_URL.
 
-# import dj_database_url
-# db_from_env = dj_database_url.config(conn_max_age=500)
+import dj_database_url
+db_from_env = dj_database_url.config(conn_max_age=500)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATIC_URL = '/static/'
+
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (  
+    os.path.join(BASE_DIR, 'static'),
+)
+
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# DATABASE_URL = 'postgres://uer3gcrj0vd76q:p2f4b3a1bc978591f71d00126f50b534013c6a5575bcc216fdd5901395ead803b@ceu9lmqblp8t3q.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d67e8fclmob063'
 # DATABASES['default'].update(db_from_env)
 
 # # DATABASES = {
