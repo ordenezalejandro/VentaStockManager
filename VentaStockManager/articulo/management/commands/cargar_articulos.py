@@ -1,71 +1,61 @@
-import datetime
+import random
+import string
+from datetime import timedelta
 from django.core.management.base import BaseCommand
 from articulo.models import Articulo
 
 class Command(BaseCommand):
-    help = 'Carga artículos en la base de datos'
+    help = 'Cargar varios artículos desde un script'
 
-    def handle(self, *args, **kwargs):
-        articulos_data = [
+    def sugerir_codigo_interno(self, articulo_data):
+        marca = articulo_data['marca']
+        nombre = articulo_data['nombre']
+        # Obtener las iniciales del nombre del artículo
+        iniciales_nombre = ''.join(word[0] for word in nombre.split())
+        # Generar un número aleatorio de 4 dígitos
+        numero_aleatorio = ''.join(random.choices(string.digits, k=4))
+        # Combinar la marca, iniciales y número aleatorio
+        codigo_interno = f'{marca}_{iniciales_nombre}_{numero_aleatorio}'
+        return codigo_interno
+
+    def handle(self, *args, **options):
+        # Lista de artículos para cargar
+        articulos_para_cargar = [
             {
-                'codigo': 1,
-                'nombre': 'galletas',
-                'descripcion': 'galletas de chocolate',
-                'precio_compra': 10.50,
-                'precio_venta': 15.00,
+                'codigo': 1001,
+                'nombre': 'Chupetines de colores',
+                'descripcion': 'Bolsa de chupetines de colores surtidos.',
+                'precio_compra': 0.50,
+                'precio_venta': 1.00,
                 'stock': 100,
-                'precio_minorista': 12.00,
-                'precio_mayorista': 10.00,
-                'vencimiento': datetime.date.today() + datetime.timedelta(days=30)
+                'precio_minorista': 1.50,
+                'precio_mayorista': 1.00,
+                'vencimiento': timedelta(days=90),  # Vencimiento mayor a 60 días (90 días)
+                'marca': 'juspy',  # Agregar marca
             },
             {
-                'codigo': 2,
-                'nombre': 'alfajores',
-                'descripcion': 'alfajor 3 tapas',
-                'precio_compra': 15.25,
-                'precio_venta': 20.00,
-                'stock': 50,
-                'precio_minorista': 18.00,
-                'precio_mayorista': 15.00,
-                'vencimiento': datetime.date.today() + datetime.timedelta(days=45)
-            },
-            {
-                'codigo': 3,
-                'nombre': 'cupetin',
-                'descripcion': 'chupetin con chicle',
-                'precio_compra': 20.00,
-                'precio_venta': 25.00,
+                'codigo': 1002,
+                'nombre': 'Bolsa de caramelos surtidos',
+                'descripcion': 'Bolsa de caramelos con distintos sabores.',
+                'precio_compra': 0.75,
+                'precio_venta': 1.50,
                 'stock': 80,
-                'precio_minorista': 22.00,
-                'precio_mayorista': 18.00,
-                'vencimiento': datetime.date.today() + datetime.timedelta(days=60)
+                'precio_minorista': 1.80,
+                'precio_mayorista': 1.20,
+                'vencimiento': timedelta(days=70),  # Vencimiento mayor a 60 días (70 días)
+                'marca': 'flimpaf',  # Agregar marca
             },
-            {
-                'codigo': 4,
-                'nombre': 'caramelos',
-                'descripcion': 'caramelos masticables',
-                'precio_compra': 8.75,
-                'precio_venta': 12.00,
-                'stock': 120,
-                'precio_minorista': 10.00,
-                'precio_mayorista': 8.50,
-                'vencimiento': datetime.date.today() + datetime.timedelta(days=20)
-            },
-            {
-                'codigo': 5,
-                'nombre': 'jugos',
-                'descripcion': 'jugos tang',
-                'precio_compra': 12.00,
-                'precio_venta': 18.00,
-                'stock': 60,
-                'precio_minorista': 14.00,
-                'precio_mayorista': 11.50,
-                'vencimiento': datetime.date.today() + datetime.timedelta(days=40)
-            }
+            # Agregar los otros artículos con los atributos de marca
         ]
 
-        for articulo_data in articulos_data:
+        # Iterar sobre la lista de artículos y crear cada uno
+        for articulo_data in articulos_para_cargar:
+            # Obtener sugerencia para el código interno
+            articulo_data['codigo_interno'] = self.sugerir_codigo_interno(articulo_data)
             articulo = Articulo(**articulo_data)
             articulo.save()
 
         self.stdout.write(self.style.SUCCESS('Se han cargado los artículos correctamente.'))
+
+       
+      
