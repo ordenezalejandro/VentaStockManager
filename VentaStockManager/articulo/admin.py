@@ -5,7 +5,7 @@ from django.contrib import messages
 from articulo.models import Articulo
 import decimal
 class ArticuloAdmin(admin.ModelAdmin):
-    list_display = ('codigo_interno','codigo', 'nombre', 'stock', 'vence_dentro_de_60_dias')
+    list_display = ('codigo_interno','codigo', 'nombre', 'marca','stock', 'vence_dentro_de_60_dias')
     search_fields = ("nombre", 'codigo')
     ordering = ("vencimiento",)
     
@@ -21,6 +21,7 @@ class ArticuloAdmin(admin.ModelAdmin):
     def vence_dentro_de_60_dias(self, obj):
         return (obj.vencimiento - date.today()).days < 60
     admin.site.add_action(agregar_10_por_ciento_al_precio, "Actualizacion 10")
+
 
 admin.site.site_header = 'Administrador Osvaldo'
 admin.site.index_title = 'Osvaldo Administrador'
