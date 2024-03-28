@@ -1,6 +1,6 @@
+
 import random
 import string
-
 from django.db import models
 import random
 # Create your models here.
@@ -19,7 +19,6 @@ class Articulo(models.Model):
     vencimiento = models.DateField(blank=True)
     marca = models.CharField(max_length=255, blank=True, null=True, default='Sin marca')
     # categoria = models.CharField(max_length=255, blank=True, null=True)
-    
 
     def save(self, *args, **kwargs):
         if not self.codigo_interno:
@@ -30,7 +29,6 @@ class Articulo(models.Model):
             # Combinar las iniciales y el número aleatorio
             self.codigo_interno = iniciales.upper() + random_number
         super().save(*args, **kwargs)
-
 
     def __str__(self):
         return self.nombre
@@ -47,4 +45,4 @@ class Articulo(models.Model):
 
 
             
-            
+  
