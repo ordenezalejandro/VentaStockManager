@@ -2,7 +2,8 @@ import random
 import string
 
 from django.db import models
-
+import random
+# Create your models here.
 class Articulo(models.Model):
     id = models.AutoField(primary_key=True)
     codigo = models.PositiveIntegerField()
@@ -16,6 +17,9 @@ class Articulo(models.Model):
     precio_minorista = models.DecimalField(max_digits=10, decimal_places=2)
     precio_mayorista = models.DecimalField(max_digits=10, decimal_places=2)
     vencimiento = models.DateField(blank=True)
+    marca = models.CharField(max_length=255, blank=True, null=True, default='Sin marca')
+    # categoria = models.CharField(max_length=255, blank=True, null=True)
+    
 
     def save(self, *args, **kwargs):
         if not self.codigo_interno:
@@ -30,10 +34,17 @@ class Articulo(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+    def sugerir_codigo_interno(self):
+        
+        if not self.nombre:
+            return self.id
+        else:
+            iniciales = [palabra[0] for palabra in self.nombre.split() if palabra]
+            random_int = [str(random.randint(0, 10) for i in range(3))]
+            return ''.join(iniciales + random_int)
 
 
-class ArticuloAutocomplete(models.Model):
-    nombre = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.nombre
+            
+            
