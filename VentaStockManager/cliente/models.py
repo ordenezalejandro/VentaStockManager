@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
-from django.utils.translation import gettext_lazy_
+
 
 
 class Cliente(models.Model):
@@ -33,8 +33,8 @@ class Cliente(models.Model):
         """
         Meta class for the Cliente model.
         """
-        verbose_name = _("cliente")
-        verbose_name_plural = _("clientes")
+        verbose_name = "cliente"
+        verbose_name_plural = "clientes"
 
         # def get_latest_by(self):
         #     pass

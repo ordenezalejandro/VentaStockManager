@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from vendedor.models import Vendedor
+from django.contrib.auth.models import User
 
 class Command(BaseCommand):
     help = 'Carga vendedores en la base de datos desde un script'
@@ -16,6 +17,15 @@ class Command(BaseCommand):
 
         # Guarda los vendedores en la base de datos
         for vendedor_data in vendedores:
+            usuario, created  = User.objects.get_or_create(
+                username=vendedor_data['nombre'].lower(),
+                first_name=vendedor_data['nombre'],
+                last_name=vendedor_data['apellido'],
+            )
+
+            if created:
+                usuario.save()
+            vendedor_data["usuario"] = usuario
             vendedor = Vendedor(**vendedor_data)
             vendedor.full_clean()  # Realiza validaciones del modelo
             vendedor.save()

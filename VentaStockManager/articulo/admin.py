@@ -5,8 +5,9 @@ from django.contrib import messages
 from articulo.models import Articulo
 import decimal
 class ArticuloAdmin(admin.ModelAdmin):
-    list_display = ('codigo_interno','codigo', 'nombre', 'marca','stock', 'vence_dentro_de_60_dias')
-    search_fields = ("nombre", 'codigo')
+
+    list_display = ('marca','codigo_interno','codigo', 'nombre', 'stock', 'vence_dentro_de_60_dias')
+    search_fields = ("nombre", 'codigo', 'codigo_interno')
     ordering = ("vencimiento",)
     
     
@@ -14,12 +15,13 @@ class ArticuloAdmin(admin.ModelAdmin):
     def agregar_10_por_ciento_al_precio(modeladmin, request, queryset):
         for obj in queryset:
             obj.precio_minorista *= decimal.Decimal(1.1)
-            obj.precio_mayorista *=decimal.Decimal(1.1)
+            obj.precio_mayorista *= decimal.Decimal(1.1)
             obj.save()
         messages.success(request, "Se actualizaron los precios al 10 porciento mas exitosamente")
     
     def vence_dentro_de_60_dias(self, obj):
         return (obj.vencimiento - date.today()).days < 60
+    
     admin.site.add_action(agregar_10_por_ciento_al_precio, "Actualizacion 10")
 
 

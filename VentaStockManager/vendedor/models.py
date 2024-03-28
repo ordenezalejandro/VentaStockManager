@@ -1,19 +1,26 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-from django.contrib.auth.models import User, Group
-
-# Crea un grupo de vendedores
-import django
-
-# django.setup()
-# group, created = Group.objects.get_or_create(name='Vendedores', created=True)
-# Create your models here.
 class Vendedor(models.Model):
-    # ... define los campos específicos del vendedor
+    GENERO_CHOICES = [
+        ('M', 'Masculino'),
+        ('F', 'Femenino'),
+    ]
+    id = models.AutoField(primary_key=True)
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    nombre = models.TextField()
+    apellido = models.TextField(blank=False)
+    # perfil = models.OneToOneField(User, on_delete=models.CASCADE)
+    cuil = models.IntegerField(blank=False)
+    telefono = models.TextField(blank=False)
+    edad = models.IntegerField()
+    sexo = models.CharField(max_length=1, choices=GENERO_CHOICES)
 
-    # Relación con el usuario (opcional)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+  # Campos adicionales del vendedor (opcional)
+  # Ej: nombre_completo, telefono, etc.
 
     def __str__(self):
-        return self.user.username  # O el nombre que prefieras
-
+        return self.usuario.username
+    class Meta:
+        verbose_name = "Vendedor"
+        verbose_name_plural = "Vendedores"# Create your models here.

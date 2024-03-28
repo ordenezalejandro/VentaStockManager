@@ -6,6 +6,8 @@ from cliente.models import Cliente
 from articulo.models import Articulo
 # from vendedor.models import Vendedor
 from vendedor.models import Vendedor
+from django.utils.translation import gettext_lazy as _
+
 
 
 class Venta(models.Model):
@@ -13,6 +15,15 @@ class Venta(models.Model):
     fecha_entrega = models.DateField()
     cliente = models.ForeignKey(Cliente, related_name='ventas', on_delete=models.CASCADE)
     vendedor = models.ForeignKey(Vendedor, related_name='ventas', on_delete=models.CASCADE)
+    class Meta:
+        ordering = ['fecha_compra']
+        verbose_name = _("venta")
+        verbose_name_plural = _("ventas")
+
+
+    def __str__(self):
+        return f"Venta del {self.fecha_compra} al cliente {self.cliente}"
+    
     @property
     def precio_total(self):
         return sum([articulo.precio for articulo in self.articulos_ventdidos.all()])
@@ -22,7 +33,6 @@ class ArticuloVenta(models.Model):
     articulo =  models.ForeignKey(Articulo, related_name='articulos_ventdidos', on_delete=models.CASCADE)
     cantidad = models.PositiveBigIntegerField()
     precio_minorista = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_mayorista = models.DecimalField(max_digits=10, decimal_places=2)
 
     def save(self, *args, **kwargs):
         # Update stock of the related ArticuloCompra

@@ -38,25 +38,33 @@ class Command(BaseCommand):
 
         for cliente_data in clientes_data:
             # Crea el usuario
-            usuario = User.objects.create_user(
+            usuario, created  = User.objects.get_or_create(
                 username=cliente_data['nombre'].lower(),
                 first_name=cliente_data['nombre'],
                 last_name=cliente_data['apellido'],
             )
-            
+
+            if created:
+                usuario.save()
             # Crea el cliente
-            Cliente.objects.create(
+            cliente = Cliente.objects.create(
                 nombre=cliente_data['nombre'],
                 apellido=cliente_data['apellido'],
                 perfil=usuario,
                 cuil=cliente_data['cuil'],
                 telefono=cliente_data['telefono'],
                 edad=cliente_data['edad'],
-                sexo=cliente_data['sexo']
+                sexo=cliente_data['sexo'],
             )
 
-        self.stdout.write(self.style.SUCCESS('Clientes cargados exitosamente.'))
+            # Guarda el cliente
+            cliente.save()
+
+            # Imprime un mensaje de éxito
+            
+
+            self.stdout.write(self.style.SUCCESS('Clientes cargados exitosamente.'))
 
         
 
-        self.stdout.write(self.style.SUCCESS(f'Cliente creado: {cliente}'))
+            self.stdout.write(self.style.SUCCESS(f'Cliente creado: {cliente}'))
