@@ -3,6 +3,8 @@ import string
 from datetime import timedelta
 from django.core.management.base import BaseCommand
 from articulo.models import Articulo
+from datetime import datetime, timedelta # agregue "timedelta" 
+
 
 class Command(BaseCommand):
     help = 'Cargar varios artículos desde un script'
@@ -30,7 +32,7 @@ class Command(BaseCommand):
                 'stock': 100,
                 'precio_minorista': 1.50,
                 'precio_mayorista': 1.00,
-                'vencimiento': timedelta(days=90),  # Vencimiento mayor a 60 días (90 días)
+                'vencimiento': datetime.now() + timedelta(days=90),  # Vencimiento mayor a 60 días (90 días)
                 'marca': 'juspy',  # Agregar marca
             },
             {
@@ -42,7 +44,7 @@ class Command(BaseCommand):
                 'stock': 80,
                 'precio_minorista': 1.80,
                 'precio_mayorista': 1.20,
-                'vencimiento': timedelta(days=70),  # Vencimiento mayor a 60 días (70 días)
+                'vencimiento':  datetime.now() + timedelta(days=70) ,  # Vencimiento mayor a 60 días (70 días)
                 'marca': 'flimpaf',  # Agregar marca
             },
             # Agregar los otros artículos con los atributos de marca
