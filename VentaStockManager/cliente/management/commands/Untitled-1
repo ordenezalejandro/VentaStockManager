@@ -4,6 +4,7 @@
 
 SELECT * FROM venta_venta;
 UPDATE TABLE "venta_venta" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "fecha_compra" date NOT NULL, "fecha_entrega" date NOT NULL,    "vendedor_id" bigint NOT NULL REFERENCES "vendedor_vendedor" ("id"),  "cliente_id" bigint NOT NULL REFERENCES "cliente_cliente" ("id") DEFERRABLE INITIALLY DEFERRED)
+
 , 
 ;
 ALTER TABLE venta_venta
@@ -11,4 +12,5 @@ ADD vendedor_id INT NULL;
 
 ALTER TABLE venta_venta
 ADD FOREIGN KEY (vendedor_id)
+
 REFERENCES vendedor (id);

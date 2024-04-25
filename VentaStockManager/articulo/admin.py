@@ -8,9 +8,8 @@ class ArticuloAdmin(admin.ModelAdmin):
 
     list_display = ('marca','codigo_interno','codigo', 'nombre', 'stock', 'vence_dentro_de_60_dias')
     search_fields = ("nombre", 'codigo', 'codigo_interno')
+    # fields = ("__all__",)
     ordering = ("vencimiento",)
-    
-    
     
     def agregar_10_por_ciento_al_precio(modeladmin, request, queryset):
         for obj in queryset:
