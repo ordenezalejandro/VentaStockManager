@@ -1,4 +1,6 @@
 from django.contrib import admin
+#from .forms import CompraAdminForm
+
 
 from .models import Proveedor, Compra, DetalleCompra
 
@@ -12,3 +14,11 @@ class CompraAdmin(admin.ModelAdmin):
 admin.site.register(Proveedor)
 
 admin.site.register(Compra, CompraAdmin)
+
+
+#@admin.register(Compra)
+#lass CompraAdmin(admin.ModelAdmin):
+  #  form = CompraAdminForm
+####
+
+

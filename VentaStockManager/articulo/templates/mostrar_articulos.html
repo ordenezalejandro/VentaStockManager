@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Artículos</title>
+</head>
+<body>
+    <h1>Lista de Artículos</h1>
+    <ul>
+        <form method="POST">
+            <input name="porcentage" type="float" placeholder="ingrese el porcentage">Porcentage</input>
+            {% if errors %}
+            <p style="color:red" > El porcentage tiene que ser mayor a cero</p>
+            {% endif %}
+           {% csrf_token %}
+        {% for articulo in articulos %}
+            <li><label><input type="checkbox" name="articulo-ids" value="{{articulo.id }}"> {{articulo.nombre }} {{articulo.descripcion }}  {{articulo.precio_venta}}</label></li><br>
+        {% endfor %}
+        
+        <button type="submit"> Actualizar</button>
+        </form>
+    
+    </ul>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Artículos</title>
+</head>
+<body>
+    <h1>Lista de Artículos</h1>
+
+    {% if perms.cliente.puede_acceder_lista_articulos %}
+        <!-- Muestra la lista de artículos solo si el usuario tiene el permiso -->
+        <ul>
+            {% for articulo in articulos %}
+                <li>{{ articulo.nombre }} - {{ articulo.descripcion }} - {{ articulo.precio_venta }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <!-- Muestra un mensaje de error si el usuario no tiene el permiso -->
+        <p>No tienes permiso para acceder a la lista de artículos.</p>
+    {% endif %}
+</body>
+</html>
+

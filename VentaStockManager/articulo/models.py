@@ -18,7 +18,8 @@ class Articulo(models.Model):
     precio_mayorista = models.DecimalField(max_digits=10, decimal_places=2)
     vencimiento = models.DateField(blank=True)
     marca = models.CharField(max_length=255, blank=True, null=True, default='Sin marca')
-    # categoria = models.CharField(max_length=255, blank=True, null=True)
+    cantidad_por_mayor = models.PositiveIntegerField(default=2)
+        # categoria = models.CharField(max_length=255, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.codigo_interno:
@@ -42,6 +43,7 @@ class Articulo(models.Model):
             iniciales = [palabra[0] for palabra in self.nombre.split() if palabra]
             random_int = [str(random.randint(0, 10) for i in range(3))]
             return ''.join(iniciales + random_int)
+
 
 
 
