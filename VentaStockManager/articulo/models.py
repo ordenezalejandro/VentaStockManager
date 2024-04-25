@@ -31,7 +31,8 @@ class Articulo(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.nombre
+        return f'{self.codigo} | {self.marca + "|" if self.marca else ""} {self.nombre}/n' \
+               f'{self.codigo_interno} | Min ${self.precio_minorista} | May ${self.precio_mayorista} '
     
     def sugerir_codigo_interno(self):
         

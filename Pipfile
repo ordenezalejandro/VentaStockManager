@@ -12,6 +12,11 @@ dj-database-url = "*"
 psycopg2 = "*"
 whitenoise = "*"
 decouple = "*"
+model-mommy = "*"
+model-bakery = "*"
+factory-boy = "*"
+faker = "*"
+django-debug-toolbar = "*"
 
 [dev-packages]
 
