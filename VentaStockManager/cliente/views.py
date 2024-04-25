@@ -2,6 +2,9 @@ from django.shortcuts import render
 from cliente.models import Cliente
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.views.generic import ListView
+from articulo.models import Articulo
+
 
 
 #Cliente/cliente/ Create your views here.
@@ -54,3 +57,12 @@ def procesar_nuevo_cliente(request):
 
     else:
         return render(request, 'formulario_cliente.html')
+    
+
+# # En tus vistas
+# if request.user.has_perm('cliente.puede_acceder_lista_articulos'):
+#     # Realiza alguna acción si el usuario tiene el permiso
+
+class ListaArticulosView(ListView):
+    model = Articulo
+    template_name = 'lista_articulos.html'

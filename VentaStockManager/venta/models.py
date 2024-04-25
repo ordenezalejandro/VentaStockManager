@@ -32,8 +32,10 @@ class ArticuloVenta(models.Model):
     venta = models.ForeignKey(Venta, related_name='ventas', on_delete=models.CASCADE)
     articulo =  models.ForeignKey(Articulo, related_name='articulos_ventdidos', on_delete=models.CASCADE)
     cantidad = models.PositiveBigIntegerField()
-    precio_minorista = models.DecimalField(max_digits=10, decimal_places=2)
+    vendido_por_mayor = models.BooleanField(default=False)
 
+    #precio_minorista = models.DecimalField(max_digits=10, decimal_places=2)
+    
     def save(self, *args, **kwargs):
         # Update stock of the related ArticuloCompra
         self.articulo.stock -= self.cantidad  # Assuming a stock field in ArticuloCompra

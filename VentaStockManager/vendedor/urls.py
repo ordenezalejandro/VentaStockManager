@@ -1,8 +1,5 @@
 from django.urls import path
-from .views import (
-    filtrar_por_mostrar_todos_los_vendedores,
-    procesar_nuevo_vendedor
-    )
+from .views import mostrar_todos_los_vendedores, procesar_nuevo_vendedor
 
 
 urlpatterns = [

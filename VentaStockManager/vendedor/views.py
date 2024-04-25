@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from vendedor.models import Vendedor
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
@@ -7,7 +10,7 @@ def mostrar_todos_los_vendedores(request):
     return render(request, 'vendedores.html', {'vendedores': vendedores})
 
 
-def procesar_nuevo_vendedor = User(email=email, password=contrasena, username=email)(request):
+def procesar_nuevo_vendedor(request):
     # process
     if request.method == 'POST':
         # saco los datos del formulario
@@ -21,12 +24,13 @@ def procesar_nuevo_vendedor = User(email=email, password=contrasena, username=em
         email = request.POST.get('email')
         # creo el vendedor     perfil = User(email=email, password=contrasena, username=email)
         new_vendedor = Vendedor(
-        nombre=nombre,
-        apellido=apellido,
-        cuil=cuil,
-        telefono=telefono,
-        sexo=genero,
-        edad=edad
+            email=email,
+            nombre=nombre,
+            apellido=apellido,
+            cuil=cuil,
+            telefono=telefono,
+            sexo=genero,
+            edad=edad
         )
         try:
             new_vendedor.save()

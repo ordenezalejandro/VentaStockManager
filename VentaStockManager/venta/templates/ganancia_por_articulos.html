@@ -1,0 +1,22 @@
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+<div class="module">
+    <table class="listing">
+        <thead>
+            <tr>
+                <th scope="col">Artículo</th>
+                <th scope="col">Ganancia</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for articulo, ganancia in ganancia_por_articulo.items %}
+                <tr>
+                    <td>{{ articulo }}</td>
+                    <td>{{ ganancia }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
