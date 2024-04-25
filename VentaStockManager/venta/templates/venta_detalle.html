@@ -1,0 +1,74 @@
+<!-- codigo_pendiente -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Artículos</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>{{ titulo_de_pagina }} a </h1>
+
+<table>
+    <th>Vendedor</th>
+    <th>Cliente</th>
+    <th>Fecha </th>
+    <th>Numero de compra</th>
+    <thead>
+<tbody>
+    <tr>
+        <td> {{venta.vendedor.full_name}}</td>
+        <td> {{venta.cliente.full_name}}</td>
+        <td> {{venta.fecha_compra}}</td>
+        <td> {{venta.id }} </td>
+    </tr>
+</tbody>
+
+<ul>
+    
+<table>
+    <thead>
+        <tr>
+            <th>Código </th>
+            <th>Código Interno</th>
+            <th>Nombre del Artículo</th>
+            <th>Descripción</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+           
+    </thead>
+    <tbody>
+    {% for articulo_venta in venta.ventas.all %}
+    <tr>
+        <td contenteditable="true">{{ articulo_venta.articulo.codigo }}</td>
+        <td contenteditable="true">{{ articulo_venta.articulo.codigo_interno }}</td>
+        <td contenteditable="true">{{ articulo_venta.cantidad.articulo.nombre }}</td>
+        <td contenteditable="true">{{ articulo_venta.artticulo.descricion }}</td>
+        <td contenteditable="true">{{ articulo_venta.artticulo.cantidad }}</td>
+        <td contenteditable="true">{{ articulo_venta.artticulo.precio_venta }}</td>
+            </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
+

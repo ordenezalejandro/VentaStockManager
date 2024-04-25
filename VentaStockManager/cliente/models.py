@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.contrib.auth.models import Group, Permission
+from django.dispatch import receiver
 
 
 
@@ -50,3 +52,38 @@ class Cliente(models.Model):
         Get the absolute URL for the client detail view.
         """
         return reverse("cliente_detail", kwargs={"pk": self.pk})
+    
+        
+#Permission.objects.create(
+#   codename='puede_acceder_lista_articulos',  
+#   name='Puede acceder a la lista de artículos'   
+
+
+
+
+
+# # Obtén el grupo de usuarios o créalo si no existe
+# clientes_group, created = Group.objects.get_or_create(name='Clientes')
+
+# # Obtén el permiso o créalo si no existe
+# permission, created = Permission.objects.get_or_create(
+#     codename='puede_acceder_lista_articulos',  
+#     name='Puede acceder a la lista de artículos'
+# )
+
+# # Agrega el permiso al grupo de usuarios
+# clientes_group.permissions.add(permission)
+
+
+
+# # Obtén el grupo de usuarios o créalo si no existe
+# clientes_group, created = Group.objects.get_or_create(name='Clientes')
+
+# # Obtén el permiso o créalo si no existe
+# permission, created = Permission.objects.get_or_create(
+#     codename='puede_acceder_lista_articulos',  
+#     name='Puede acceder a la lista de artículos'
+# )
+
+# # Agrega el permiso al grupo de usuarios
+# clientes_group.permissions.add(permission)

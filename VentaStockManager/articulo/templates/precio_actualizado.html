@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Artículos</title>
+</head>
+<body>
+    <h1>Lista de Artículos</h1>
+    <ul>
+        
+        {% for articulo in articulos %}
+            <li><label>{{articulo.nombre }} {{articulo.descripcion }}  precio actualizado a minorista: {{articulo.precio_minorista}}  mayorista: {{articulo.precio_mayorista}}</label></li><br>
+        {% endfor %}
+        
+        
+    
+    </ul>
+</body>
+</html>
