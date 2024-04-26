@@ -13,7 +13,7 @@ class ArticuloVentaInline(admin.TabularInline):
     verbose_name = "Item de venta"
     verbose_name_plural = "Items de ventas"
     
-    # search_fields = ('codigo', 'codigo_interno', "nombre")
+    search_fields = ('codigo', 'codigo_interno', "nombre")
     raw_id_fields = ["articulo"]
     # autocomplete_fields = ["articulo"]
     
@@ -45,8 +45,6 @@ class ArticuloVentaInline(admin.TabularInline):
     #         return "-- select-articulo-first"
     #     return str(obj.articulo.precio_minorista)
     #readonly_fields = ('precio_minorista', 'precio_mayorista')(self, request, queryset)
-
-
     class Media:
         js = ('js/articulo_venta_admin.js',)
 
@@ -70,7 +68,7 @@ class VentaAdmin(admin.ModelAdmin):
             "classes": ('fw-bold', 'align-right', 'required'),
         }),
     )
-    # search_fields = ('cliente__nombre', )
+    search_fields = ('cliente__nombre', )
     data_hierarchy = "fecha_compra"
 admin.site.register(Venta, VentaAdmin)
 
