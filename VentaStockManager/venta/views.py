@@ -3,6 +3,24 @@ from venta.models import Venta, ArticuloVenta
 from articulo.models import Articulo
 from vendedor.models import Vendedor
 from django.contrib.auth.decorators import login_required
+from dal import autocomplete
+from django.db import models
+
+
+
+class ArticuloAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:  
+            return Articulo.objects.none()
+        if self.q:
+            articulos = Articulo.objects.filter(
+                models.Q(nombre__icontains=self.q) |
+                models.Q(codigo__icontains=self.q) |
+                models.Q(codigo_interno__icontains=self.q)
+            )
+        else:
+            articulos = Articulo.objects.all()
+        return articulos
 
 # Create your views here.
 def venta_detalle(request, venta_id):
@@ -11,7 +29,6 @@ def venta_detalle(request, venta_id):
     """
     # buscamos la venta por el id
     venta = Venta.objects.get(id=venta_id)
-    import ipdb;ipdb.set_trace()
     context = {'venta': venta, 'titulo_de_pagina' : 'detalle de venta'}
 
     # rendarizamo el temaplate

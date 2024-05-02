@@ -26,6 +26,8 @@ class Venta(models.Model):
     
     @property
     def precio_total(self):
+        if not self.ventas.exists():
+            return 0
         return sum([articulo.precio for articulo in self.articulos_ventdidos.all()])
 
 class ArticuloVenta(models.Model):
@@ -34,8 +36,8 @@ class ArticuloVenta(models.Model):
     cantidad = models.PositiveBigIntegerField(default=1)
     precio_minorista = models.DecimalField(max_digits=10, decimal_places=2)
     precio = models.CharField(max_length=255)
-    def save(self, *args, **kwargs):
-        # Update stock of the related ArticuloCompra
+    def save(self, *args, **kwargs):\
+        # Update stock of the related ArticuloCompraπ
         self.articulo.stock -= self.cantidad  # Assuming a stock field in ArticuloCompra
         self.articulo.save()
         super().save(*args, **kwargs)

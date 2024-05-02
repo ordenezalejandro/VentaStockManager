@@ -2,11 +2,7 @@ from django.shortcuts import render, HttpResponse
 from .models import Articulo
 from django.contrib import messages
 import decimal
-# Create your views here.
-#para esto se puede directamente crear un formulario. con un input numerico y un select para buscar
-#los productos. y agregar un checklist para que cada uno de los que este checkeado actualize el precio.
 
-# crear una vista para mostrar los articulos, "mostar_articulos"
 
 def mostrar_articulos(request):
     # Recupera todos los artículos del modelo Articulo
