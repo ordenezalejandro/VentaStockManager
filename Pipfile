@@ -17,6 +17,9 @@ model-bakery = "*"
 factory-boy = "*"
 faker = "*"
 django-debug-toolbar = "*"
+django-extensions = "*"
+pydotplus = "*"
+django-admin-autocomplete-all = "*"
 
 [dev-packages]
 
