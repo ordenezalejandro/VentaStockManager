@@ -1,7 +1,8 @@
-from django.shortcuts import render
-from venta.models import Venta, ArticuloVenta
+from django.shortcuts import render, redirect
+from venta.models import Venta, ArticuloVenta, Pedido
 from articulo.models import Articulo
 from vendedor.models import Vendedor
+from .forms import PedidoEstadoForm
 from django.contrib.auth.decorators import login_required
 from dal import autocomplete
 from django.db import models
@@ -72,3 +73,38 @@ def calcular_ganancia_articulos(request):
     # Pasar el diccionario de ganancias a la plantilla
     context = {'ganancia_por_articulo': ganancia_por_articulo}
     return render(request, 'ganancia_por_articulos.html', context)
+
+
+
+def comprovante_de_venta(request, venta_id):
+    venta = Venta.objects.get(id=venta_id)
+    cliente = venta.cliente  # Ajusta este campo según la estructura real de tu modelo Venta
+    vendedor = venta.vendedor.fullname()# Ajusta este campo según la estructura real de tu modelo Venta
+    articulos_venta = ArticuloVenta.objects.filter(venta=venta)  # Filtrar los artículos vendidos asociados a esta venta
+
+    return render(request, 'comprovante_de_venta.html', {'venta': venta, 'cliente': cliente, 'vendedor': vendedor, 'articulos_venta': articulos_venta})
+
+
+def ver_pedido(request, pedido_id):
+    pedido = Pedido.objects.get(id=pedido_id)
+    cliente = pedido.venta.cliente  # Ajusta este campo según la estructura real de tu modelo Venta
+    vendedor = pedido.venta.vendedor.fullname()# Ajusta este campo según la estructura real de tu modelo Venta
+    articulos_venta =  pedido.venta.articulos_vendidos.all()  # Filtrar los artículos vendidos asociados a esta venta
+    if request.method == 'POST':
+        form = PedidoEstadoForm(request.POST)
+        if form.is_valid():
+            pedido.pagado =  form.cleaned_data['pagado']
+            pedido.estado = form.cleaned_data['estado']
+            pedido.save()
+              
+            return redirect('admin:venta_pedido_changelist')
+    
+    return render(request, 'ver_pedido.html', {
+        'venta': pedido.venta,
+        'cliente': cliente, 
+        'vendedor': vendedor, 
+        'articulos_venta': articulos_venta,
+        'pedido': pedido,
+        'form': PedidoEstadoForm(initial={"estado": pedido.estado, 'pagado':pedido.pagado})})
+
+      

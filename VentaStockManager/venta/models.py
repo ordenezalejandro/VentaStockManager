@@ -1,3 +1,4 @@
+from typing import Iterable
 from django.db import models
 
 # Create your models here.
@@ -24,11 +25,17 @@ class Venta(models.Model):
     def __str__(self):
         return f"Venta del {self.fecha_compra} al cliente {self.cliente}"
     
+    def save(self,*args, **kwargs) -> None:
+        super().save(*args, **kwargs)
+        new_pedido = Pedido(venta=self, id=self.id)
+        new_pedido.save()
+    
     @property
     def precio_total(self):
         if not self.ventas.exists():
             return 0
         return sum([articulo.precio for articulo in self.articulos_ventdidos.all()])
+
 
 class ArticuloVenta(models.Model):
     venta = models.ForeignKey(Venta, related_name='ventas', on_delete=models.CASCADE)
@@ -58,3 +65,19 @@ class ArticuloVenta(models.Model):
 
     def __str__(self):
         return f"{self.cantidad} unidades de {self.articulo} en la venta {self.venta}"
+    
+class Pedido(models.Model):
+    PENDIENTE = 'Pendiente'
+    ENTREGADO = 'Entregado'
+    LISTO_PARA_RETIRAR = 'Listo para retirar'
+
+    ESTADO_CHOICES = [
+        (PENDIENTE, 'Pendiente'),
+        (ENTREGADO, 'Entregado'),
+        (LISTO_PARA_RETIRAR, 'Listo para retirar'),
+    ]
+
+    venta = models.OneToOneField(Venta, on_delete=models.CASCADE, related_name='pedido')
+    pagado = models.BooleanField(default=False)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default=PENDIENTE)
+ 

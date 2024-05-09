@@ -10,6 +10,9 @@ class ArticuloAdmin(admin.ModelAdmin):
     search_fields = ("nombre", 'codigo', 'codigo_interno')
     # fields = ("__all__",)
     ordering = ("vencimiento",)
+    icon_name = "local_play"
+    model = Articulo
+    
     
     def agregar_10_por_ciento_al_precio(modeladmin, request, queryset):
         for obj in queryset:

@@ -1,0 +1,16 @@
+@startuml
+class Venta {
+    __str__()
+    precio_total()
+        __init__()
+}
+class ArticuloVenta {
+    precio_venta()
+    save()
+    __str__()
+        __init__()
+}
+class Pedido {
+        __init__()
+}
+@enduml

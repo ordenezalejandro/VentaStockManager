@@ -25,6 +25,9 @@ class Cliente(models.Model):
     sexo = models.CharField(max_length=1, choices=GENERO_CHOICES)
 
 
+    def Nombre_completo(self):
+        return f"{self.nombre} {self.apellido}"
+
     def clean(self):
         """
         Clean method to validate the client's age.
