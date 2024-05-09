@@ -72,7 +72,7 @@ class VentaAdmin(admin.ModelAdmin):
     )
     search_fields = ('cliente__nombre', )
     data_hierarchy = "fecha_compra"
-    
+            
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         if 'precio_total' in form.base_fields:

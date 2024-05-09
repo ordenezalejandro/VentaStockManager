@@ -14,11 +14,11 @@ class Articulo(models.Model):
     precio_compra = models.DecimalField(max_digits=10, decimal_places=2)
     precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField()
-    precio_minorista = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_mayorista = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_minorista = models.DecimalField(max_digits=10, decimal_places=2,  null=True)
+    precio_mayorista = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     vencimiento = models.DateField(blank=True)
     marca = models.CharField(max_length=255, blank=True, null=True, default='Sin marca')
-    cantidad_por_mayor = models.PositiveIntegerField(default=2)
+    cantidad_por_mayor = models.PositiveIntegerField(default=100, null=True)
         # categoria = models.CharField(max_length=255, blank=True, null=True)
 
     def save(self, *args, **kwargs):

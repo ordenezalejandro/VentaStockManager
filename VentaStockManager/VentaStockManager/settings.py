@@ -30,7 +30,7 @@ SECRET_KEY = "django-insecure-n(&88i1@5enum3s3g@-3k9!hgl=l6330&pm$uto4sd1ju1@4*9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', "2ee0-201-252-61-204.ngrok-free.app"]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', "2ee0-201-252-61-204.ngrok-free.app", "jairoDO.pythonanywhere.com)"]
 CSRF_TRUSTED_ORIGINS  = ["https://2ee0-201-252-61-204.ngrok-free.app"]
 
 # Application definition
