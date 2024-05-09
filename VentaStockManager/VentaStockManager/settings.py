@@ -36,7 +36,6 @@ CSRF_TRUSTED_ORIGINS  = ["https://2ee0-201-252-61-204.ngrok-free.app"]
 # Application definition
 
 INSTALLED_APPS = [
-    'autocomplete_all',
     'material',
     'material.admin',
     # "django.contrib.admin",
@@ -79,7 +78,8 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [os.path.join(BASE_DIR, 'compra', 'templates'),
-                 os.path.join(BASE_DIR, 'venta', 'templates')],
+                 os.path.join(BASE_DIR, 'venta', 'templates'),
+                 os.path.join(BASE_DIR, 'cliente', 'templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

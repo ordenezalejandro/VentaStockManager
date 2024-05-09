@@ -51,8 +51,22 @@ class ArticuloVentaInline(admin.TabularInline):
         js = ('js/articulo_venta_admins.js',)
 
 class VentaAdmin(admin.ModelAdmin):
-    list_display = ['fecha_compra', 'fecha_entrega', 'cliente', 'vendedor']
+    list_display = ['fecha_compra', 'fecha_entrega', 'cliente', 'vendedor', 'cantidad_articulos_vendidos', 'total_venta_por_articulo', 'vendedor']
     list_filter = ['fecha_compra', 'fecha_entrega']
+    icon_name = "monetization_on"
+
+    def cantidad_articulos_vendidos(self, obj):
+        return obj.articulos_vendidos.count()
+
+    cantidad_articulos_vendidos.short_description = 'Cantidad de artículos vendidos'
+
+    def total_venta_por_articulo(self, obj):
+        total = 0
+        for articulo_venta in obj.articulos_vendidos.all():
+            total += articulo_venta.cantidad * articulo_venta.precio_venta()
+        return total
+
+    total_venta_por_articulo.short_description = 'Total Venta por Artículo'
     inlines = [ArticuloVentaInline]
 
     def precio_total(self, venta):
@@ -80,4 +94,11 @@ class VentaAdmin(admin.ModelAdmin):
         return form
 
 admin.site.register(Venta, VentaAdmin)
+admin.site.register(ArticuloVenta, ArticuloVentaAdmin)
 
+class PedidoAdmin(admin.ModelAdmin):
+    list_display = ['id', 'venta', 'pagado', 'estado']  
+    list_filter = ['estado']  
+    icon_name = "library_books"
+
+admin.site.register(Pedido, PedidoAdmin)
