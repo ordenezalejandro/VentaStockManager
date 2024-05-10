@@ -1,5 +1,5 @@
 # from django.contrib import admin
-from venta.models import Venta, ArticuloVenta
+from venta.models import Venta, ArticuloVenta, Pedido
 from articulo.models import Articulo
 from django import forms
 # import autocomplete_all
@@ -51,10 +51,10 @@ class ArticuloVentaInline(admin.TabularInline):
         js = ('js/articulo_venta_admins.js',)
 
 class VentaAdmin(admin.ModelAdmin):
-    list_display = ['fecha_compra', 'fecha_entrega', 'cliente', 'vendedor', 'cantidad_articulos_vendidos', 'total_venta_por_articulo', 'vendedor']
+    list_display = ['fecha_compra', 'fecha_entrega', 'cliente', 'vendedor', 'total_venta_por_articulo', 'vendedor']
     list_filter = ['fecha_compra', 'fecha_entrega']
     icon_name = "monetization_on"
-
+    inlines = [ArticuloVentaInline]
     def cantidad_articulos_vendidos(self, obj):
         return obj.articulos_vendidos.count()
 
@@ -67,7 +67,7 @@ class VentaAdmin(admin.ModelAdmin):
         return total
 
     total_venta_por_articulo.short_description = 'Total Venta por Artículo'
-    inlines = [ArticuloVentaInline]
+  
 
     def precio_total(self, venta):
         if not venta.id:
@@ -94,7 +94,6 @@ class VentaAdmin(admin.ModelAdmin):
         return form
 
 admin.site.register(Venta, VentaAdmin)
-admin.site.register(ArticuloVenta, ArticuloVentaAdmin)
 
 class PedidoAdmin(admin.ModelAdmin):
     list_display = ['id', 'venta', 'pagado', 'estado']  
