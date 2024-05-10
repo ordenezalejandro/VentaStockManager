@@ -7,4 +7,4 @@ class VendedorAdmin(admin.ModelAdmin):
     model = Vendedor
     search_fields = ('nombre', 'apellido')
 
-admin.site.register(Vendedor, VendedorAdmin, VendedorAdmin)
+admin.site.register(Vendedor, VendedorAdmin)
