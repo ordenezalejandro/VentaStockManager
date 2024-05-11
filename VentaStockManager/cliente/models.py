@@ -25,7 +25,7 @@ class Cliente(models.Model):
     sexo = models.CharField(max_length=1, choices=GENERO_CHOICES)
 
 
-    def Nombre_completo(self):
+    def nombre_completo(self):
         return f"{self.nombre} {self.apellido}"
 
     def clean(self):
