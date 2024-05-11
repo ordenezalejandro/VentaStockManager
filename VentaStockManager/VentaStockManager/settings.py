@@ -105,6 +105,15 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'tu_nombre_de_usuario$nombre_de_tu_base_de_datos',
+#         'USER': 'tu_nombre_de_usuario',
+#         'PASSWORD': 'tu_contraseña',
+#         'HOST': 'tu_nombre_de_usuario.mysql.pythonanywhere-services.com',
+#     }
+# }
 
 
 

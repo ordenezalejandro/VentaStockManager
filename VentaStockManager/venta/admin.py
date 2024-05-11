@@ -14,7 +14,7 @@ class ArticuloVentaInline(admin.TabularInline):
     extra = 4
     verbose_name = "Item de venta"
     verbose_name_plural = "Items de ventas"
-    
+    empty_value_display = 'Busca un articulo'
     # search_fields = ('codigo', 'codigo_interno', "nombre")
     raw_id_fields = ["articulo"]
     # autocomplete_fields = ["articulo"]
@@ -33,7 +33,7 @@ class ArticuloVentaInline(admin.TabularInline):
         return obj.total
     readonly_fields = ("precio_total", )
     fields = ("articulo", "cantidad" , "precio", "precio_total")
-
+    
     precio_total.short_description = "Total"
     
     # def formfield_overrides(self, request, form):
@@ -54,7 +54,7 @@ class VentaAdmin(admin.ModelAdmin):
     list_display = ['fecha_compra', 'fecha_entrega', 'cliente', 'vendedor']
     list_filter = ['fecha_compra', 'fecha_entrega']
     inlines = [ArticuloVentaInline]
-
+    
     def precio_total(self, venta):
         if not venta.id:
             return f'\n{" "*8}$0.00'
