@@ -1,5 +1,5 @@
 # from django.contrib import admin
-from venta.models import Venta, ArticuloVenta
+from venta.models import Venta, ArticuloVenta, Pedido
 from articulo.models import Articulo
 from django import forms
 # import autocomplete_all
@@ -51,10 +51,24 @@ class ArticuloVentaInline(admin.TabularInline):
         js = ('js/articulo_venta_admins.js',)
 
 class VentaAdmin(admin.ModelAdmin):
-    list_display = ['fecha_compra', 'fecha_entrega', 'cliente', 'vendedor']
+    list_display = ['fecha_compra', 'fecha_entrega', 'cliente', 'vendedor', 'total_venta_por_articulo', 'vendedor']
     list_filter = ['fecha_compra', 'fecha_entrega']
+    icon_name = "monetization_on"
     inlines = [ArticuloVentaInline]
-    
+    def cantidad_articulos_vendidos(self, obj):
+        return obj.articulos_vendidos.count()
+
+    cantidad_articulos_vendidos.short_description = 'Cantidad de artículos vendidos'
+
+    def total_venta_por_articulo(self, obj):
+        total = 0
+        for articulo_venta in obj.ventas.all():
+            total += articulo_venta.cantidad * float(articulo_venta.precio)
+        return total
+
+    total_venta_por_articulo.short_description = 'Total Venta por Artículo'
+  
+
     def precio_total(self, venta):
         if not venta.id:
             return f'\n{" "*8}$0.00'
@@ -81,3 +95,9 @@ class VentaAdmin(admin.ModelAdmin):
 
 admin.site.register(Venta, VentaAdmin)
 
+class PedidoAdmin(admin.ModelAdmin):
+    list_display = ['id', 'venta', 'pagado', 'estado']  
+    list_filter = ['estado']  
+    icon_name = "library_books"
+
+admin.site.register(Pedido, PedidoAdmin)
