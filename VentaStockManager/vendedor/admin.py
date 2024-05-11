@@ -1,11 +1,12 @@
-# from django.contrib import admin
-import autocomplete_all as admin
+from django.contrib import admin
 # Register your models here.
 from vendedor.models import Vendedor
 from django.urls import reverse
 from django.utils.html import format_html
 
 class VendedorAdmin(admin.ModelAdmin):
+    icon_name = "phone_android"
+    model = Vendedor
     search_fields = ('nombre', 'apellido')
     def ventas_por_vendedor(self, obj):
         """

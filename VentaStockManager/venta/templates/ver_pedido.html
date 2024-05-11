@@ -1,0 +1,20 @@
+{% extends './comprovante_de_venta.html'%}
+{% block title%} Pedido Detalle {% endblock%}
+{% block extra_trs%}
+<tr>
+    <td>
+        Estado 
+    <td>
+    <td>
+        <p class='text-red'> {{pedido.estado}} </p>
+        <form method="post">
+            {% csrf_token %} {% comment %}  esto va en todos los formularos por motivos de seguridad  genera un token que compora para validar que sea del mismo usario y del mismo tiemp {% endcomment %}
+            <label for="pagado">Pagado:</label>
+            {{ form.as_p }}
+            <button type="submit">Guardar</button>
+        </form>
+    </td>
+</tr>
+
+{% endblock%}
+

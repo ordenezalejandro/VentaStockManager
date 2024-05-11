@@ -6,10 +6,18 @@ from articulo.models import Articulo
 import decimal
 class ArticuloAdmin(admin.ModelAdmin):
 
-    list_display = ('marca','codigo_interno','codigo', 'nombre', 'stock', 'vence_dentro_de_60_dias')
+    list_display = ('marca','codigo_interno','codigo', 'nombre', 'stock', 'vence_dentro_de_60_dias', 'total_venta_por_articulo')
     search_fields = ("nombre", 'codigo', 'codigo_interno')
     # fields = ("__all__",)
     ordering = ("vencimiento",)
+    icon_name = "local_play"
+    model = Articulo
+    
+    def total_venta_por_articulo(self, obj):
+        total = 0
+        for articulo_venta in obj.articulos_vendidos.all():
+            total += articulo_venta.cantidad * articulo_venta.precio_venta()
+        return total
     
     def agregar_10_por_ciento_al_precio(modeladmin, request, queryset):
         for obj in queryset:

@@ -2,6 +2,8 @@ from dal import autocomplete
 
 from django import forms
 from venta.models import ArticuloVenta
+from .models import Pedido
+
 
 class ArticuloVentaForm(forms.ModelForm):
     class Meta:
@@ -11,6 +13,16 @@ class ArticuloVentaForm(forms.ModelForm):
             'articulo': autocomplete.ModelSelect2(url='articulo-autocomplete',
                         attrs={'data-placeholder': 'Buscar Articulo', 'empty_label': 'No_seleccionado'})
         }
-    def __init__(self, *args, **kwargs):
-            super(ArticuloVentaForm, self).__init__(*args, **kwargs)
-            self.fields['articulo'].widget.attrs['initial'] = 'No_seleccionado'
+
+class PedidoEstadoForm(forms.ModelForm):
+    class Meta:
+        model = Pedido
+        fields = ['pagado', 'estado']
+        labels = {
+            'pagado': 'Pagado',
+            'estado': 'Estado',
+        }
+        widgets = {
+            'pagado': forms.CheckboxInput(),
+            'estado': forms.Select(choices=Pedido.ESTADO_CHOICES),
+        }

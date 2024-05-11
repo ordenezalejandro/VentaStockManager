@@ -1,0 +1,69 @@
+{% extends './base.html' %}
+
+{% block title %}
+Comprobante de Venta    
+{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="module">
+        <h2>Información de la Venta</h2>
+        <div class="row">
+            <div class="col-xxl-8">
+                <table class="table table-dark table-striped">
+                    <tbody>
+                        <tr>
+                            <th>ID de Venta:</th>
+                            <td>{{ venta.id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Cliente:</th>
+                            <td>{{ cliente }}</td>
+                        </tr>
+                        <tr>
+                            <th>Vendedor:</th>
+                            <td>{{ vendedor }}</td>
+                        </tr>
+                        <!-- Puedes agregar más filas según sea necesario -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <h2>Artículos</h2>
+    <div class="row">
+        <div class="col-xxl-8">
+            
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for articulo_venta in articulos_venta %}
+                    <tr>
+                        <td>{{ articulo_venta.articulo.nombre }}</td>
+                        <td>
+                            {% if articulo_venta.vendido_por_mayor %}
+                                {{ articulo_venta.articulo.precio_mayorista }}
+                            {% else %}
+                                {{ articulo_venta.articulo.precio_minorista }}
+                            {% endif %}
+                        </td>
+                        <td>{{ articulo_venta.cantidad }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% block extra_trs%} {% endblock %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

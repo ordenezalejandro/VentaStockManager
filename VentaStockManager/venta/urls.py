@@ -1,6 +1,6 @@
 from django.urls import re_path, path
 from venta.views import (
-    venta_detalle, ventas_por_vendedor, calcular_ganancia_articulos, ArticuloAutocomplete
+    venta_detalle, ventas_por_vendedor, calcular_ganancia_articulos, comprovante_de_venta, ver_pedido, ArticuloAutocomplete
 
 )
 
@@ -13,9 +13,13 @@ urlpatterns = [
             r'^ventas_por_vendedor/(?P<id_vendedor>\d+)/$',
              ventas_por_vendedor, 
              name='ventas_por_vendedor'),    
-    path('ganancia_por_articulos/', calcular_ganancia_articulos, name='ganancia_por_articulos'), 
+    path('ganancia_por_articulos/', calcular_ganancia_articulos, name='ganancia_por_articulos'),    
     path(r'articulo-autocomplete/$', ArticuloAutocomplete.as_view(), name='articulo-autocomplete'),
-]
+    path('venta/<int:venta_id>/', comprovante_de_venta, name='comprovante_de_venta'),
+    path('venta/pedido/<int:pedido_id>/', ver_pedido, name='ver_pedido'),
+
+
+            ]
 # url(r'^/(?P<venta_id>\d+)/detalle/$', views.venta_detalle, name='category-detail'),
 
   
