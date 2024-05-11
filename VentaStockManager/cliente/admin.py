@@ -17,7 +17,7 @@ class ClienteAdmin(admin.ModelAdmin):
    model = Cliente
 
 
-   list_display = ('Nombre_completo', 'telefono')
+   list_display = ('nombre_completo', 'telefono')
     
    
     # Esta función se llama cuando se guarda un nuevo objeto Cliente en el administrador
