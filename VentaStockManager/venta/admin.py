@@ -62,8 +62,8 @@ class VentaAdmin(admin.ModelAdmin):
 
     def total_venta_por_articulo(self, obj):
         total = 0
-        for articulo_venta in obj.articulos_vendidos.all():
-            total += articulo_venta.cantidad * articulo_venta.precio_venta()
+        for articulo_venta in obj.ventas.all():
+            total += articulo_venta.cantidad * float(articulo_venta.precio)
         return total
 
     total_venta_por_articulo.short_description = 'Total Venta por Artículo'
