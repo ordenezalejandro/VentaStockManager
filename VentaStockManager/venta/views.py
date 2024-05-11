@@ -21,7 +21,20 @@ class ArticuloAutocomplete(autocomplete.Select2QuerySetView):
         else:
             articulos = Articulo.objects.all()
         return articulos
-
+    
+    def get_result_label(self, item):
+        # Define cómo se mostrará cada opción en el menú desplegable
+        return f"{item.nombre} - {item.codigo}"
+    def create_option(self, term, valor, articulo):
+        # Crea una opción personalizada para el término especificado
+        return {
+            'id': valor,
+            'text': term,
+            'nombre': articulo.nombre,
+            'codigo': articulo.codigo,
+            'precio_mayorista': articulo.precio_mayorista,
+            'precio_minorista': articulo.precio_minorista,
+        }
 # Create your views here.
 def venta_detalle(request, venta_id):
     """ esta vista toma in venta_id, busca la base de datos  y rendariza el template de la venta
