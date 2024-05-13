@@ -19,7 +19,7 @@ class Vendedor(models.Model):
   # Campos adicionales del vendedor (opcional)
   # Ej: nombre_completo, telefono, etc.
     def fullname(self):
-            return self.nombre + (' ') + self.apellido
+            return self.nombre + ' ' + self.apellido
 
     def __str__(self):
         return self.usuario.username
