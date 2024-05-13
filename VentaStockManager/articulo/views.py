@@ -17,7 +17,6 @@ def mostrar_articulos(request):
             return render(request, 'mostrar_articulos.html', {'articulos': articulos_seleccionados   , 'errors': errors})
 
         for articulo in articulos_seleccionados:
-            import ipdb;ipdb.set_trace()
             articulo.precio_venta *= decimal.Decimal(1+(0.01*porcentage_desde_el_form)) # recoradr que si queremos aumentar un 50% es igual al valor del producto multiplicado por 1.5. si queremos aumentar en 20% es igual a multiplicar a 1.2
             articulo.save()
             messages.success(request, f"articulo seleccionado {articulo}")

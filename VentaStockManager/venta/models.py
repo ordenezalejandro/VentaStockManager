@@ -8,6 +8,7 @@ from articulo.models import Articulo
 # from vendedor.models import Vendedor
 from vendedor.models import Vendedor
 from django.utils.translation import gettext_lazy as _
+from django.utils.html import format_html
 
 
 
@@ -34,7 +35,14 @@ class Venta(models.Model):
     def precio_total(self):
         if not self.ventas.exists():
             return 0
-        return sum([articulo.precio for articulo in self.articulos_ventdidos.all()])
+        return sum([articulo.get_precio_total() for articulo in self.ventas.all()])
+
+    def generar_link(self):
+        return format_html("<a href='/venta/{}/'>Ver venta</a>", self.id)
+    
+    def crear_fila_html_desde_venta(self): 
+        return format_html("<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td></td></tr>",
+                           self.fecha_compra, self.cliente.nombre_completo(), self.pedido.estado, self.precio_total, self.generar_link())
 
 
 class ArticuloVenta(models.Model):
@@ -51,9 +59,9 @@ class ArticuloVenta(models.Model):
 
     def get_precio_total(self):
         if self.articulo:
-            return self.cantidad * self.articulo.price
+            return float(self.cantidad) * float(self.precio)
         else:
-            return 0
+            return 0.0
     @property
     def precio_minorista_2(self):
         return str(self.articulo.precio_minorista)
@@ -61,11 +69,12 @@ class ArticuloVenta(models.Model):
     @property
     def total(self):
 
-        return self.cantidad * self.articulo.price
+        return self.cantidad * self.articulo.precio
 
     def __str__(self):
         return f"{self.cantidad} unidades de {self.articulo} en la venta {self.venta}"
     
+
 class Pedido(models.Model):
     PENDIENTE = 'Pendiente'
     ENTREGADO = 'Entregado'

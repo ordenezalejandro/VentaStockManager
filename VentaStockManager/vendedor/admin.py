@@ -8,6 +8,7 @@ class VendedorAdmin(admin.ModelAdmin):
     icon_name = "phone_android"
     model = Vendedor
     search_fields = ('nombre', 'apellido')
+    
     def ventas_por_vendedor(self, obj):
         """
         Proporciona un enlace para ver las ventas por vendedor.
