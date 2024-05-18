@@ -9,6 +9,7 @@ from articulo.models import Articulo
 from vendedor.models import Vendedor
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
+from datetime import datetime, timedelta
 
 
 
@@ -43,6 +44,7 @@ class Venta(models.Model):
     def crear_fila_html_desde_venta(self): 
         return format_html("<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td></td></tr>",
                            self.fecha_compra, self.cliente.nombre_completo(), self.pedido.estado, self.precio_total, self.generar_link())
+
 
 
 class ArticuloVenta(models.Model):
@@ -89,4 +91,5 @@ class Pedido(models.Model):
     venta = models.OneToOneField(Venta, on_delete=models.CASCADE, related_name='pedido')
     pagado = models.BooleanField(default=False)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default=PENDIENTE)
+ 
  

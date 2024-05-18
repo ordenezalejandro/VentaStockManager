@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from dal import autocomplete
 from django.db import models
 
-
+from django.utils import timezone
+from datetime import timedelta
 
 class ArticuloAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -54,13 +55,65 @@ def ventas_por_vendedor(request, id_vendedor):
     
     # Recupera las ventas asociadas al vendedor
     ventas = Venta.objects.filter(vendedor=vendedor)
+    total_ventas = sum(venta.total for venta in ventas)
+
     
     # Puedes hacer más procesamiento aquí si es necesario
+    context = {
+        'vendedor': vendedor,
+        'ventas': ventas,
+        'total_ventas': total_ventas,
+        'titulo_de_pagina': 'Ventas'
+    }
+    return render(request, 'ventas_por_vendedor.html', context)
+
+
+
+
+@login_required
+def ventas_recientes_por_vendedor(request, id_vendedor):
+    # Recupera el vendedor por su ID
+    vendedor = Vendedor.objects.get(pk=id_vendedor)
     
-    # Renderiza el template con el contexto de las ventas por vendedor
-    return render(request, 'ventas_por_vendedor.html', {'vendedor': vendedor, 'ventas': ventas})
+    # Establece la fecha de hace 7 días
+    fecha_inicio = timezone.now() - timedelta(days=7)
+    
+    # Recupera las ventas asociadas al vendedor en los últimos 7 días
+    ventas_recientes = Venta.objects.filter(vendedor=vendedor, fecha_compra__gte=fecha_inicio)
+    
+    # Calcula el total de ventas
+    total_ventas = sum(venta.total for venta in ventas_recientes)
+    
+    # Renderiza el template con el contexto de las ventas recientes por vendedor
+    context = {
+        'vendedor': vendedor,
+        'ventas': ventas_recientes,
+        'total_ventas': total_ventas,
+        'titulo_de_pagina': 'Ventas Recientes por Vendedor'
+    }
+    return render(request, 'ventas_por_vendedor.html', context)
 
-
+def ventas_mensual_por_vendedor(request, id_vendedor):
+    # Recupera el vendedor por su ID
+    vendedor = Vendedor.objects.get(pk=id_vendedor)
+    
+    # Establece la fecha de hace 7 días
+    fecha_inicio = timezone.now() - timedelta(days=30)
+    
+    # Recupera las ventas asociadas al vendedor en los últimos 7 días
+    ventas_mensual = Venta.objects.filter(vendedor=vendedor, fecha_compra__gte=fecha_inicio)
+    
+    # Calcula el total de ventas
+    total_ventas = sum(venta.total for venta in ventas_mensual)
+    
+    # Renderiza el template con el contexto de las ventas recientes por vendedor
+    context = {
+        'vendedor': vendedor,
+        'ventas': ventas_mensual,
+        'total_ventas': total_ventas,
+        'titulo_de_pagina': 'Ventas Mensual por Vendedor'
+    }
+    return render(request, 'ventas_por_vendedor.html', context)
 @login_required
 def calcular_ganancia_articulos(request):
     # Obtener todos los artículos
