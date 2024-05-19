@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from dal import autocomplete
 from django.db import models
 
-
+def custom_404_view(request, exception):
+    return render(request, '404.html', status=404)
 
 class ArticuloAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
