@@ -8,7 +8,8 @@ from dal import autocomplete
 from django.db import models
 
 def custom_404_view(request, exception):
-    return render(request, '404.html', status=404)from django.utils import timezone
+    return render(request, '404.html', status=404)
+from django.utils import timezone
 from datetime import timedelta
 
 class ArticuloAutocomplete(autocomplete.Select2QuerySetView):
