@@ -1,0 +1,26 @@
+{% extends './base.html' %}
+{% block title %}
+{% endblock title%}
+
+{% block content %}
+
+
+    <h1>Ventas ultimos 7 dias</h1>
+    <h2>Vendedor ID: {{ vendedor.id }}</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha de compra</th>
+                <th>CLiente</th>
+                <th>Pedido</th>
+                <th>Total</th>
+                <th>Link al detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+                {{ venta.crear_fila_html_desde_venta }}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
