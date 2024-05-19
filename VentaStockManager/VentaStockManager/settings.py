@@ -83,7 +83,7 @@ DATABASES = {
         'USER': 'jairoDO',
         'PASSWORD': '05v4ld0!',
         'HOST': 'jairoDO.mysql.pythonanywhere-services.com',
-        'PORT': '443'
+        'PORT': '3306'
     }
 }
 # DATABASES = {
