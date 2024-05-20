@@ -6,14 +6,16 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Static files (CSS, JavaScript, Images)
-STATICFILES_STORAGE = ('whitenoise.storage.CompressedManifestStaticFilesStorage')
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# WHITENOISE_MANIFEST_STRICT = False
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'articulo', 'static'),
 ]
+STATICFILES_STORAGE ='whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = "DihCl2FfbgQqgUDEp0HS_aJPqcSUlP_lB_HytyBi29Ws791ZTNgaWqgK9LNp9SANpXM"
@@ -27,9 +29,10 @@ CSRF_TRUSTED_ORIGINS = ["https://2ee0-201-252-61-204.ngrok-free.app"]
 
 # Application definition
 INSTALLED_APPS = [
-    'django.contrib.auth',  
     'material',
     'material.admin',
+    'material.admin.default',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'whitenoise.runserver_nostatic',    
     'django.contrib.sessions',
@@ -79,23 +82,23 @@ TEMPLATES = [
     },
 ]
 
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'jairoDO$osvaldo_manager',
-        'USER': 'jairoDO',
-        'PASSWORD': '05v4ld0!',
-        'HOST': 'jairoDO.mysql.pythonanywhere-services.com',
-        'PORT': '3306'
-    }
-}
+# # Database
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'jairoDO$osvaldo_manager',
+#         'USER': 'jairoDO',
+#         'PASSWORD': '05v4ld0!',
+#         'HOST': 'jairoDO.mysql.pythonanywhere-services.com',
+#         'PORT': '3306'
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
