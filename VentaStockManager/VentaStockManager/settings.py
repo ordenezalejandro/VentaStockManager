@@ -23,16 +23,16 @@ SECRET_KEY = "DihCl2FfbgQqgUDEp0HS_aJPqcSUlP_lB_HytyBi29Ws791ZTNgaWqgK9LNp9SANpX
 # # Configuración para hacer que las cookies de sesión solo se envíen a través de conexiones seguras
 # SESSION_COOKIE_SECURE = True
 # DEBUG = bool(os.environ.get('DJANGO_DEBUG', False))
-DEBUG=False
+DEBUG=True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '2ee0-201-252-61-204.ngrok-free.app', 'jairoDO.pythonanywhere.com']
 CSRF_TRUSTED_ORIGINS = ["https://2ee0-201-252-61-204.ngrok-free.app"]
 
 # Application definition
 INSTALLED_APPS = [
     'material',
-    'material.admin',
-    'material.admin.default',
+    # 'material.admin',
     'django.contrib.auth',
+    'django.contrib.admin',
     'django.contrib.contenttypes',
     'whitenoise.runserver_nostatic',    
     'django.contrib.sessions',

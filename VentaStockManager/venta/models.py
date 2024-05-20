@@ -49,7 +49,7 @@ class Venta(models.Model):
 
 class ArticuloVenta(models.Model):
     venta = models.ForeignKey(Venta, related_name='ventas', on_delete=models.CASCADE)
-    articulo =  models.ForeignKey(Articulo, related_name='articulos_ventdidos', on_delete=models.CASCADE)
+    articulo =  models.ForeignKey(Articulo, related_name='articulos_vendidos', on_delete=models.CASCADE)
     cantidad = models.PositiveBigIntegerField(default=1)
     precio = models.CharField(max_length=255)
     

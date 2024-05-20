@@ -16,7 +16,7 @@ class ArticuloAdmin(admin.ModelAdmin):
     def total_venta_por_articulo(self, obj):
         total = 0
         for articulo_venta in obj.articulos_vendidos.all():
-            total += articulo_venta.cantidad * articulo_venta.precio_venta()
+            total += articulo_venta.cantidad * float(articulo_venta.precio)
         return total
     
     def agregar_10_por_ciento_al_precio(modeladmin, request, queryset):
