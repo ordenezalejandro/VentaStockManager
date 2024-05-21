@@ -27,7 +27,7 @@ DEBUG=False
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '2ee0-201-252-61-204.ngrok-free.app', 'jairoDO.pythonanywhere.com']
 CSRF_TRUSTED_ORIGINS = ["https://2ee0-201-252-61-204.ngrok-free.app"]
 
-# Application definition
+# Application definition    
 INSTALLED_APPS = [
     'material',
     'material.admin',
