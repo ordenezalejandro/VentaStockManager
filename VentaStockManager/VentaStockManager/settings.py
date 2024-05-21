@@ -29,10 +29,11 @@ CSRF_TRUSTED_ORIGINS = ["https://2ee0-201-252-61-204.ngrok-free.app"]
 
 # Application definition    
 INSTALLED_APPS = [
+    'material'
     'material.admin',
-    'material.admin.default',
+    # 'material.admin.default',
     'django.contrib.auth',
-    # 'django.contrib.admin'
+    'django.contrib.admin'
     'django.contrib.contenttypes',
     'whitenoise.runserver_nostatic',    
     'django.contrib.sessions',
