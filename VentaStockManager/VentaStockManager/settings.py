@@ -14,7 +14,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'articulo', 'static'),
 ]
-STATICFILES_STORAGE ='whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE =('whitenoise.storage.CompressedManifestStaticFilesStorage')
 
 # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # Quick-start development settings - unsuitable for production
@@ -32,10 +32,10 @@ INSTALLED_APPS = [
     'material',
     'material.admin',
     # 'material.admin.default',
+    'whitenoise.runserver_nostatic',    
     'django.contrib.auth',
     #'django.contrib.admin'
     'django.contrib.contenttypes',
-    'whitenoise.runserver_nostatic',    
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -162,4 +162,3 @@ if DEBUG:
 
     INSTALLED_APPS.append('debug_toolbar')
     MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
-    
