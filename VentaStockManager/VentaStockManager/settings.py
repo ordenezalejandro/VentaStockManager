@@ -147,9 +147,9 @@ MATERIAL_ADMIN_SITE = {
     'APP_ICONS': {  # Set icons for applications(lowercase), including 3rd party apps, {'application_name': 'material_icon_name', ...}
         'sites': 'send',
     },
-    # 'MODEL_ICONS': {  # Set icons for models(lowercase), including 3rd party models, {'model_name': 'material_icon_name', ...}
-    #     'site': 'contact_mail',
-    # }
+    'MODEL_ICONS': {  # Set icons for models(lowercase), including 3rd party models, {'model_name': 'material_icon_name', ...}
+        'site': 'contact_mail',
+    }
 }
 # settings.py
 
