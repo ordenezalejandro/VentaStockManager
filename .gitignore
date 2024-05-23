@@ -22,7 +22,7 @@ media
 
 # C extensions
 *.so
-
+VentaStockManager/static/
 # Distribution / packaging
 .Python
 build/
