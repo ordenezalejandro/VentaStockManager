@@ -186,14 +186,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 let articulo_venta = select_to_articulo_venta(item);
                 let total = document.querySelector(`tr#ventas-${indice} td.field-precio_total`);
-
-                if(price_node.textContent && cantidad > articulo_venta.umbral) {
-                    price_node.setAttribute("value", articulo_venta.precio_mayorista);
-                    total.innerHTML =  "<p style='color:blue'>" + String(parseFloat(cantidad)*parseFloat(price_node.textContent)) + "</p>";
-                }
-                if(price_node.textContent && cantidad > articulo_venta.umbral) {
-                    price_node.setAttribute("value", articulo_venta.precio_minorista);
-                    total.innerHTML = "<p style='color:blue'>" + String(parseFloat(cantidad)*parseFloat(articulo_venta.precio_minorista)) + "</p>";
+                if (price_node.textContent == ''){
+                    if(cantidad > articulo_venta.umbral) {
+                        price_node.setAttribute("value", articulo_venta.precio_mayorista);
+                        total.innerHTML =  "<p style='color:blue'>" + String(parseFloat(cantidad)*parseFloat(price_node.textContent)) + "</p>";
+                    } else {
+                        price_node.setAttribute("value", articulo_venta.precio_minorista);
+                        total.innerHTML = "<p style='color:blue'>" + String(parseFloat(cantidad)*parseFloat(articulo_venta.precio_minorista)) + "</p>";
+                    }
                 }
                 update_precio_total();
             
