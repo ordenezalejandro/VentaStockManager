@@ -14,7 +14,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'articulo', 'static'),
 ]
-STATICFILES_STORAGE =('whitenoise.storage.CompressedManifestStaticFilesStorage')
+# STATICFILES_STORAGE =('whitenoise.storage.CompressedManifestStaticFilesStorage')
 
 # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # Quick-start development settings - unsuitable for production
@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    #'django.contrib.staticfiles',
     'bootstrap5',
     'dal',
     'dal_select2',

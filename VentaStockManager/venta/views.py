@@ -28,7 +28,8 @@ class ArticuloAutocomplete(autocomplete.Select2QuerySetView):
     
     def get_result_label(self, item):
         # Define cómo se mostrará cada opción en el menú desplegable
-        return f"{item.nombre} - {item.codigo}"
+        return f"{item.articulo}"
+    
     def create_option(self, term, valor, articulo):
         # Crea una opción personalizada para el término especificado
         return {
