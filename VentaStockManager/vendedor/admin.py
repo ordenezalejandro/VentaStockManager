@@ -13,7 +13,7 @@ class VendedorAdmin(admin.ModelAdmin):
         """
         Proporciona un enlace para ver las ventas por vendedor.
         """
-        if obj.id is not None:
+        if obj and obj.id is not None:
             url = reverse('ventas_por_vendedor', args=[obj.id])
             return format_html('<a href="{}">Ver Ventas</a>', url)
         
