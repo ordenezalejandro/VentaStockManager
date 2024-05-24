@@ -187,11 +187,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 let articulo_venta = select_to_articulo_venta(item);
                 let total = document.querySelector(`tr#ventas-${indice} td.field-precio_total`);
 
-                if(!parseBoolean(price_node.textContent) && cantidad > articulo_venta.umbral) {
+                if(price_node.textContent && cantidad > articulo_venta.umbral) {
                     price_node.setAttribute("value", articulo_venta.precio_mayorista);
                     total.innerHTML =  "<p style='color:blue'>" + String(parseFloat(cantidad)*parseFloat(price_node.textContent)) + "</p>";
                 }
-                if(!parseBoolean(price_node.textContent) && cantidad > articulo_venta.umbral) {
+                if(price_node.textContent && cantidad > articulo_venta.umbral) {
                     price_node.setAttribute("value", articulo_venta.precio_minorista);
                     total.innerHTML = "<p style='color:blue'>" + String(parseFloat(cantidad)*parseFloat(articulo_venta.precio_minorista)) + "</p>";
                 }
