@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Vendedor(models.Model):
-    GENERO_CHOICES = [
+    GENERO_CHOICES = [ 
         ('M', 'Masculino'),
         ('F', 'Femenino'),
     ]
