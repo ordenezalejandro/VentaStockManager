@@ -3,7 +3,7 @@ import random
 import string
 from django.db import models
 import random
-from django.utils.html import format_html
+
 # Create your models here.
 class Articulo(models.Model):
     id = models.AutoField(primary_key=True)
@@ -33,8 +33,8 @@ class Articulo(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return format_html(f'<span style="color red">{self.codigo} | {self.marca + "|" if self.marca else ""} {self.nombre}/n' \
-               f'{self.codigo_interno} </span><br>| Min ${self.precio_minorista} | May ${self.precio_mayorista} ')
+        return f'{self.codigo} | {self.marca + "|" if self.marca else ""} {self.nombre}/n' \
+               f'{self.codigo_interno}| Min ${self.precio_minorista} | May ${self.precio_mayorista} '
     
     def sugerir_codigo_interno(self):
         
