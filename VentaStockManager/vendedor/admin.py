@@ -33,7 +33,7 @@ class VendedorAdmin(admin.ModelAdmin):
         """
         url = reverse('ventas_mensual_por_vendedor', args=[obj.id])
         return format_html('<a href="{}">Ver Ventas Mensuales</a>', url)
-
+    
     list_display = ['nombre', 'apellido', 'ventas_por_vendedor','ventas_recientes_por_vendedor', 'ventas_mensual_por_vendedor']
 
     ventas_por_vendedor.short_description = 'Ventas por Vendedor'

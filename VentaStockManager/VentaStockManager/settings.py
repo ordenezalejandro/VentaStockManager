@@ -70,7 +70,7 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'compra', 'templates'),
             os.path.join(BASE_DIR, 'venta', 'templates'),
             os.path.join(BASE_DIR, 'cliente', 'templates')
-        ],
+        ],  
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

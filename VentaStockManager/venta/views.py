@@ -6,6 +6,8 @@ from .forms import PedidoEstadoForm
 from django.contrib.auth.decorators import login_required
 from dal import autocomplete
 from django.db import models
+from django.shortcuts import render, get_object_or_404
+
 
 def custom_404_view(request, exception):
     return render(request, '404.html', status=404)
@@ -54,7 +56,7 @@ def venta_detalle(request, venta_id):
 
 def ventas_por_vendedor(request, id_vendedor):
     # Recupera el vendedor por su ID
-    vendedor = Vendedor.objects.get(pk=id_vendedor)
+    vendedor = get_object_or_404(Vendedor, pk=id_vendedor)
     
     # Recupera las ventas asociadas al vendedor
     ventas = Venta.objects.filter(vendedor=vendedor)
