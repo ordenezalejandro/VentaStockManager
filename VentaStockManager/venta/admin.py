@@ -2,12 +2,13 @@
 from venta.models import Venta, ArticuloVenta, Pedido
 from articulo.models import Articulo
 from django import forms
+from django.utils import timezone
 # import autocomplete_all
 
 # from django.db.models.query import SelectQuerySet
 from django.contrib import admin
 from venta.forms import ArticuloVentaForm
-
+from vendedor.models import Vendedor
 class ArticuloVentaInline(admin.TabularInline):
     model = ArticuloVenta
     form = ArticuloVentaForm
@@ -59,6 +60,13 @@ class VentaAdmin(admin.ModelAdmin):
         return obj.articulos_vendidos.count()
 
     cantidad_articulos_vendidos.short_description = 'Cantidad de artículos vendidos'
+    
+    def get_changeform_initial_data(self, request):
+        # Obtiene los datos iniciales para el formulario de creación
+        initial = super().get_changeform_initial_data(request)
+        initial['vendedor'] = Vendedor.objects.get_or_create(usuario=request.user)
+        initial['fecha_venta'] = timezone.now()
+        return initial
 
     def total_venta_por_articulo(self, obj):
         total = 0
