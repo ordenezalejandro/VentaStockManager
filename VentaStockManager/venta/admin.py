@@ -1,6 +1,8 @@
 # from django.contrib import admin
 from venta.models import Venta, ArticuloVenta, Pedido
 from articulo.models import Articulo
+from vendedor.models import Vendedor
+
 from django import forms
 from django.utils import timezone
 # import autocomplete_all
@@ -8,7 +10,6 @@ from django.utils import timezone
 # from django.db.models.query import SelectQuerySet
 from django.contrib import admin
 from venta.forms import ArticuloVentaForm
-from vendedor.models import Vendedor
 class ArticuloVentaInline(admin.TabularInline):
     model = ArticuloVenta
     form = ArticuloVentaForm
