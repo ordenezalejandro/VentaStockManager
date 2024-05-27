@@ -1,6 +1,36 @@
 from django.db import models
 from django.contrib.auth.models import User
+import re
 
+def validar_cuil(cuil):
+    """
+    Validar un CUIL Argentino.
+    El CUIL debe tener 11 dígitos.
+    """
+    # Regex para verificar el formato correcto
+    if not re.match(r'^\d{2}-\d{8}-\d$', cuil):
+        return False
+    
+    # Remover los guiones
+    cuil = cuil.replace('-', '')
+
+    # Coeficientes para validación
+    coef = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]
+    suma = 0
+
+    for i in range(10):
+        suma += int(cuil[i]) * coef[i]
+
+    digito_verificador = (11 - (suma % 11)) % 11
+    return digito_verificador == int(cuil[-1])
+
+# Ejemplo de uso:
+# print(validar_cuil("20-12345678-9"))
+
+def validate_cuil(value):
+    if not validar_cuil(value):
+        raise ValidationError(f'{value} no es un CUIL válido')
+    
 class Vendedor(models.Model):
     GENERO_CHOICES = [
         ('M', 'Masculino'),
@@ -8,13 +38,13 @@ class Vendedor(models.Model):
     ]
     id = models.AutoField(primary_key=True)
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    nombre = models.TextField()
-    apellido = models.TextField(blank=False)
+    nombre = models.TextField(blank=True, null=True)
+    apellido = models.TextField(blank=True, null=True)
     # perfil = models.OneToOneField(User, on_delete=models.CASCADE)
-    cuil = models.IntegerField(blank=False)
-    telefono = models.TextField(blank=False)
-    edad = models.IntegerField()
-    sexo = models.CharField(max_length=1, choices=GENERO_CHOICES)
+    cuil = models.CharField(max_length=13, validators=[validate_cuil])
+    telefono = models.TextField(blank=True, null=True)
+    edad = models.IntegerField(blank=True, null=True)
+    sexo = models.CharField(max_length=1, choices=GENERO_CHOICES, default=GENERO_CHOICES[0])
 
   # Campos adicionales del vendedor (opcional)
   # Ej: nombre_completo, telefono, etc.
@@ -26,3 +56,4 @@ class Vendedor(models.Model):
     class Meta:
         verbose_name = "Vendedor"
         verbose_name_plural = "Vendedores"# Create your models here.
+

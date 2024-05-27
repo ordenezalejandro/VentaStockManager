@@ -2,6 +2,8 @@
 from venta.models import Venta, ArticuloVenta, Pedido
 from articulo.models import Articulo
 from vendedor.models import Vendedor
+from django.utils.html import format_html
+from django.urls import reverse
 
 from django import forms
 from django.utils import timezone
@@ -65,8 +67,10 @@ class VentaAdmin(admin.ModelAdmin):
     def get_changeform_initial_data(self, request):
         # Obtiene los datos iniciales para el formulario de creación
         initial = super().get_changeform_initial_data(request)
-        initial['vendedor'] = Vendedor.objects.get_or_create(usuario=request.user)
-        initial['fecha_venta'] = timezone.now()
+        vendedor, created = Vendedor.objects.get_or_create(usuario=request.user)
+        
+        initial['vendedor'] = vendedor
+        initial['fecha_compra'] = timezone.now()
         return initial
 
     def total_venta_por_articulo(self, obj):
@@ -105,8 +109,46 @@ class VentaAdmin(admin.ModelAdmin):
 admin.site.register(Venta, VentaAdmin)
 
 class PedidoAdmin(admin.ModelAdmin):
-    list_display = ['id', 'venta', 'pagado', 'estado']  
+    readonly_fields = ('venta','mostrar_articulos')
+    list_display = ['id', 'pagado', 'estado', 'descargar_pdf']
     list_filter = ['estado']  
     icon_name = "library_books"
+    
+    def descargar_pdf(self, obj):
+        if obj:
+            url = reverse('generar_pdf_pedido', args=[obj.id])
+            return format_html('<a href="{}" target="_blank">Descargar PDF</a>', url)
+        return ''
+
+    descargar_pdf.short_description = 'Descargar PDF'
+    
+    def mostrar_articulos(self, obj):
+        if obj.venta:
+            articulosVentas = obj.venta.ventas.all()
+            html = '<table>'
+            html += "<tr><th>Nombre</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr>"
+            for articuloVenta in articulosVentas:
+                html += f"<tr><td>{articuloVenta.articulo.get_articulo_short_name()}</td>" \
+                        f"<td>{articuloVenta.cantidad}</td>" \
+                        f"<td>{articuloVenta.precio}</td>" \
+                        f"<td>{articuloVenta.total}</td></tr>"
+            html +=f"<tr><td colspan='3'><strong>Total</strong> </td><td><p style='color:blue'><b>{obj.venta.precio_total}</b></p></td></tr>"
+            html += "</table>"
+            html += f'<br> {self.descargar_pdf(obj)}'
+            return format_html(html)
+        return "No hay artículos"
+    mostrar_articulos.short_description = 'Artículos de la Venta'
+
+    fieldsets = (
+        (None, {
+            'fields': ('venta', 'estado',
+                       ('mostrar_articulos',))
+        }),
+    )
+
+    # def get_readonly_fields(self, request, obj=None):
+    #        return self.readonly_fields + ('venta',)
+    #     return self.readonly_fields
+
 
 admin.site.register(Pedido, PedidoAdmin)

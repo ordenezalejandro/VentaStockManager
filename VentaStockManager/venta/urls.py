@@ -6,7 +6,7 @@ handler404 = custom_404_view
 
 from venta.views import (
     venta_detalle, ventas_por_vendedor, calcular_ganancia_articulos, comprovante_de_venta, ver_pedido, 
-    ArticuloAutocomplete, ventas_recientes_por_vendedor, ventas_mensual_por_vendedor,
+    ArticuloAutocomplete, ventas_recientes_por_vendedor, ventas_mensual_por_vendedor, generar_pdf_pedido
 
 )
 
@@ -32,9 +32,8 @@ urlpatterns = [
     path('articulo-autocomplete/', ArticuloAutocomplete.as_view(), name='articulo-autocomplete'),
     path('venta/<int:venta_id>/', comprovante_de_venta, name='comprovante_de_venta'),
     path('venta/pedido/<int:pedido_id>/', ver_pedido, name='ver_pedido'),
-
-
-        ]
+    path('pedido/generar-pdf/<int:pedido_id>', generar_pdf_pedido, name='generar_pdf_pedido')
+]
 # url(r'^/(?P<venta_id>\d+)/detalle/$', views.venta_detalle, name='category-detail'),
 
   

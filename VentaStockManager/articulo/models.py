@@ -35,6 +35,9 @@ class Articulo(models.Model):
     def __str__(self):
         return f'{self.codigo} | {self.marca + " - " if self.marca else " - "} |  {self.nombre}' \
                f'{self.codigo_interno} | Min ${self.precio_minorista} | May ${self.precio_mayorista} '
+
+    def get_articulo_short_name(self):
+        return  f'{self.codigo} - {self.marca} - {self.nombre}'
     
     def sugerir_codigo_interno(self):
         
