@@ -1,6 +1,10 @@
 from pathlib import Path
 import os
-import dj_database_url
+from environs import Env, EnvError
+
+env = Env()
+env.read_env()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -144,12 +148,12 @@ MATERIAL_ADMIN_SITE = {
     'TRAY_REVERSE': True,  # Hide object-tools and additional-submit-line by default
     'NAVBAR_REVERSE': True,  # Hide side navbar by default
     'SHOW_COUNTS': True, # Show instances counts for each model
-    'APP_ICONS': {  # Set icons for applications(lowercase), including 3rd party apps, {'application_name': 'material_icon_name', ...}
-        'sites': 'send',
-    },
-    'MODEL_ICONS': {  # Set icons for models(lowercase), including 3rd party models, {'model_name': 'material_icon_name', ...}
-        'site': 'contact_mail',
-    }
+#     'APP_ICONS': {  # Set icons for applications(lowercase), including 3rd party apps, {'application_name': 'material_icon_name', ...}
+#         'sites': 'send',
+#     },
+#     'MODEL_ICONS': {  # Set icons for models(lowercase), including 3rd party models, {'model_name': 'material_icon_name', ...}
+#         'site': 'contact_mail',
+#     }
 }
 # settings.py
 
@@ -162,3 +166,11 @@ if DEBUG:
 
     INSTALLED_APPS.append('debug_toolbar')
     MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+
+try:
+    if env.str("environment") == "production":
+        from VentaStockManager.production_settings import *
+    elif env.str("environment") == "development":
+        from VentaStockManager.dev_settings import *
+except EnvError:
+    pass

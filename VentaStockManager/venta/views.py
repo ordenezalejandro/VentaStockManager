@@ -7,6 +7,13 @@ from django.contrib.auth.decorators import login_required
 from dal import autocomplete
 from django.db import models
 from django.shortcuts import render, get_object_or_404
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
+from io import BytesIO
+from reportlab.lib import colors
+
 
 
 def custom_404_view(request, exception):
@@ -178,4 +185,95 @@ def ver_pedido(request, pedido_id):
         'pedido': pedido,
         'form': PedidoEstadoForm(initial={"estado": pedido.estado, 'pagado':pedido.pagado})})
 
-      
+
+
+def generar_pdf_pedido(request, pedido_id):
+    # Lógica para obtener los datos del pedido
+    pedido = Pedido.objects.get(id=pedido_id)
+
+    # Crear un objeto BytesIO para almacenar el PDF en memoria
+    buffer = BytesIO()
+
+    # Crear un objeto PDF
+    pdf = SimpleDocTemplate(buffer, pagesize=letter)
+
+    # Lista para almacenar los datos de la tabla de artículos
+    data_articulos = []
+
+    # Agregar el encabezado de la tabla de artículos
+    data_articulos.append(['Artículo', 'Cantidad', 'Precio', 'Subtotal'])
+
+    # Agregar los detalles de los artículos a la tabla
+    for articulo_venta in pedido.venta.ventas.all():
+        data_articulos.append([
+            articulo_venta.articulo.get_articulo_short_name(),
+            articulo_venta.cantidad,
+            articulo_venta.precio,
+            articulo_venta.total
+        ])
+    # Crear una lista para almacenar los datos de la tabla de total
+    data_total = [['Total:', pedido.venta.precio_total]]
+
+    # Crear la tabla de total
+    tabla_total = Table(data_total)
+
+    # Establecer estilo para la tabla de total
+    estilo_tabla_total = TableStyle([
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),  # Establecer la fuente en negrita
+        ('FONTSIZE', (0, 0), (-1, -1), 12),  # Ajustar el tamaño de la fuente
+        ('ALIGN', (-1, 0), (-1, 0), 'RIGHT'),  # Alinear el total a la derecha
+    ])
+
+    # Aplicar estilo a la tabla de total
+    tabla_total.setStyle(estilo_tabla_total)
+
+     # Crear la tabla de artículos
+    tabla_articulos = Table(data_articulos)
+
+    # Establecer estilo para la tabla de artículos
+    estilo_tabla_articulos = TableStyle([('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+    # Aplicar estilo a la tabla de artículos
+    tabla_articulos.setStyle(estilo_tabla_articulos)
+
+    # Lista para almacenar los datos de la tabla de cliente
+    data_cliente = [[f'Id: # {pedido.venta.id}',  f'Nombre del Cliente: {pedido.venta.cliente.nombre}', f'Telefono: ({pedido.venta.cliente.telefono})', f'Vendedor: {pedido.venta.vendedor}'],
+                    [f"Direccion: {pedido.venta.cliente.direccion}", f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')}"]]
+
+    # Crear la tabla de cliente
+    tabla_cliente = Table(data_cliente)
+
+    # Establecer estilo para la tabla de cliente
+    estilo_tabla_cliente = TableStyle([('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+    # Aplicar estilo a la tabla de cliente
+    tabla_cliente.setStyle(estilo_tabla_cliente)
+    
+    # Crear una lista para almacenar elementos
+    elementos = []
+
+    # Agregar la tabla de cliente al PDF
+    elementos.append(tabla_cliente)
+
+    # Agregar un espacio en blanco
+    elementos.append(Spacer(1, 20))
+
+    # Agregar la tabla de artículos al PDF
+    elementos.append(tabla_articulos)
+    elementos.append(tabla_total)
+
+    # Construir el PDF
+    pdf.build(elementos)
+
+    # Obtener el valor del buffer
+    pdf_buffer = buffer.getvalue()
+
+    # Liberar la memoria del buffer
+    buffer.close()
+
+    # Crear la respuesta HTTP con el contenido del PDF
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="pedido_{pedido_id}.pdf"'
+
+    return response

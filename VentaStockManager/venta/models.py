@@ -10,7 +10,7 @@ from vendedor.models import Vendedor
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 from datetime import datetime, timedelta
-
+from decimal import Decimal
 
 
 class Venta(models.Model):
@@ -25,7 +25,7 @@ class Venta(models.Model):
 
 
     def __str__(self):
-        return f"Venta del {self.fecha_compra} al cliente {self.cliente}"
+        return format_html(f"\nVenta del {self.fecha_compra} al cliente {self.cliente}")
     
     def save(self,*args, **kwargs) -> None:
         super().save(*args, **kwargs)
@@ -71,7 +71,7 @@ class ArticuloVenta(models.Model):
     @property
     def total(self):
 
-        return self.cantidad * self.articulo.precio
+        return Decimal(self.cantidad) * Decimal(self.precio)
 
     def __str__(self):
         return f"{self.cantidad} unidades de {self.articulo} en la venta {self.venta}"

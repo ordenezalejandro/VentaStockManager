@@ -16,13 +16,14 @@ class Cliente(models.Model):
         ('M', 'Masculino'),
         ('F', 'Femenino'),
     ]
-    nombre = models.TextField()
-    apellido = models.TextField(blank=False)
+    nombre = models.TextField(blank=False)
+    apellido = models.TextField(blank=True)
     perfil = models.OneToOneField(User, on_delete=models.CASCADE)
-    cuil = models.IntegerField(blank=False)
-    telefono = models.TextField(blank=False)
-    edad = models.IntegerField()
+    cuil = models.IntegerField(blank=True, null=True)
+    telefono = models.TextField(blank=True)
+    edad = models.IntegerField(blank=True, null=True)
     sexo = models.CharField(max_length=1, choices=GENERO_CHOICES)
+    direccion = models.CharField(blank=True, max_length=50)
 
 
     def nombre_completo(self):
