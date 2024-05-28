@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.contrib.auth.models import User
 from django.urls import reverse
-from django.contrib.auth.models import Group, Permission
-from django.dispatch import receiver
-
 
 
 class Cliente(models.Model):
@@ -18,7 +14,6 @@ class Cliente(models.Model):
     ]
     nombre = models.TextField(blank=False)
     apellido = models.TextField(blank=True)
-    perfil = models.OneToOneField(User, on_delete=models.CASCADE)
     cuil = models.IntegerField(blank=True, null=True)
     telefono = models.TextField(blank=True)
     edad = models.IntegerField(blank=True, null=True)
@@ -33,8 +28,9 @@ class Cliente(models.Model):
         """
         Clean method to validate the client's age.
         """
-        if self.edad <= 0:
+        if self.edad and self.edad <= 0:
             raise ValidationError("La edad debe ser mayor a 0")
+        
     class Meta:
         """
         Meta class for the Cliente model.
@@ -49,7 +45,7 @@ class Cliente(models.Model):
         #     pass
 
     def __str__(self):
-        return self.nombre + "  " + self.apellido + f" ({self.edad} años)"
+        return self.nombre + "  " + self.apellido + f" ({self.direccion})" if self.direccion else "(sin direccion)"
 
     def get_absolute_url(self):
         """

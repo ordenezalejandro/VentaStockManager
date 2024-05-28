@@ -38,10 +38,10 @@ class Vendedor(models.Model):
     ]
     id = models.AutoField(primary_key=True)
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    nombre = models.TextField(blank=True, null=True)
+    nombre = models.TextField()
     apellido = models.TextField(blank=True, null=True)
     # perfil = models.OneToOneField(User, on_delete=models.CASCADE)
-    cuil = models.CharField(max_length=13, validators=[validate_cuil])
+    cuil = models.CharField(max_length=13, blank=True, null=True, validators=[validate_cuil])
     telefono = models.TextField(blank=True, null=True)
     edad = models.IntegerField(blank=True, null=True)
     sexo = models.CharField(max_length=1, choices=GENERO_CHOICES, default=GENERO_CHOICES[0])
