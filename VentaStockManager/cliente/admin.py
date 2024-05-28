@@ -1,6 +1,6 @@
 from django.contrib import admin
 from cliente.models import Cliente
-from django.contrib.auth.models import Permission, Group
+from django.contrib.auth.models import  Group
 
 from .models import Cliente
 
@@ -10,22 +10,15 @@ from .models import Cliente
 
 
 
-# Registra el modelo Cliente en el administrador de Django
+# Registra el modelo Cliente en el administrador de Djang
 
 class ClienteAdmin(admin.ModelAdmin):
    icon_name = "account_circle"
    model = Cliente
-
-
+   search_fields = ['nombre']
    list_display = ('nombre_completo', 'telefono')
     
-   
-    # Esta función se llama cuando se guarda un nuevo objeto Cliente en el administrador
-   def save_model(self, request, obj, form, change):
-        # Asigna el permiso de "Puede ver tus artículos" al nuevo cliente creado
-        obj.user.user_permissions.add(Permission.objects.get(codename='view_your_items'))
-
 admin.register(Cliente, ClienteAdmin)
 # Desregistrar otros modelos que no necesitan administración en el panel de administración
 admin.site.register(Cliente, ClienteAdmin)
-admin.site.unregister(Group)
+

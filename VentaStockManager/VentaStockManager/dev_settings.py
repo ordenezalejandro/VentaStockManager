@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'compra.apps.CompraConfig',
 ]
 
-DEBUG = False
+DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
