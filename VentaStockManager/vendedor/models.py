@@ -41,11 +41,8 @@ class Vendedor(models.Model):
     nombre = models.TextField()
     apellido = models.TextField(blank=True, null=True)
     # perfil = models.OneToOneField(User, on_delete=models.CASCADE)
-    cuil = models.CharField(max_length=13, blank=True, null=True, validators=[validate_cuil])
     telefono = models.TextField(blank=True, null=True)
-    edad = models.IntegerField(blank=True, null=True)
-    sexo = models.CharField(max_length=1, choices=GENERO_CHOICES, default=GENERO_CHOICES[0])
-
+    
   # Campos adicionales del vendedor (opcional)
   # Ej: nombre_completo, telefono, etc.
     def fullname(self):
