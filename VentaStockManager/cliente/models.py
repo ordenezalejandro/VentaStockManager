@@ -14,10 +14,7 @@ class Cliente(models.Model):
     ]
     nombre = models.TextField(blank=False)
     apellido = models.TextField(blank=True)
-    cuil = models.IntegerField(blank=True, null=True)
-    telefono = models.TextField(blank=True)
-    edad = models.IntegerField(blank=True, null=True)
-    sexo = models.CharField(max_length=1, choices=GENERO_CHOICES)
+    telefono = models.TextField(blank=True, null=True)
     direccion = models.CharField(blank=True, max_length=50)
 
 
