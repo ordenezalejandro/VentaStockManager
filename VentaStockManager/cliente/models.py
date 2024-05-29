@@ -21,12 +21,12 @@ class Cliente(models.Model):
     def nombre_completo(self):
         return f"{self.nombre} {self.apellido}"
 
-    def clean(self):
-        """
-        Clean method to validate the client's age.
-        """
-        if self.edad and self.edad <= 0:
-            raise ValidationError("La edad debe ser mayor a 0")
+    # def clean(self):
+    #     """
+    #     Clean method to validate the client's age.
+    #     """
+    #     if self.edad and self.edad <= 0:
+    #         raise ValidationError("La edad debe ser mayor a 0")
         
     class Meta:
         """
