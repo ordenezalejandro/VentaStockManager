@@ -1,9 +1,12 @@
+from dal import autocomplete
 from django import forms
-from .models import Compra
+from .models import Compra, Proveedor
 
 class CompraAdminForm(forms.ModelForm):
-    imagen = forms.ImageField(required=False)
-
+    proveedor = forms.ModelChoiceField(
+        queryset=Proveedor.objects.all(),
+        widget=autocomplete.ModelSelect2(url='proveedor-autocomplete')
+    )
     class Meta:
         model = Compra
         fields = '__all__'

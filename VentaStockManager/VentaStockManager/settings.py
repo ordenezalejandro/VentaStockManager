@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'articulo.apps.ArticuloConfig',
     'vendedor.apps.VendedorConfig',
     'compra.apps.CompraConfig',
-    ' django_extensions',
 ]
 
 MIDDLEWARE = [
