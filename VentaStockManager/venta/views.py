@@ -8,11 +8,11 @@ from dal import autocomplete
 from django.db import models
 from django.shortcuts import render, get_object_or_404
 from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
 from io import BytesIO
 from reportlab.lib import colors
+from django.urls import reverse_lazy
 
 
 
@@ -277,3 +277,16 @@ def generar_pdf_pedido(request, pedido_id):
     response['Content-Disposition'] = f'attachment; filename="pedido_{pedido_id}.pdf"'
 
     return response
+
+from django.views.generic.edit import CreateView, UpdateView
+from cliente.models import Cliente
+
+class ClienteCreateView(CreateView):
+    model = Cliente
+    fields = ['nombre', 'direccion', 'telefono']
+    success_url = reverse_lazy('cliente_list')
+
+class ClienteUpdateView(UpdateView):
+    model = Cliente
+    fields = ['nombre', 'direccion', 'telefono']
+    success_url = reverse_lazy('cliente_list')

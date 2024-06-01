@@ -11,7 +11,7 @@ from django.utils import timezone
 
 # from django.db.models.query import SelectQuerySet
 from django.contrib import admin
-from venta.forms import ArticuloVentaForm
+from venta.forms import ArticuloVentaForm, VentaForm
 class ArticuloVentaInline(admin.TabularInline):
     model = ArticuloVenta
     form = ArticuloVentaForm
@@ -55,10 +55,18 @@ class ArticuloVentaInline(admin.TabularInline):
         js = ('js/articulo_venta_admins.js',)
 
 class VentaAdmin(admin.ModelAdmin):
+    form = VentaForm
     list_display = ['fecha_compra', 'fecha_entrega', 'cliente', 'vendedor', 'total_venta_por_articulo', 'vendedor']
     list_filter = ['fecha_compra', 'fecha_entrega']
     icon_name = "monetization_on"
     inlines = [ArticuloVentaInline]
+    search_fields = ('cliente__nombre')
+    data_hierarchy = "fecha_compra"
+    raw_id_fields = ["cliente"]
+    autocomplete_fields = ['cliente']
+
+    
+    
     def cantidad_articulos_vendidos(self, obj):
         return obj.articulos_vendidos.count()
 
@@ -71,7 +79,7 @@ class VentaAdmin(admin.ModelAdmin):
         
         initial['vendedor'] = vendedor
         initial['fecha_compra'] = timezone.now()
-        return initial
+        return initial  
 
     def total_venta_por_articulo(self, obj):
         total = 0

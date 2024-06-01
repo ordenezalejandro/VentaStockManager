@@ -4,6 +4,9 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.views.generic import ListView
 from articulo.models import Articulo
+from dal import autocomplete
+from django.db import models
+
 
 
 
@@ -58,7 +61,19 @@ def procesar_nuevo_cliente(request):
     else:
         return render(request, 'formulario_cliente.html')
     
+class ClienteAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Cliente.objects.none()
 
+        qs = Cliente.objects.all()
+
+        if self.q:
+            qs = qs.filter(
+                models.Q(nombre__icontains=self.q)|
+                models.Q(apellido__icontains=self.q))
+
+        return qs
 # # En tus vistas
 # if request.user.has_perm('cliente.puede_acceder_lista_articulos'):
 #     # Realiza alguna acción si el usuario tiene el permiso

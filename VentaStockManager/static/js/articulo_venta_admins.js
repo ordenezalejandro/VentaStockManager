@@ -59,119 +59,6 @@ let get_price_node = indice => {
 let get_cantidad_node = indice => {
     return document.querySelector('#id_ventas-'+indice+'-cantidad');    
 }
-
-// let get_price_from_articulo_option = node => {
-
-//     let option_selected = node.selectedOptions[0].textContent;
-
-//     let precio_minorista = option_selected.split("|")[3].trim().slice(5);
-
-//     let precio_mayorista = option_selected.split("|")[4].trim().slice(5);
-
-
-
-//     return precio_mayorista, precio_minorista
-
-// }
-
-
-
-// let select_to_articulo_venta = (node, text=null) => {
-
-//     let option_selected = '';
-
-//     if(text) {
-
-//         option_selected = text;
-
-//     } else {
-
-//         option_selected = node.selectedOptions[0].textContent;
-
-//     }
-
-//     let row = option_selected.split("|")
-
-//     const result = {
-
-//         codigo: row[0].trim(),
-
-//         codigo_interno: row[1].trim(),
-
-//         nombre: row[2].trim(),
-
-//         precio_minorista: row[3].trim().slice(5),
-
-//         precio_mayorista: row[4].trim().slice(5),
-
-//         umbral:4
-
-//     };
-
-//     return result;
-
-// };
-
-
-
-// const update_precio_total = () => {
-
-//     const precio_total_element = document.querySelector("div.readonly");
-
-//     const precio_total = calcular_precio_total();
-
-//     precio_total_element.innerHTML = `<br><p class="text-blue text-bold">${precio_total.toFixed(2)}</p>`;
-
-
-
-// }
-
-// const calcular_precio_total = ()=> {
-
-//    return Array.from(document.querySelectorAll('.field-precio_total p')).slice(1).reduce(
-
-//     (acumulador, elemento)=>{
-
-//         if(elemento.class == ['text-blue', 'text-bold']){
-
-//             return acumulador
-
-//         }
-
-//         const valor = parseFloat(elemento.textContent);
-
-//         return acumulador + (isNaN(valor)? 0 : valor)
-
-//     }, 0
-
-//    );
-
-    
-
-// };
-
-
-
-// const get_indice = (select_id, select_name='-articulo') => {
-
-//     return select_id.slice('id_ventas-'.length, -`${select_name}`.length)
-
-// };
-
-
-
-// let get_price_node = indice => {
-
-//     return document.querySelector('#id_ventas-'+indice+'-precio');
-
-// }
-
-
-
-// let get_cantidad_node = indice => {
-
-//     return document.querySelector('#id_ventas-'+indice+'-cantidad');    
-
 // }
 
 
@@ -237,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .reduce((acc, el) => acc + parseFloat(el.textContent || 0), 0);
         let total_p = document.querySelector('div.readonly');
         if (total_p) {
-            total_p.textContent = sumTotal.toFixed(2);
+            total_p.innerHTML= `<br><strong> ${sumTotal.toFixed(2)}</strong>` ;
         }
     }
 

@@ -9,6 +9,7 @@ from venta.views import (
     ArticuloAutocomplete, ventas_recientes_por_vendedor, ventas_mensual_por_vendedor, generar_pdf_pedido
 
 )
+from .views import ClienteCreateView, ClienteUpdateView
 
 urlpatterns = [
     re_path(
@@ -32,7 +33,10 @@ urlpatterns = [
     path('articulo-autocomplete/', ArticuloAutocomplete.as_view(), name='articulo-autocomplete'),
     path('venta/<int:venta_id>/', comprovante_de_venta, name='comprovante_de_venta'),
     path('venta/pedido/<int:pedido_id>/', ver_pedido, name='ver_pedido'),
-    path('pedido/generar-pdf/<int:pedido_id>', generar_pdf_pedido, name='generar_pdf_pedido')
+    path('pedido/generar-pdf/<int:pedido_id>', generar_pdf_pedido, name='generar_pdf_pedido'),
+    path('cliente/add/', ClienteCreateView.as_view(), name='cliente_add'),
+    path('cliente/<int:pk>/edit/', ClienteUpdateView.as_view(), name='cliente_edit'),
+
 ]
 # url(r'^/(?P<venta_id>\d+)/detalle/$', views.venta_detalle, name='category-detail'),
 

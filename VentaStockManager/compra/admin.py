@@ -1,7 +1,7 @@
 from django.contrib import admin
 #from .forms import CompraAdminForm
 from .models import Proveedor, Compra, DetalleCompra
-
+from .forms import CompraAdminForm
 class DetalleCompraInline(admin.TabularInline):
     model = DetalleCompra
     extra = 1  # Allows adding one extra detail by default
@@ -11,7 +11,7 @@ class CompraAdmin(admin.ModelAdmin):
     icon_name = "shopping_cart"
     inlines = [DetalleCompraInline]
     list_display = ('fecha_compra', 'proveedor', 'cantidad_compras_realizadas', 'monto_total')
-
+    form = CompraAdminForm
     def cantidad_compras_realizadas(self, obj):
         return obj.detallecompra_set.count()
 

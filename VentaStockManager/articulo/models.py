@@ -10,17 +10,13 @@ class Articulo(models.Model):
     codigo = models.PositiveIntegerField()
     codigo_interno = models.CharField(max_length=50, blank=True, null=True)
     nombre = models.CharField(max_length=255)
-    marca = models.CharField(max_length=255)
-    descripcion = models.TextField()
-    precio_compra = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
+    descripcion = models.TextField(blank=True, null=True)
     stock = models.PositiveIntegerField()
     precio_minorista = models.DecimalField(max_digits=10, decimal_places=2,  null=True)
     precio_mayorista = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     vencimiento = models.DateField(blank=True)
-    marca = models.CharField(max_length=255, blank=True, null=True, default='Sin marca')
+    marca = models.CharField(max_length=255, blank=True, null=True, default='Generico')
     cantidad_por_mayor = models.PositiveIntegerField(default=100, null=True)
-        # categoria = models.CharField(max_length=255, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.codigo_interno:
