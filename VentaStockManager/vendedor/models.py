@@ -38,8 +38,8 @@ class Vendedor(models.Model):
     ]
     id = models.AutoField(primary_key=True)
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    nombre = models.TextField()
-    apellido = models.TextField(blank=True, null=True)
+    nombre = models.TextField(blank=False)
+    apellido = models.TextField(blank=False, default='Sin apellido')
     # perfil = models.OneToOneField(User, on_delete=models.CASCADE)
     telefono = models.TextField(blank=True, null=True)
     
