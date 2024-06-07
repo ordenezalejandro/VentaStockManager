@@ -13,9 +13,9 @@ class Cliente(models.Model):
         ('F', 'Femenino'),
     ]
     nombre = models.TextField(blank=False)
-    apellido = models.TextField(blank=True)
-    telefono = models.TextField(blank=True, null=True)
-    direccion = models.CharField(blank=True, max_length=50)
+    apellido = models.TextField(blank=False)
+    telefono = models.TextField(blank=True, default='00000000')
+    direccion = models.CharField(blank=True, max_length=50, default='direccion')
 
 
     def nombre_completo(self):
