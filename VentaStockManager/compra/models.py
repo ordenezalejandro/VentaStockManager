@@ -6,8 +6,8 @@ class Proveedor(models.Model):
     """Modelo que representa un proveedor"""
     nombre = models.CharField(max_length=255)
     apellido = models.CharField(max_length=255)
-    direccion = models.CharField(max_length=255, default='direccion Vacia')
-    telefono = models.CharField(max_length=20, default='0000000')
+    direccion = models.CharField(max_length=255, default='direccion Vacia', blank=True, null=True)
+    telefono = models.CharField(max_length=20, default='0000000', blank=True, null=True)
     
 
     def __str__(self):
