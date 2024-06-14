@@ -19,7 +19,7 @@ class CompraAdmin(admin.ModelAdmin):
 
     
     def monto_total(self, obj):
-        total = sum(detalle.precio_unitario * detalle.cantidad for detalle in obj.detallecompra_set.all())
+        total = sum(detalle.precio_unitario * detalle.cantidad for detalle in obj.detalles_compra.all())
         return f"${total:.2f}"
 
     monto_total.short_description = 'total de la compra'
@@ -27,6 +27,7 @@ class CompraAdmin(admin.ModelAdmin):
   
 class ProvedorAdmin(admin.ModelAdmin):
       icon_name = "local_shipping"
+      ordering = ['nombre']
       model = Proveedor
 
     
