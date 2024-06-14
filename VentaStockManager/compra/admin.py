@@ -13,7 +13,7 @@ class CompraAdmin(admin.ModelAdmin):
     list_display = ('fecha_compra', 'proveedor', 'cantidad_compras_realizadas', 'monto_total')
     form = CompraAdminForm
     def cantidad_compras_realizadas(self, obj):
-        return obj.detalle_compra.count()
+        return obj.detalles_compra.count()
 
     cantidad_compras_realizadas.short_description = 'Cantidad de compras realizadas'
 
