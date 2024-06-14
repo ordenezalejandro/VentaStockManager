@@ -18,7 +18,7 @@ class VentaForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'cliente': autocomplete.ModelSelect2(url='cliente-autocomplete',
-                        attrs={'data-placeholder': 'Buscar Articulo', 'empty_label': 'No_seleccionado'})
+                        attrs={'data-placeholder': 'Buscar Cliente', 'empty_label': 'No_seleccionado'})
 ,
         }
     def __init__(self, *args, **kwargs):

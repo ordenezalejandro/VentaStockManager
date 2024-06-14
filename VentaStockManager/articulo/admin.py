@@ -4,6 +4,7 @@ from django.contrib import messages
 # Register your models here.
 from articulo.models import Articulo
 import decimal
+
 class ArticuloAdmin(admin.ModelAdmin):
 
     list_display = ('marca','codigo_interno','codigo', 'nombre', 'stock', 'vence_dentro_de_60_dias', 'total_venta_por_articulo')
@@ -12,6 +13,8 @@ class ArticuloAdmin(admin.ModelAdmin):
     ordering = ("vencimiento",)
     icon_name = "local_play"
     model = Articulo
+    actions = ['agregar_10_por_ciento_al_precio']
+
     
     def total_venta_por_articulo(self, obj):
         total = 0
@@ -29,7 +32,6 @@ class ArticuloAdmin(admin.ModelAdmin):
     def vence_dentro_de_60_dias(self, obj):
         return (obj.vencimiento - date.today()).days < 60
     
-    admin.site.add_action(agregar_10_por_ciento_al_precio, "Actualizacion 10")
 
 
 admin.site.site_header = 'Administrador Osvaldo'

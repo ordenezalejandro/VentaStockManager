@@ -100,7 +100,7 @@ class VentaAdmin(admin.ModelAdmin):
     readonly_fields = ('precio_total',)
 
     fieldsets = (
-        ("Detalle the venta", {
+        ("Detalle de venta", {
             "fields":  (("cliente", "fecha_entrega", "fecha_compra"), ("precio_total", "vendedor" )),
             "classes": ('fw-bold', 'align-right', 'required'),
         }),
