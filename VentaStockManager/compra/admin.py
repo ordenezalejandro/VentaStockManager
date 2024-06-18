@@ -30,8 +30,6 @@ class ProvedorAdmin(admin.ModelAdmin):
       ordering = ['nombre']
       model = Proveedor
 
-    
-
 
 admin.site.register(Proveedor, ProvedorAdmin)
 
