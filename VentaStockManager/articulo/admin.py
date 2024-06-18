@@ -13,7 +13,7 @@ class ArticuloAdmin(admin.ModelAdmin):
     ordering = ("vencimiento",)
     icon_name = "local_play"
     model = Articulo
-    actions = ['agregar_10_por_ciento_al_precio']
+    actions = ['agregar_10_por_ciento_al_precio', 'agregar_5_por_ciento_al_precio', 'agregar_1_por_ciento_al_precio']
 
     
     def total_venta_por_articulo(self, obj):
@@ -28,7 +28,21 @@ class ArticuloAdmin(admin.ModelAdmin):
             obj.precio_mayorista *= decimal.Decimal(1.1)
             obj.save()
         messages.success(request, "Se actualizaron los precios al 10 porciento mas exitosamente")
-    
+
+    def agregar_5_por_ciento_al_precio(modeladmin, request, queryset):
+        for obj in queryset:
+            obj.precio_minorista *= decimal.Decimal(1.05)
+            obj.precio_mayorista *= decimal.Decimal(1.05)
+            obj.save()
+        messages.success(request, "Se actualizaron los precios al 5 porciento mas exitosamente")
+
+    def agregar_1_por_ciento_al_precio(modeladmin, request, queryset):
+        for obj in queryset:
+            obj.precio_minorista *= decimal.Decimal(1.01)
+            obj.precio_mayorista *= decimal.Decimal(1.01)
+            obj.save()
+        messages.success(request, "Se actualizaron los precios al 1 porciento mas exitosamente")
+  
     def vence_dentro_de_60_dias(self, obj):
         return (obj.vencimiento - date.today()).days < 60
     
