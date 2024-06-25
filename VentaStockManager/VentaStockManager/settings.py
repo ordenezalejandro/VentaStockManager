@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'bootstrap5',
     'dal',
     'dal_select2',
-    'django_extensions',
+    'django_extensions',    
     'cliente.apps.ClienteConfig',
     'venta.apps.VentaConfig',
     'articulo.apps.ArticuloConfig',

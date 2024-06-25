@@ -29,7 +29,7 @@ class ProvedorAdmin(admin.ModelAdmin):
       icon_name = "local_shipping"
       ordering = ['nombre']
       model = Proveedor
-
+      
 
 admin.site.register(Proveedor, ProvedorAdmin)
 
