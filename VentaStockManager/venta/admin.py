@@ -15,7 +15,7 @@ from venta.forms import ArticuloVentaForm, VentaForm
 class ArticuloVentaInline(admin.TabularInline):
     model = ArticuloVenta
     form = ArticuloVentaForm
-    extra = 4
+    extra = 12
     verbose_name = "Item de venta"
     verbose_name_plural = "Items de ventas"
     empty_value_display = 'Busca un articulo'

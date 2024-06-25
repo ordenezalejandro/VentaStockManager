@@ -22,7 +22,7 @@ let select_to_articulo_venta = (node, text=null) => {
             nombre: row[2].trim(),
             precio_minorista: row[3].trim().slice(5),
             precio_mayorista: row[4].trim().slice(5),
-            umbral:4
+            umbral: row[5].trim().slice(7)
         };
     } else {
         return null
