@@ -23,6 +23,7 @@ class ArticuloAdmin(admin.ModelAdmin):
         return total
     
     def agregar_10_por_ciento_al_precio(modeladmin, request, queryset):
+
         for obj in queryset:
             obj.precio_minorista *= decimal.Decimal(1.1)
             obj.precio_mayorista *= decimal.Decimal(1.1)

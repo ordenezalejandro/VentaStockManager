@@ -16,13 +16,17 @@ class Cliente(models.Model):
     apellido = models.TextField(blank=False)
     telefono = models.TextField(default='00000000', blank=True, null=True)
     direccion = models.CharField(max_length=50, default='direccion', blank=True, null=True)
-
+    codigo_interno = models.CharField(max_length=50, default='no-codigo', blank=True, null=True)
 
     def nombre_completo(self):
         return f"{self.nombre} {self.apellido}"
-
+    
+    def get_str_with_user(self, user):
+        if user.is_superuser:
+            return f"{self.nombre} {self.apellido} - {self.direccion}"
+        return str(self)
     # def clean(self):
-    #     """
+    #     """       
     #     Clean method to validate the client's age.
     #     """
     #     if self.edad and self.edad <= 0:
