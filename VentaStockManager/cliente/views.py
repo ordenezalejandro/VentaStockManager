@@ -6,7 +6,7 @@ from django.views.generic import ListView
 from articulo.models import Articulo
 from dal import autocomplete
 from django.db import models
-
+from dal import autocomplete
 
 
 
@@ -65,15 +65,15 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Cliente.objects.none()
-
-        qs = Cliente.objects.all()
-
         if self.q:
-            qs = qs.filter(
+            clientes = Cliente.objects.filter(
                 models.Q(nombre__icontains=self.q)|
+                models.Q(codigo_interno__icontains=self.q) |
                 models.Q(apellido__icontains=self.q))
-
-        return qs
+        else:   
+            clientes = Cliente.objects.all()
+        return clientes
+        
 # # En tus vistas
 # if request.user.has_perm('cliente.puede_acceder_lista_articulos'):
 #     # Realiza alguna acción si el usuario tiene el permiso
@@ -81,3 +81,5 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
 class ListaArticulosView(ListView):
     model = Articulo
     template_name = 'lista_articulos.html'
+
+ 

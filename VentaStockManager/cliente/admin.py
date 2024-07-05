@@ -14,9 +14,14 @@ from .models import Cliente
 
 class ClienteAdmin(admin.ModelAdmin):
    icon_name = "account_circle"
-   model = Cliente
+   model = Cliente   
    search_fields = ['nombre']
-   list_display = ('nombre_completo', 'telefono')
+   list_display = ('nombre_completo', 'codigo_interno','telefono')
+   
+   def get_readonly_fields(self, request, obj=None):
+        if not request.user.is_superuser:
+            return ['direccion']
+        return []
     
 admin.register(Cliente, ClienteAdmin)
 # Desregistrar otros modelos que no necesitan administración en el panel de administración
