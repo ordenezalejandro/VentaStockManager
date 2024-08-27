@@ -122,7 +122,6 @@ class CalcularGananciaPorArticuloTestCase(TestCase):
         venta2 = VentaFactory.create()
         ArticuloVentaFactory.create(venta=venta2, articulo=articulo1, cantidad=1)
         ArticuloVentaFactory.create(venta=venta2, articulo=articulo2, cantidad=1)
-        import ipdb;ipdb.set_trace() 
 
         # hacer compra. de 4 productos distintos
         # despues hacer 1 venta que venta venda todo

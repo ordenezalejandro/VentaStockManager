@@ -35,7 +35,7 @@ class Articulo(models.Model):
                    
 
     def get_articulo_short_name(self):
-        return  f'{self.codigo} - {self.marca} - {self.nombre}'
+        return  f'{self.codigo_interno} {self.marca if self.marca != "Generico" else ""} {self.nombre}'
     
     def sugerir_codigo_interno(self):
         

@@ -1,4 +1,10 @@
 from django.shortcuts import render, redirect
+from io import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import mm
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+
 from venta.models import Venta, ArticuloVenta, Pedido
 from articulo.models import Articulo
 from vendedor.models import Vendedor
@@ -9,7 +15,8 @@ from django.db import models
 from django.shortcuts import render, get_object_or_404
 from reportlab.lib.pagesizes import letter
 from django.http import HttpResponse
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, PageBreak, Paragraph, Frame, PageTemplate
+
 from io import BytesIO
 from reportlab.lib import colors
 from django.urls import reverse_lazy
@@ -184,99 +191,222 @@ def ver_pedido(request, pedido_id):
         'articulos_venta': articulos_venta,
         'pedido': pedido,
         'form': PedidoEstadoForm(initial={"estado": pedido.estado, 'pagado':pedido.pagado})})
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import mm
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, PageTemplate, Frame, Spacer, PageBreak
+from io import BytesIO
+from django.http import HttpResponse
 
+def generar_pdf_pedidos_(request, pedido_ids=None):
+    if not pedido_ids:
+        pedido_ids = request.GET.getlist('ids')
+    pedidos = Pedido.objects.filter(id__in=pedido_ids[0].split(","))
 
-
-def generar_pdf_pedido(request, pedido_id):
-    # Lógica para obtener los datos del pedido
-    pedido = Pedido.objects.get(id=pedido_id)
-
-    # Crear un objeto BytesIO para almacenar el PDF en memoria
     buffer = BytesIO()
+    pdf = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
+    styles = getSampleStyleSheet()
+    frame_width = (A4[0] - 30 * mm) / 2  # Adjusted for margin
+    frame_height = (A4[1] - 30 * mm) / 2  # Adjusted for margin
+    frames = [] 
+    padding = 1 * mm  # Padding entre tablas
 
-    # Crear un objeto PDF
-    pdf = SimpleDocTemplate(buffer, pagesize=letter)
+    # Define frames
+    for i in range(2):
+        for j in range(2):
+            frames.append(Frame(
+                10 * mm + i * frame_width,
+                A4[1] - 10 * mm - (j + 1) * frame_height,
+                frame_width - 10 * mm,
+                frame_height - 10 * mm,
+                id=f'frame_{i}_{j}'
+            ))
 
-    # Lista para almacenar los datos de la tabla de artículos
-    data_articulos = []
+    # Add page template
+    pdf.addPageTemplates([PageTemplate(id='FourFrames', frames=frames)])
 
-    # Agregar el encabezado de la tabla de artículos
-    data_articulos.append(['Artículo', 'Cantidad', 'Precio', 'Subtotal'])
+    quarter_count = 0
 
-    # Agregar los detalles de los artículos a la tabla
-    for articulo_venta in pedido.venta.ventas.all():
-        data_articulos.append([
-            articulo_venta.articulo.get_articulo_short_name(),
-            articulo_venta.cantidad,
-            articulo_venta.precio,
-            articulo_venta.total
+    for pedido in pedidos:
+        # Información del cliente y vendedor
+        data_cliente = [
+            [f'Id: # {pedido.venta.id}', f'Nombre del Cliente: {pedido.venta.cliente.nombre}', '', ''],
+            [f'Teléfono: ({pedido.venta.cliente.telefono})', f'Vendedor: {pedido.venta.vendedor}', '', ''],
+            [f"Dirección: {pedido.venta.cliente.direccion}", f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')}", '', '']
+        ]
+        data_articulos = [['Artículo', '#', 'Precio', 'Subtotal']]
+        
+        for articulo_venta in pedido.venta.ventas.all():
+            articulo_nombre = articulo_venta.articulo.get_articulo_short_name()
+            if len(articulo_nombre) > 20:  # Truncar nombres largos
+                articulo_nombre = articulo_nombre[:17] + '...'
+            data_articulos.append([
+                articulo_nombre,
+                articulo_venta.cantidad,
+                articulo_venta.precio,
+                articulo_venta.total
+            ])
+        
+        # Completar las filas si hay menos de 12 artículos
+        while len(data_articulos) < 13:
+            data_articulos.append(['', '', '', ''])
+
+        # Tabla del cliente
+        tabla_cliente = Table(data_cliente, colWidths=[frame_width/4]*4)
+        estilo_tabla_cliente = TableStyle([
+            ('SPAN', (0, 0), (1, 0)),  # Combina las dos primeras celdas en la primera fila
+            ('SPAN', (0, 1), (1, 1)),  # Combina las dos primeras celdas en la segunda fila
+            ('SPAN', (0, 2), (1, 2)),  # Combina las dos primeras celdas en la tercera fila
+            ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 0), (-1, -1), 8)
         ])
-    # Crear una lista para almacenar los datos de la tabla de total
-    data_total = [['Total:', pedido.venta.precio_total]]
+        tabla_cliente.setStyle(estilo_tabla_cliente)
 
-    # Crear la tabla de total
-    tabla_total = Table(data_total)
+        # Tabla de artículos
+        tabla_articulos = Table(data_articulos, colWidths=[frame_width/4]*4)
+        estilo_tabla_articulos = TableStyle([
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 0), (-1, -1), 8)
+        ])
+        tabla_articulos.setStyle(estilo_tabla_articulos)
 
-    # Establecer estilo para la tabla de total
-    estilo_tabla_total = TableStyle([
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),  # Establecer la fuente en negrita
-        ('FONTSIZE', (0, 0), (-1, -1), 12),  # Ajustar el tamaño de la fuente
-        ('ALIGN', (-1, 0), (-1, 0), 'RIGHT'),  # Alinear el total a la derecha
-    ])
+        # Tabla del total
+        data_total = [['Total:', '', '', pedido.venta.precio_total]]
+        tabla_total = Table(data_total, colWidths=[frame_width/4]*4)
+        estilo_tabla_total = TableStyle([
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('ALIGN', (3, 0), (3, 0), 'RIGHT'),
+        ])
+        tabla_total.setStyle(estilo_tabla_total)
 
-    # Aplicar estilo a la tabla de total
-    tabla_total.setStyle(estilo_tabla_total)
+        # Añadir tablas a los elementos
+        elements.append(tabla_cliente)
+        elements.append(tabla_articulos)
+        elements.append(tabla_total)
+        elements.append(Spacer(1, padding))  # Agregar padding entre tablas
+        
+        quarter_count += 1
+        
+        if quarter_count % 4 == 0:
+            elements.append(PageBreak())
+            quarter_count = 0
 
-     # Crear la tabla de artículos
-    tabla_articulos = Table(data_articulos)
+    pdf.build(elements)
 
-    # Establecer estilo para la tabla de artículos
-    estilo_tabla_articulos = TableStyle([('GRID', (0, 0), (-1, -1), 1, colors.black)])
-
-    # Aplicar estilo a la tabla de artículos
-    tabla_articulos.setStyle(estilo_tabla_articulos)
-
-    # Lista para almacenar los datos de la tabla de cliente
-    data_cliente = [[f'Id: # {pedido.venta.id}',  f'Nombre del Cliente: {pedido.venta.cliente.nombre}', f'Telefono: ({pedido.venta.cliente.telefono})', f'Vendedor: {pedido.venta.vendedor}'],
-                    [f"Direccion: {pedido.venta.cliente.direccion}", f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')}"]]
-
-    # Crear la tabla de cliente
-    tabla_cliente = Table(data_cliente)
-
-    # Establecer estilo para la tabla de cliente
-    estilo_tabla_cliente = TableStyle([('GRID', (0, 0), (-1, -1), 1, colors.black)])
-
-    # Aplicar estilo a la tabla de cliente
-    tabla_cliente.setStyle(estilo_tabla_cliente)
-    
-    # Crear una lista para almacenar elementos
-    elementos = []
-
-    # Agregar la tabla de cliente al PDF
-    elementos.append(tabla_cliente)
-
-    # Agregar un espacio en blanco
-    elementos.append(Spacer(1, 20))
-
-    # Agregar la tabla de artículos al PDF
-    elementos.append(tabla_articulos)
-    elementos.append(tabla_total)
-
-    # Construir el PDF
-    pdf.build(elementos)
-
-    # Obtener el valor del buffer
     pdf_buffer = buffer.getvalue()
-
-    # Liberar la memoria del buffer
     buffer.close()
-
-    # Crear la respuesta HTTP con el contenido del PDF
     response = HttpResponse(pdf_buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="pedido_{pedido_id}.pdf"'
-
+    response['Content-Disposition'] = 'attachment; filename="pedidos.pdf"'
     return response
+
+def generar_pdf_pedidos(request, pedido_ids=None):
+    from reportlab.lib.pagesizes import landscape
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.units import cm
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, PageBreak
+    from reportlab.lib.styles import getSampleStyleSheet
+    from io import BytesIO
+    from django.http import HttpResponse
+    from .models import Pedido
+    if pedido_ids is None:
+        pedido_ids = request.GET.get('pedidos_ids').split(',')
+        
+    
+    buffer = BytesIO()
+    elements = []
+    styles = getSampleStyleSheet()
+    padding = 0.5 * cm
+    pedidos_count = len(pedido_ids)
+    cantidad_articulos = []
+    for index, pedido_id in enumerate(pedido_ids):
+        pedido = Pedido.objects.get(id=pedido_id)
+        cantidad_articulos.append(pedido.venta.ventas.count())
+        data_cliente = [
+            ['Fecha de Compra:', pedido.venta.fecha_compra, 'Fecha de Entrega:', pedido.venta.fecha_entrega],
+            ['Cliente:', pedido.venta.cliente.nombre_completo(), 'Dirección:', pedido.venta.cliente.direccion],
+        ]
+
+        # Tabla del cliente
+        tabla_cliente = Table(data_cliente, colWidths=[2 * cm, 2 * cm, 2 * cm,  2 * cm])
+        estilo_tabla_cliente = TableStyle([
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 0), (-1, -1), 6)
+        ])
+        tabla_cliente.setStyle(estilo_tabla_cliente)
+
+        # Tabla de artículos
+        data_articulos = [['Articulos', 'Cant', 'Precio/Unidad', 'Total']]
+        for articulo_venta in pedido.venta.ventas.all():
+            nombre_articulo = articulo_venta.articulo.get_articulo_short_name()
+            nombre_articulo_corto = ""
+            nombre_articulo_len = len(nombre_articulo)
+            for i in range(0, nombre_articulo_len, 26):
+                if i%26 > 0:
+                    nombre_articulo_corto += nombre_articulo[i:i+26] + "\n"
+                else:
+                    nombre_articulo_corto += nombre_articulo[i:i+26] 
+                
+            data_articulos.append([
+                nombre_articulo_corto,
+                articulo_venta.cantidad,
+                articulo_venta.precio,
+                articulo_venta.total
+            ])
+
+        tabla_articulos = Table(data_articulos, colWidths=[4 * cm, 1 * cm, 1.5 * cm, 1.5 * cm])
+        estilo_tabla_articulos = TableStyle([
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 0), (-1, -1), 6)
+        ])
+        tabla_articulos.setStyle(estilo_tabla_articulos)
+
+        # Tabla del total
+        data_total = [['Total:', pedido.venta.precio_total]]
+        tabla_total = Table(data_total, colWidths=[6 * cm, 2 * cm])
+        estilo_tabla_total = TableStyle([
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            # ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+        ])
+        tabla_total.setStyle(estilo_tabla_total)
+
+        # Añadir tablas a los elementos
+        elements.append(tabla_cliente)
+        elements.append(Spacer(1, padding))
+        elements.append(tabla_articulos)
+        elements.append(Spacer(1, padding))
+        elements.append(tabla_total)
+        elements.append(Spacer(1, padding))
+        if index + 1< pedidos_count:
+            elements.append(PageBreak())
+    
+    page_height = max(cantidad_articulos )  * 1.1* cm 
+    pdf = SimpleDocTemplate(buffer, pagesize=(8 * cm, page_height), topMargin=0.5 * cm, bottomMargin=0.5 * cm)
+
+    pdf.build(elements)
+
+    pdf_buffer = buffer.getvalue()
+    buffer.close()
+    from datetime import datetime
+    fecha_del_dia = str(datetime.now().date())
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="pedidos_{fecha_del_dia}.pdf"'
+    return response
+
+def add_quarter_page(canvas, doc):
+    canvas.saveState()
+    canvas.translate(0, -doc.height)
+    canvas.restoreState()
+    
+def generar_pdf_pedido(request, pedido_id):
+    return generar_pdf_pedidos(request, [pedido_id])
 
 from django.views.generic.edit import CreateView, UpdateView
 from cliente.models import Cliente

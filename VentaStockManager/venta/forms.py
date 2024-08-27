@@ -8,7 +8,7 @@ from venta.models import ArticuloVenta
 from .models import Pedido, Venta
 from  cliente.models import Cliente
 from django.urls import reverse
-from django_addanother.widgets import AddAnotherWidgetWrapper
+# from django_addanother.widgets import AddAnotherWidgetWrapper
 
 
 from django import forms

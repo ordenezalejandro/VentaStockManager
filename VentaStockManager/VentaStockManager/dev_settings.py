@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Application definition    
 INSTALLED_APPS = [
     'material',
-    'material.admin',
+    # 'material.admin',
     # 'material.admin.default',
     # 'whitenoise.runserver_nostatic',    
     'django.contrib.auth',
@@ -14,7 +14,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bootstrap5',
+    # 'bootstrap5',
     'dal',
     'dal_select2',
     'django_extensions',
@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'compra.apps.CompraConfig',
 ]
 
-DEBUG = False
+DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
