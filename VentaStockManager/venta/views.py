@@ -388,7 +388,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         if index + 1< pedidos_count:
             elements.append(PageBreak())
     
-    page_height = max(cantidad_articulos )  * 1.6* cm 
+    page_height = max(cantidad_articulos )  * 1.3* cm 
     pdf = SimpleDocTemplate(buffer, pagesize=(8 * cm, page_height), topMargin=0.5 * cm, bottomMargin=0.5 * cm)
 
     pdf.build(elements)
