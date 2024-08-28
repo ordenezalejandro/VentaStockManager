@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     # 'material.admin.default',
     'whitenoise.runserver_nostatic',    
     'django.contrib.auth',
-    'django.contrib.admin'
+    'django.contrib.admin',git 
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
