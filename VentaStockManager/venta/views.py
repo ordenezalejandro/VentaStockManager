@@ -328,19 +328,15 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         pedido = Pedido.objects.get(id=pedido_id)
         cantidad_articulos.append(pedido.venta.ventas.count())
         data_cliente = [
-            ['Fecha \nCompra:', pedido.venta.fecha_compra, 'Fecha \nEntrega:', pedido.venta.fecha_entrega],
+            ['Compra:', pedido.venta.fecha_compra, 'Entrega:', pedido.venta.fecha_entrega],
             ['Cliente:', pedido.venta.cliente.nombre_completo(), 'Dirección:', pedido.venta.cliente.direccion],
         ]
 
         # Tabla del cliente
         tabla_cliente = Table(data_cliente, colWidths=[2 * cm, 2 * cm, 2 * cm,  2 * cm])
         estilo_tabla_cliente = TableStyle([
-             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (0, 0), 8),  # Reduce the font size
-            ('TEXTCOLOR', (0, 0), (0, 0), colors.black),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 0), (-1, -1), 7)
         ])
         tabla_cliente.setStyle(estilo_tabla_cliente)
 
