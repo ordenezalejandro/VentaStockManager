@@ -328,7 +328,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         pedido = Pedido.objects.get(id=pedido_id)
         cantidad_articulos.append(pedido.venta.ventas.count())
         data_cliente = [
-            ['Fecha de Compra:', pedido.venta.fecha_compra, 'Fecha de Entrega:', pedido.venta.fecha_entrega],
+            ['Fecha \nCompra:', pedido.venta.fecha_compra, 'Fecha \nEntrega:', pedido.venta.fecha_entrega],
             ['Cliente:', pedido.venta.cliente.nombre_completo(), 'Dirección:', pedido.venta.cliente.direccion],
         ]
 
@@ -336,12 +336,12 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         tabla_cliente = Table(data_cliente, colWidths=[2 * cm, 2 * cm, 2 * cm,  2 * cm])
         estilo_tabla_cliente = TableStyle([
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('FONTSIZE', (0, 0), (-1, -1), 6)
+            ('FONTSIZE', (0, 0), (-1, -1), 7)
         ])
         tabla_cliente.setStyle(estilo_tabla_cliente)
 
         # Tabla de artículos
-        data_articulos = [['Articulos', 'Cant', 'Precio/Unidad', 'Total']]
+        data_articulos = [['Articulos', 'Cant', 'Precio/U', 'Total']]
         for articulo_venta in pedido.venta.ventas.all():
             nombre_articulo = articulo_venta.articulo.get_articulo_short_name()
             nombre_articulo_corto = ""
@@ -362,13 +362,14 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         tabla_articulos = Table(data_articulos, colWidths=[4 * cm, 1 * cm, 1.5 * cm, 1.5 * cm])
         estilo_tabla_articulos = TableStyle([
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('FONTSIZE', (0, 0), (-1, -1), 6)
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 7)
         ])
         tabla_articulos.setStyle(estilo_tabla_articulos)
 
         # Tabla del total
         data_total = [['Total:', pedido.venta.precio_total]]
-        tabla_total = Table(data_total, colWidths=[6 * cm, 2 * cm])
+        tabla_total = Table(data_total, colWidths=[5 * cm, 3 * cm])
         estilo_tabla_total = TableStyle([
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
