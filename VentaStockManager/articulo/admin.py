@@ -60,18 +60,6 @@ class ArticuloAdmin(admin.ModelAdmin):
         return (obj.vencimiento - date.today()).days < 60
     
 
-def get_app_list(self, request, app_label=None):
-    app_dict = self._build_app_dict(request, app_label)
-    
-    # Debugging: Print or log the app_dict to inspect its structure    
-    # Ensure all values in app_dict are dictionaries with a 'name' key
-    for app in app_dict.values():
-        if not isinstance(app, dict) or 'name' not in app:
-            raise ValueError(f"Invalid app entry: {app}")
-    
-    app_list = sorted(app_dict.values(), key=lambda x: x["name"].lower())
-    return app_list
-
 # # admin.site.get_app_list = get_app_list
 # admin.site.site_header = 'Administrador Osvaldo'
 # admin.site.index_title = 'Osvaldo Administrador'

@@ -10,8 +10,8 @@ from compra.models import Proveedor, Compra
 
 
 class MyAdminSite(admin.AdminSite):
-    def get_app_list(self, request):
-        app_dict = self._build_app_dict(request)
+    def get_app_list(self, request, app_label=None):
+        app_dict = self._build_app_dict(request, app_label)
         # Ensure app_dict values are dictionaries with a "name" key
         for app in app_dict.values():
             if not isinstance(app, dict) or "name" not in app:

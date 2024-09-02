@@ -8,7 +8,7 @@ from articulo.models import Articulo
 import traceback
 import decimal
 import openpyxl
-
+from django_q.tasks import async_task
 directorio_credenciales = 'credentials_module.json'
 file_id = '1Zv9TDVJRDG_Ar-U4qTvlTcTiJ7RUpZnawxGwPpL4IZI'
 mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -79,7 +79,7 @@ def procesar_archivo_xlsx(ruta_archivo):
         if not row[0] or not row[1] or not row[3] or not row[3] or (row[3]  is str and row[3].replace('$','') == ''):  # Si la primera celda está vacía, saltar la
             if row[1]:
                 # self.stdout.write(f'esta fila no se proceso fila {i+4} row {row[0]} {row[1]}')
-                errores.append(f'esta fila no se proceso fila {i+4} row {row[0]} {row[1]}')
+                errores.append(f'revise la fila {i+4} row {row[0]} {row[1]}')
             continue
         try:
             nombre = row[0]
@@ -128,6 +128,7 @@ def procesar_archivo_xlsx(ruta_archivo):
         articulo.save()
 
     return errores  
+
 def actualizar_precios_articulos_desde_drive():
     ruta_archivo = download_file_from_google_drive(file_id, 'articulo/data/')
     if ruta_archivo and os.path.exists(ruta_archivo):
@@ -149,9 +150,6 @@ def generar_codigo_interno(nombre):
     return codigo_interno
 
 # Programar la tarea
-# async_task('VentaStockManager.tasks.buscar_y_cargar_documento')
+async_task('VentaStockManager.tasks.actualizar_precios_articulos_desde_drive')
 
-if __name__ == '__main__':
-    # login_google_drive()
-    procesar_archivo_xlsx(download_file_from_google_drive(file_id, 'articulo/data/'))
     
