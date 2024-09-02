@@ -20,6 +20,7 @@ class MyAdminSite(admin.AdminSite):
         
         # Add icons to the app list
         for app in app_list:
+            from django.apps import apps
             app_config = apps.get_app_config(app['app_label'])
             app['icon'] = getattr(app_config, 'icon_name', 'default_icon')
         
