@@ -1,4 +1,4 @@
-from django.contrib import admin
+from material.admin.sites import MaterialAdminSite
 from venta.admin import VentaAdmin, PedidoAdmin
 from articulo.admin import ArticuloAdmin
 from cliente.admin import ClienteAdmin
@@ -7,9 +7,10 @@ from venta.models import Venta, Pedido
 from articulo.models import Articulo
 from cliente.models import Cliente
 from compra.models import Proveedor, Compra
+from django.apps import apps
 
 
-class MyAdminSite(admin.AdminSite):
+class MyAdminSite(MaterialAdminSite):
     def get_app_list(self, request, app_label=None):
         app_dict = self._build_app_dict(request, app_label)
         # Ensure app_dict values are dictionaries with a "name" key
@@ -20,7 +21,6 @@ class MyAdminSite(admin.AdminSite):
         
         # Add icons to the app list
         for app in app_list:
-            from django.apps import apps
             app_config = apps.get_app_config(app['app_label'])
             app['icon'] = getattr(app_config, 'icon_name', 'default_icon')
         
