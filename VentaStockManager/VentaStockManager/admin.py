@@ -17,8 +17,13 @@ class MyAdminSite(admin.AdminSite):
             if not isinstance(app, dict) or "name" not in app:
                 raise ValueError("Invalid app_dict structure")
         app_list = sorted(app_dict.values(), key=lambda x: x["name"].lower())
+        
+        # Add icons to the app list
+        for app in app_list:
+            app_config = apps.get_app_config(app['app_label'])
+            app['icon'] = getattr(app_config, 'icon_name', 'default_icon')
+        
         return app_list
-
 admin_site = MyAdminSite()
 
 admin_site.site_header = 'Administrador Osvaldo'
