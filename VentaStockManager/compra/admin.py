@@ -31,9 +31,9 @@ class ProvedorAdmin(admin.ModelAdmin):
       model = Proveedor
       
 
-admin.site.register(Proveedor, ProvedorAdmin)
-
-admin.site.register(Compra, CompraAdmin)
+# admin_site.site.register(Proveedor, ProvedorAdmin)
+# 
+# admin_site.site.register(Compra, CompraAdmin)
 
 
 #@admin.register(Compra)

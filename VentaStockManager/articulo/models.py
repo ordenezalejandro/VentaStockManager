@@ -7,7 +7,7 @@ from django.utils.html import format_html
 # Create your models here.
 class Articulo(models.Model):
     id = models.AutoField(primary_key=True)
-    codigo = models.PositiveIntegerField()
+    codigo = models.CharField(max_length=255)
     codigo_interno = models.CharField(max_length=50, blank=True, null=True)
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)

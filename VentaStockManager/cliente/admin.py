@@ -23,7 +23,7 @@ class ClienteAdmin(admin.ModelAdmin):
             return ['direccion']
         return []
     
-admin.register(Cliente, ClienteAdmin)
+# admin.register(Cliente, ClienteAdmin)
 # Desregistrar otros modelos que no necesitan administración en el panel de administración
-admin.site.register(Cliente, ClienteAdmin)
+# admin.site.register(Cliente, ClienteAdmin)
 

@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'articulo.apps.ArticuloConfig',
     'vendedor.apps.VendedorConfig',
     'compra.apps.CompraConfig',
+    'django_q',
 ]
 
 MIDDLEWARE = [
@@ -156,6 +157,16 @@ MATERIAL_ADMIN_SITE = {
 #     }
 }
 # settings.py
+
+Q_CLUSTER = {
+    'name': 'DjangoQ',
+    'workers': 4,
+    'recycle': 500,
+    'timeout': 60,
+    'queue_limit': 50,
+    'bulk': 10,
+    # 'orm': 'default'  # Usar el ORM de Django
+}
 
 # Configuración de HSTS (HTTP Strict Transport Security)
 # SECURE_HSTS_SECONDS = 31536000  # 1 año en segundos

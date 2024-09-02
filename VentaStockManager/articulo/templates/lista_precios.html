@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Precios</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Lista de Precios</h1>
+        <form method="GET" action="">
+            <div class="form-group">
+                <input type="text" name="q" class="form-control" placeholder="Buscar por nombre" value="{{ query }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Precio minorista</th>
+                    <th>Precio mayorista</th>
+                    <th>Cantidad para ser Mayorista</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for articulo in articulos %}
+                <tr>
+                    <td>{{ articulo.nombre }}</td>
+                    <td>{{ articulo.precio_minorista }}</td>
+                    <td>{{ articulo.precio_mayorista }}</td>
+                    <td>{{ articulo.cantidad_por_mayor }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

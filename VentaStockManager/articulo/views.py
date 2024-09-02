@@ -29,3 +29,14 @@ def mostrar_articulos(request):
 
 
 
+
+
+
+def lista_precios(request):
+    query = request.GET.get('q', '')
+    if query:
+        articulos = Articulo.objects.filter(nombre__icontains=query)
+    else:
+        articulos = Articulo.objects.all()
+    
+    return render(request, 'lista_precios.html', {'articulos': articulos, 'query': query})

@@ -118,7 +118,7 @@ class VentaAdmin(admin.ModelAdmin):
             form.base_fields['precio_total'].widget.attrs['id'] = 'id_precio_total'
         return form
 
-admin.site.register(Venta, VentaAdmin)
+# admin_site.site.register(Venta, VentaAdmin)
 
 class PedidoAdmin(admin.ModelAdmin):
     
@@ -219,4 +219,5 @@ class PedidoAdmin(admin.ModelAdmin):
     #     return self.readonly_fields
 
 
-admin.site.register(Pedido, PedidoAdmin)
+
+# admin_site.site.register(Pedido, PedidoAdmin)
