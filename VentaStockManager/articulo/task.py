@@ -8,7 +8,7 @@ from articulo.models import Articulo
 import traceback
 import decimal
 import openpyxl
-from django_q.tasks import async_task
+# from django_q.tasks import async_task
 directorio_credenciales = 'credentials_module.json'
 file_id = '1Zv9TDVJRDG_Ar-U4qTvlTcTiJ7RUpZnawxGwPpL4IZI'
 mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -150,6 +150,6 @@ def generar_codigo_interno(nombre):
     return codigo_interno
 
 # Programar la tarea
-async_task('VentaStockManager.tasks.actualizar_precios_articulos_desde_drive')
+# async_task('VentaStockManager.tasks.actualizar_precios_articulos_desde_drive')
 
     

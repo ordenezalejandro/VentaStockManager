@@ -177,4 +177,5 @@ cython_debug/
 # End of https://www.toptal.com/developers/gitignore/api/django
 
 client_secrets.json
-credentials_modellus.json
+credentials_module.json
+settings.yaml
