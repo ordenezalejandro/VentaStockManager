@@ -109,7 +109,7 @@ class Command(BaseCommand):
                 codigo =f'{letra}{row[1][1:]}'
                 try:
                     precio_minorista = decimal.Decimal(row[3].replace('$', ''))
-                except e:
+                except Exception as e:
                     self.stdout.write(self.style.ERROR(f'Error al procesar la fila {i+1}: {str(e)} , se pondra a 0'))
                     precio_minorista = 0
                 precio_mayorista = round(precio_minorista*decimal.Decimal(0.97), 2)
