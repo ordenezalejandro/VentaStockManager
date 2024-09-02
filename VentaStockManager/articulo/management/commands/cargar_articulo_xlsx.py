@@ -85,7 +85,8 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'Importando datos desde {ruta_archivo}...'))
 
         try:
-            ruta_archivo = download_file_from_google_drive(file_id, 'articulo/data/')
+            if not ruta_archivo:
+                ruta_archivo = download_file_from_google_drive(file_id, 'articulo/data/')
             self.procesar_archivo_xlsx(ruta_archivo)
             self.stdout.write(self.style.SUCCESS('Importación completada exitosamente.'))
         except Exception as e:
