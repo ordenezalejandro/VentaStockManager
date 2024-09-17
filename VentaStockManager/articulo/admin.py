@@ -9,7 +9,7 @@ import decimal
 
 class ArticuloAdmin(admin.ModelAdmin):
 
-    list_display = ('marca','codigo_interno','codigo', 'nombre', 'stock', 'vence_dentro_de_60_dias', 'total_venta_por_articulo')
+    list_display = ('marca','codigo_interno','codigo', 'nombre', 'stock', 'precio_minorista', 'vence_dentro_de_60_dias', 'total_venta_por_articulo')
     search_fields = ("nombre", 'codigo', 'codigo_interno')
     # fields = ("__all__",)
     ordering = ("vencimiento",)
@@ -59,7 +59,10 @@ class ArticuloAdmin(admin.ModelAdmin):
     def vence_dentro_de_60_dias(self, obj):
         return (obj.vencimiento - date.today()).days < 60
     
-
+    vence_dentro_de_60_dias.boolean = True
+    vence_dentro_de_60_dias.short_description = "Vence menos 60 días"
+    
+    
 # # admin.site.get_app_list = get_app_list
 # admin.site.site_header = 'Administrador Osvaldo'
 # admin.site.index_title = 'Osvaldo Administrador'
