@@ -80,6 +80,7 @@ def procesar_archivo_xlsx(ruta_archivo):
     errores = []
     wb = openpyxl.load_workbook(ruta_archivo)
     sheet = wb.active
+    error_multiple_values = []
     for i, row in enumerate(sheet.iter_rows(min_row=4, values_only=True)):
         if not row[0] or not row[1] or not row[3] or not row[3] or (row[3]  is str and row[3].replace('$','') == ''):  # Si la primera celda está vacía, saltar la
             if row[1]:
@@ -126,7 +127,7 @@ def procesar_archivo_xlsx(ruta_archivo):
         except Articulo.MultipleObjectsReturned:
             articulo = Articulo.objects.filter(codigo_interno=codigo_interno, nombre=nombre).first()
             creado = False
-            errores.append(f'mas de una fila tiene este valor codigo_interno: {codigo_interno}, nombre: {nombre}')
+            error_multiple_values.append(f' ({codigo_interno}- {nombre})')
 
         articulo.precio_minorista = precio_minorista
         articulo.precio_mayorista = precio_mayorista
@@ -135,7 +136,8 @@ def procesar_archivo_xlsx(ruta_archivo):
             articulo.codigo = codigo_interno
         articulo.stock = 100
         articulo.save()
-
+    if error_multiple_values:
+        errores.append(f'mas de una fila tiene este valor codigo_interno: {", ".join(error_multiple_values)}')
     return errores  
 
 def actualizar_precios_articulos_desde_drive():
@@ -148,6 +150,7 @@ def actualizar_precios_articulos_desde_drive():
             return "Se actualizaron los precios desde el archivo drive con éxito"
     else:
         return f"Archivo no encontrado en {ruta_archivo}"
+    
 def generar_codigo_interno(nombre):
     primera_letra = nombre[0].lower()
 
