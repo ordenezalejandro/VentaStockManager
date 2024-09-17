@@ -179,3 +179,4 @@ cython_debug/
 client_secrets.json
 credentials_module.json
 settings.yaml
+credentials.json

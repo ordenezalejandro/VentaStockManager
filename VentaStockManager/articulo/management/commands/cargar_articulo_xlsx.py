@@ -8,61 +8,54 @@ from articulo.models import Articulo
 import traceback
 import decimal
 import os
-from pydrive2.auth import GoogleAuth
-from pydrive2.drive import GoogleDrive
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseDownload
+from openpyxl import Workbook
 
-directorio_credenciales = 'credentials_module.json'
-file_id = '1Zv9TDVJRDG_Ar-U4qTvlTcTiJ7RUpZnawxGwPpL4IZI'
-mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'VentaStockManager.settings')
+SERVICE_ACCOUNT_FILE = 'credentials.json'
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+FILE_ID = '1Zv9TDVJRDG_Ar-U4qTvlTcTiJ7RUpZnawxGwPpL4IZI'
 
-def login_google_drive():
-    gauth = GoogleAuth()
-    gauth.settings['get_refresh_token'] = True  # Asegúrate de obtener el refresh token
-    gauth.settings['client_config_file'] = 'client_secrets.json'
-    gauth.settings['get_refresh_token'] = True
-    gauth.settings['oauth_scope'] = ['https://www.googleapis.com/auth/drive']
-    gauth.settings['access_type'] = 'offline'
-    gauth.LoadCredentialsFile(directorio_credenciales)  # Corrige el error tipográfico
-    
-    if gauth.access_token_expired:
-        try:
-            gauth.Refresh()  # Intenta refrescar el token
-        except Exception as e:
-            print(f"Error al refrescar el token: {e}")
-            gauth.LocalWebserverAuth()  # Reautentica si no se puede refrescar
-        gauth.SaveCredentialsFile(directorio_credenciales)
-    else:
-        gauth.LoadCredentialsFile(directorio_credenciales)
-        gauth.Authorize()
-    
-    return GoogleDrive(gauth)
+def login_google_sheets():
+    credentials = service_account.Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+    return build('sheets', 'v4', credentials=credentials)
 
-def download_file_from_google_drive(id_archivo, ruta_descarga):
-    credentials = login_google_drive()
-    archivo = credentials.CreateFile({'id': id_archivo})
-    nombre_archivo = archivo['title'] + '.xlsx'
-    
-    # Asegúrate de que la carpeta de destino exista
+def download_sheet_from_google_sheets(sheet_id, range_name, ruta_descarga):
+    service = login_google_sheets()
+    sheet = service.spreadsheets()
+    result = sheet.values().get(spreadsheetId=sheet_id, range=range_name).execute()
+    values = result.get('values', [])
+
+    if not values:
+        print('No data found.')
+        return None
+
+    nombre_archivo = f'{sheet_id}.xlsx'
+    ruta_archivo = os.path.join(ruta_descarga, nombre_archivo)
+
     if not os.path.exists(ruta_descarga):
         os.makedirs(ruta_descarga)
-    
-    try:
-        archivo.GetContentFile(os.path.join(ruta_descarga, nombre_archivo), mimetype=mime_type)
-    except Exception as e:
-        print(f"Error al descargar el archivo: {e}")
-        return None
-    
-    return os.path.join(ruta_descarga, nombre_archivo)
-    
-def buscar_y_cargar_documento():
-    # Ruta del documento en el driver
-    ruta_documento = download_file_from_google_drive(file_id, 'articulo/data/')
 
-    # Verifica si el documento existe
+    wb = Workbook()
+    ws = wb.active
+
+    for row in values:
+        ws.append(row)
+
+    wb.save(ruta_archivo)
+    return ruta_archivo
+
+def buscar_y_cargar_documento():
+    # ID del documento y rango de datos
+    sheet_id = '1Zv9TDVJRDG_Ar-U4qTvlTcTiJ7RUpZnawxGwPpL4IZI'
+    range_name = 'articulos!A1:Z1000'  # Ajusta el rango según tus necesidades
+
+    ruta_documento = download_sheet_from_google_sheets(sheet_id, range_name, 'articulo.xlsx')
+
     if ruta_documento and os.path.exists(ruta_documento):
-        # Ejecuta el comando cargar_articulo_xlsx
-        call_command('cargar_articulo_xlsx','-ruta_archivo', ruta_documento)
+        call_command('cargar_articulo_xlsx', '-ruta_archivo', ruta_documento)
     else:
         print(f"Documento no encontrado en {ruta_documento}")
 
@@ -86,7 +79,9 @@ class Command(BaseCommand):
 
         try:
             if not ruta_archivo:
-                ruta_archivo = download_file_from_google_drive(file_id, 'articulo/data/')
+                ruta_archivo = download_sheet_from_google_sheets(FILE_ID, 'articulos!A1:Z1000', 'articulo.xlsx')
+            if not ruta_archivo:
+                raise ValueError("No se pudo descargar el archivo.")
             self.procesar_archivo_xlsx(ruta_archivo)
             self.stdout.write(self.style.SUCCESS('Importación completada exitosamente.'))
         except Exception as e:
