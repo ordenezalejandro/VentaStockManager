@@ -113,17 +113,21 @@ def procesar_archivo_xlsx(ruta_archivo):
 
         
             
-        # codigo_interno = self.generar_codigo_interno(nombre)
+        try:
+            articulo, creado = Articulo.objects.get_or_create(
+                codigo_interno=codigo_interno,
+                nombre=nombre,
+                defaults={
+                    'codigo': codigo,
+                    'stock': 100,
+                    'vencimiento': datetime.now() + timedelta(days=90)
+                }
+            )
+        except Articulo.MultipleObjectsReturned:
+            articulo = Articulo.objects.filter(codigo_interno=codigo_interno, nombre=nombre).first()
+            creado = False
+            errores.append(f'mas de una fila tiene este valor codigo_interno: {codigo_interno}, nombre: {nombre}')
 
-        articulo, creado = Articulo.objects.get_or_create(
-            codigo_interno=codigo_interno,
-            nombre=nombre,
-            defaults={
-            'codigo': codigo,
-            'stock': 100,
-            'vencimiento': datetime.now() + timedelta(days=90)
-            }
-        )
         articulo.precio_minorista = precio_minorista
         articulo.precio_mayorista = precio_mayorista
         articulo.stock = 100
