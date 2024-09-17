@@ -21,7 +21,7 @@ mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'VentaStockManager.settings')
 
 
-SERVICE_ACCOUNT_FILE = 'credentials.json'
+SERVICE_ACCOUNT_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'credentials.json')
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 FILE_ID = '1Zv9TDVJRDG_Ar-U4qTvlTcTiJ7RUpZnawxGwPpL4IZI'
 
