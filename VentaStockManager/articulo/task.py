@@ -60,7 +60,7 @@ def download_sheet_from_google_sheets(sheet_id, range_name, ruta_descarga):
 def buscar_y_cargar_documento():
     # ID del documento y rango de datos
     sheet_id = '1Zv9TDVJRDG_Ar-U4qTvlTcTiJ7RUpZnawxGwPpL4IZI'
-    range_name = 'articulos!A1:Z1000'  # Ajusta el rango según tus necesidades
+    range_name = 'articulos!A1:Z1500'  # Ajusta el rango según tus necesidades
 
     ruta_documento = download_sheet_from_google_sheets(sheet_id, range_name, 'articulo.xlsx')
 
@@ -135,7 +135,7 @@ def procesar_archivo_xlsx(ruta_archivo):
     return errores  
 
 def actualizar_precios_articulos_desde_drive():
-    ruta_archivo = download_file_from_google_drive(file_id, 'articulo/data/')
+    ruta_archivo = download_sheet_from_google_sheets(file_id, 'articulos!A1:Z1500', 'articulo/data/')
     if ruta_archivo and os.path.exists(ruta_archivo):
         errores = procesar_archivo_xlsx(ruta_archivo)
         if errores:
