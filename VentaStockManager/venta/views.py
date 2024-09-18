@@ -340,6 +340,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         cliente_info = f"Cliente: {pedido.venta.cliente.nombre_completo()} - Dirección: {pedido.venta.cliente.direccion} - Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')} - Fecha de Entrega: {pedido.venta.fecha_entrega.strftime('%Y-%m-%d')}\n"
         elements.append(Paragraph(cliente_info, styleN))
         elements.append(Spacer(1, padding))
+        elements.append(Spacer(1, padding))
 
         # Línea antes de los artículos
         elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
