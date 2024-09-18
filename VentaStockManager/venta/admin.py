@@ -135,11 +135,14 @@ class PedidoAdmin(admin.ModelAdmin):
         return sum(articulo_venta.cantidad for articulo_venta in obj.venta.ventas.all())
     cantidad_articulos_vendidos.short_description = '# Artículos'
 
+
     def total_venta_por_articulo(self, obj):
         total = 0
-        for articulo_venta in obj.venta.ventas.all():
-            total += articulo_venta.cantidad * float(articulo_venta.precio)
+        for articulo_venta in obj.articulos.all():
+            precio = articulo_venta.precio.replace("'", "").replace(",", "")
+            total += articulo_venta.cantidad * float(precio)
         return total
+
 
     total_venta_por_articulo.short_description = 'Total Venta'
 
