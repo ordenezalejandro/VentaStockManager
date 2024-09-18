@@ -337,9 +337,11 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         elements.append(Spacer(1, padding))
 
         # Información del cliente
-        cliente_info = f"Cliente: {pedido.venta.cliente.nombre_completo()} - Dirección: {pedido.venta.cliente.direccion} - Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')} - Fecha de Entrega: {pedido.venta.fecha_entrega.strftime('%Y-%m-%d')}\n"
+        cliente_info = f"Cliente: {pedido.venta.cliente.nombre_completo()} - Dirección: {pedido.venta.cliente.direccion} "
+        cliente_address =  f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')} - Fecha de Entrega: {pedido.venta.fecha_entrega.strftime('%Y-%m-%d')}\n"
         elements.append(Paragraph(cliente_info, styleN))
         elements.append(Spacer(1, padding))
+        elements.append(Paragraph(cliente_address, styleN))
         elements.append(Spacer(1, padding))
 
         # Línea antes de los artículos
@@ -352,7 +354,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
             if len(articulo_info) > 40:
                 articulo_info = articulo_info[:40] + '\n' + articulo_info[40:]
                 
-            articulo_info_price = f" \t ({articulo_venta.cantidad} x ${articulo_venta.precio})   ${articulo_venta.total}\n"
+            articulo_info_price = f"<div style='text-align: right;'>({articulo_venta.cantidad} x ${articulo_venta.precio})   ${articulo_venta.total}</div>\n"
             elements.append(Paragraph(articulo_info, styleN))
             elements.append(Spacer(1, padding))
             elements.append(Paragraph(articulo_info_price, styleN))
