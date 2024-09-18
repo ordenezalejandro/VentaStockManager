@@ -328,10 +328,9 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         fontName='Helvetica-Bold'  # Set font to bold
     )
     padding = 1 * cm  # Increase padding
-    total_articulos = []
+    total_element = []
     for index, pedido_id in enumerate(pedido_ids):
         pedido = Pedido.objects.get(id=pedido_id)
-        total_articulos.append(pedido.venta.ventas.count())
         # Línea de inicio del ticket
         elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
         elements.append(Spacer(1, padding))
@@ -381,10 +380,13 @@ def generar_pdf_pedidos(request, pedido_ids=None):
 
         if index < len(pedido_ids) - 1:
             elements.append(PageBreak())
+        total_element.append(len(elements))   
+    # Calculate the height of the page based on the number of elements
+    page_height = (len(max(total_element)) * 1.2 * cm) + 2 * cm  # Adjust the multiplier as needed
+    page_size = (letter[0], page_height)
 
     # Set margins to zero
-    size = (max(total_articulos) * 10) * cm
-    pdf = SimpleDocTemplate(buffer, pagesize=size, topMargin=0, bottomMargin=0, leftMargin=0, rightMargin=0)
+    pdf = SimpleDocTemplate(buffer, pagesize=page_size, topMargin=0, bottomMargin=0, leftMargin=0, rightMargin=0)
     pdf.build(elements)
 
     pdf_buffer = buffer.getvalue()
