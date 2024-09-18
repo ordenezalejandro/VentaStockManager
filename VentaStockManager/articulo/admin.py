@@ -23,7 +23,7 @@ class ArticuloAdmin(admin.ModelAdmin):
         for articulo_venta in obj.articulos_vendidos.all():
             total += articulo_venta.cantidad * float(articulo_venta.precio)
         return total
-    
+        
     def disparar_actualizar_precio_archivo(self, request, queryset):
         # Aquí se dispara la tarea
         errores = actualizar_precios_articulos_desde_drive()
