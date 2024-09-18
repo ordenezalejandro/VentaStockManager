@@ -308,7 +308,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.units import cm
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, HRFlowable
-    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from io import BytesIO
     from django.http import HttpResponse
     from .models import Pedido
@@ -319,8 +319,14 @@ def generar_pdf_pedidos(request, pedido_ids=None):
     buffer = BytesIO()
     elements = []
     styles = getSampleStyleSheet()
-    styleN = styles['Normal']
-    styleN.fontSize = 12  # Increase font size
+    
+    # Define a new style with larger font size and bold text
+    styleN = ParagraphStyle(
+        'Normal',
+        parent=styles['Normal'],
+        fontSize=14,  # Increase font size
+        fontName='Helvetica-Bold'  # Set font to bold
+    )
     padding = 0.5 * cm
 
     for index, pedido_id in enumerate(pedido_ids):
