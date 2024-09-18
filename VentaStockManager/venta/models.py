@@ -10,7 +10,7 @@ from vendedor.models import Vendedor
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 from datetime import datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 
 class Venta(models.Model):
@@ -70,9 +70,13 @@ class ArticuloVenta(models.Model):
 
     @property
     def total(self):
-
-        return Decimal(self.cantidad) * Decimal(self.precio)
-
+        try:
+            # Clean the precio field to ensure it only contains numeric characters and a decimal point
+            cleaned_precio = self.precio.replace("'", "").replace(",", "")
+            return Decimal(self.cantidad) * Decimal(cleaned_precio)
+        except InvalidOperation:
+            # Handle the case where conversion to Decimal fails
+            return Decimal(0)
     def __str__(self):
         return f"{self.cantidad} unidades de {self.articulo} en la venta {self.venta}"
     
@@ -91,5 +95,4 @@ class Pedido(models.Model):
     venta = models.OneToOneField(Venta, on_delete=models.CASCADE, related_name='pedido')
     pagado = models.BooleanField(default=False)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default=PENDIENTE)
- 
- 
+
