@@ -20,7 +20,7 @@ class ArticuloAdmin(admin.ModelAdmin):
         
     def total_venta_por_articulo(self, obj):
         total = 0
-        for articulo_venta in obj.articulos.all():
+        for articulo_venta in obj.ventas.all():
             # Remove any non-numeric characters except for the decimal point
             precio = articulo_venta.precio.replace("'", "").replace(",", "")
             total += articulo_venta.cantidad * float(precio)
