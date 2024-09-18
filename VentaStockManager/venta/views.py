@@ -324,7 +324,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
     styleN = ParagraphStyle(
         'Normal',
         parent=styles['Normal'],
-        fontSize=18,  # Increase font size
+        fontSize=24,  # Increase font size
         fontName='Helvetica-Bold'  # Set font to bold
     )
     padding = 0.5 * cm
@@ -370,7 +370,8 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         if index < len(pedido_ids) - 1:
             elements.append(PageBreak())
 
-    pdf = SimpleDocTemplate(buffer, pagesize=letter, topMargin=1 * cm, bottomMargin=1 * cm)
+    # Set margins to zero
+    pdf = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0, bottomMargin=0, leftMargin=0, rightMargin=0)
     pdf.build(elements)
 
     pdf_buffer = buffer.getvalue()
