@@ -328,20 +328,26 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         fontName='Helvetica-Bold'  # Set font to bold
     )
     padding = 1 * cm  # Increase padding
-
+    total_articulos = []
     for index, pedido_id in enumerate(pedido_ids):
         pedido = Pedido.objects.get(id=pedido_id)
-        
+        total_articulos.append(pedido.venta.articulos_vendidos.count())
         # Línea de inicio del ticket
         elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
         elements.append(Spacer(1, padding))
 
         # Información del cliente
-        cliente_info = f"Cliente: {pedido.venta.cliente.nombre_completo()} - Dirección: {pedido.venta.cliente.direccion} "
-        cliente_address =  f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')} - Fecha de Entrega: {pedido.venta.fecha_entrega.strftime('%Y-%m-%d')}\n"
+        cliente_info = f"Cliente: {pedido.venta.cliente.nombre_completo()}"
+        direccion = f" Dirección: {pedido.venta.cliente.direccion} "
+        fecha_compra = f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')} "
+        fecha_entrega = f"Fecha de Entrega: {pedido.venta.fecha_entrega.strftime('%Y-%m-%d')}\n"
         elements.append(Paragraph(cliente_info, styleN))
         elements.append(Spacer(1, padding))
-        elements.append(Paragraph(cliente_address, styleN))
+        elements.append(Paragraph(direccion, styleN))
+        elements.append(Spacer(1, padding))
+        elements.append(Paragraph(fecha_compra, styleN))
+        elements.append(Spacer(1, padding))
+        elements.append(Paragraph(fecha_entrega, styleN))
         elements.append(Spacer(1, padding))
 
         # Línea antes de los artículos
@@ -377,7 +383,8 @@ def generar_pdf_pedidos(request, pedido_ids=None):
             elements.append(PageBreak())
 
     # Set margins to zero
-    pdf = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0, bottomMargin=0, leftMargin=0, rightMargin=0)
+    size = (max(total_articulos) * 10) * cm
+    pdf = SimpleDocTemplate(buffer, pagesize=size, topMargin=0, bottomMargin=0, leftMargin=0, rightMargin=0)
     pdf.build(elements)
 
     pdf_buffer = buffer.getvalue()
