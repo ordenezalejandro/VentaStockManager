@@ -17,13 +17,15 @@ class ArticuloAdmin(admin.ModelAdmin):
     model = Articulo
     actions = ['agregar_10_por_ciento_al_precio', 'agregar_5_por_ciento_al_precio', 'agregar_1_por_ciento_al_precio', 'disparar_actualizar_precio_archivo']
 
-    
+        
     def total_venta_por_articulo(self, obj):
         total = 0
-        for articulo_venta in obj.articulos_vendidos.all():
-            total += articulo_venta.cantidad * float(articulo_venta.precio)
+        for articulo_venta in obj.articulos.all():
+            # Remove any non-numeric characters except for the decimal point
+            precio = articulo_venta.precio.replace("'", "").replace(",", "")
+            total += articulo_venta.cantidad * float(precio)
         return total
-        
+
     def disparar_actualizar_precio_archivo(self, request, queryset):
         # Aquí se dispara la tarea
         errores = actualizar_precios_articulos_desde_drive()

@@ -309,7 +309,6 @@ def generar_pdf_pedidos(request, pedido_ids=None):
     from reportlab.lib.units import cm
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, HRFlowable
     from reportlab.lib.styles import getSampleStyleSheet
-    from reportlab.lib import colors
     from io import BytesIO
     from django.http import HttpResponse
     from .models import Pedido
