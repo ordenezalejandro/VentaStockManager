@@ -61,7 +61,7 @@ class ArticuloVenta(models.Model):
 
     def get_precio_total(self):
         if self.articulo:
-            return float(self.cantidad) * float(self.precio)
+            return float(self.cantidad) * float(self.precio.replace("'", "").replace(",", ""))
         else:
             return 0.0
     @property
