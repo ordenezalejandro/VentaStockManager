@@ -324,7 +324,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
     styleN = ParagraphStyle(
         'Normal',
         parent=styles['Normal'],
-        fontSize=14,  # Increase font size
+        fontSize=18,  # Increase font size
         fontName='Helvetica-Bold'  # Set font to bold
     )
     padding = 0.5 * cm
