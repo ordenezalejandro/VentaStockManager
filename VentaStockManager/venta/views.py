@@ -331,7 +331,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
     total_articulos = []
     for index, pedido_id in enumerate(pedido_ids):
         pedido = Pedido.objects.get(id=pedido_id)
-        total_articulos.append(pedido.venta.articulos_vendidos.count())
+        total_articulos.append(pedido.venta.ventas.count())
         # Línea de inicio del ticket
         elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
         elements.append(Spacer(1, padding))
