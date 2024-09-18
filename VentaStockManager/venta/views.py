@@ -347,9 +347,10 @@ def generar_pdf_pedidos(request, pedido_ids=None):
 
         # Información de los artículos
         for articulo_venta in pedido.venta.ventas.all():
-            articulo_info = f"{articulo_venta.articulo.get_articulo_short_name()}  ({articulo_venta.cantidad} x ${articulo_venta.precio})   ${articulo_venta.total}\n"
+            articulo_info = f"{articulo_venta.articulo.get_articulo_short_name()}" 
             if len(articulo_info) > 40:
                 articulo_info = articulo_info[:40] + '\n' + articulo_info[40:]
+            articulo_info += f" \n ({articulo_venta.cantidad} x ${articulo_venta.precio})   ${articulo_venta.total}\n"
             elements.append(Paragraph(articulo_info, styleN))
             elements.append(Spacer(1, padding))
 
