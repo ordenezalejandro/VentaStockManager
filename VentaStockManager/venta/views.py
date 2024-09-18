@@ -354,6 +354,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
                 
             articulo_info_price = f" \t ({articulo_venta.cantidad} x ${articulo_venta.precio})   ${articulo_venta.total}\n"
             elements.append(Paragraph(articulo_info, styleN))
+            elements.append(Spacer(1, padding))
             elements.append(Paragraph(articulo_info_price, styleN))
             elements.append(Spacer(1, padding))
 
