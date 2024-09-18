@@ -351,7 +351,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
             if len(articulo_info) > 40:
                 articulo_info = articulo_info[:40] + '\n' + articulo_info[40:]
                 
-            articulo_info_price += f" \t ({articulo_venta.cantidad} x ${articulo_venta.precio})   ${articulo_venta.total}\n"
+            articulo_info_price = f" \t ({articulo_venta.cantidad} x ${articulo_venta.precio})   ${articulo_venta.total}\n"
             elements.append(Paragraph(articulo_info, styleN))
             elements.append(Paragraph(articulo_info_price, styleN))
             elements.append(Spacer(1, padding))
