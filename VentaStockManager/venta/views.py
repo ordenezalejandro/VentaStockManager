@@ -324,7 +324,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
     styleN = ParagraphStyle(
         'Normal',
         parent=styles['Normal'],
-        fontSize=24,  # Increase font size
+        fontSize=28,  # Increase font size
         fontName='Helvetica-Bold'  # Set font to bold
     )
     padding = 0.5 * cm
@@ -337,7 +337,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         elements.append(Spacer(1, padding))
 
         # Información del cliente
-        cliente_info = f"Cliente: {pedido.venta.cliente.nombre_completo()} - Dirección: {pedido.venta.cliente.direccion} - Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')} - Fecha de Entrega: {pedido.venta.fecha_entrega.strftime('%Y-%m-%d')}\n"
+        cliente_info = f"Cliente: {pedido.venta.cliente.nombre_completo()} - Dirección: {pedido.venta.cliente.direccion} - \n\nFecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')} - Fecha de Entrega: {pedido.venta.fecha_entrega.strftime('%Y-%m-%d')}\n"
         elements.append(Paragraph(cliente_info, styleN))
         elements.append(Spacer(1, padding))
 
@@ -350,7 +350,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
             articulo_info = f"{articulo_venta.articulo.get_articulo_short_name()}" 
             if len(articulo_info) > 40:
                 articulo_info = articulo_info[:40] + '\n' + articulo_info[40:]
-            articulo_info += f" \n ({articulo_venta.cantidad} x ${articulo_venta.precio})   ${articulo_venta.total}\n"
+            articulo_info += f" \n\n ({articulo_venta.cantidad} x ${articulo_venta.precio})   ${articulo_venta.total}\n"
             elements.append(Paragraph(articulo_info, styleN))
             elements.append(Spacer(1, padding))
 
