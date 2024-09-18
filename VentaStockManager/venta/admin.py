@@ -87,7 +87,7 @@ class VentaAdmin(admin.ModelAdmin):
 
     def total_venta_por_articulo(self, obj):
         total = 0
-        for articulo_venta in obj.articulos.all():
+        for articulo_venta in obj.venta.ventas.all():  # Corrected line
             precio = articulo_venta.precio.replace("'", "").replace(",", "")
             total += articulo_venta.cantidad * float(precio)
         return total
