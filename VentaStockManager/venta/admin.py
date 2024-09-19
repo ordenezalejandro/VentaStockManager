@@ -71,8 +71,25 @@ class VentaAdmin(admin.ModelAdmin):
     autocomplete_fields = ['cliente']
 
     def save_model(self, request, obj, form, change):
+        # Save the main object first to get an ID
         super().save_model(request, obj, form, change)
-        total_venta = obj.precio_total
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        
+        # Calculate total from the inline formset data
+        total_venta = 0
+        for formset in formsets:
+            for inline_form in formset.forms:
+                if inline_form.cleaned_data and not inline_form.cleaned_data.get('DELETE', False):
+                    cantidad = inline_form.cleaned_data['cantidad']
+                    precio = inline_form.cleaned_data['precio']
+                    total_venta += cantidad * float(precio)  # Convert precio to float
+        
+        # Update the total price and save again
+        # form.instance.precio_total = total_venta
+        form.instance.save()
+        
         messages.success(request, f'Venta exitosa. Total: ${total_venta}')
     
     def cantidad_articulos_vendidos(self, obj):
