@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 from django import forms
 from django.utils import timezone
 from .views import generar_pdf_pedidos
+from django.contrib import messages
 
 # import autocomplete_all
 
@@ -69,7 +70,10 @@ class VentaAdmin(admin.ModelAdmin):
     raw_id_fields = ["cliente"]
     autocomplete_fields = ['cliente']
 
-    
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        total_venta = obj.precio_total
+        messages.success(request, f'Venta exitosa. Total: ${total_venta}')
     
     def cantidad_articulos_vendidos(self, obj):
         return obj.articulos_vendidos.count()
