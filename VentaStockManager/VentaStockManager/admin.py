@@ -25,7 +25,11 @@ class MyAdminSite(MaterialAdminSite):
             app['icon'] = getattr(app_config, 'icon_name', 'default_icon')
         
         return app_list
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+
 admin_site = MyAdminSite()
+admin_site.register(User, UserAdmin)
 
 admin_site.site_header = 'Administrador Osvaldo'
 admin_site.index_title = 'Osvaldo Administrador'
