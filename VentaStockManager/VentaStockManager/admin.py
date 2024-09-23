@@ -28,6 +28,8 @@ class MyAdminSite(MaterialAdminSite):
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
+UserAdmin.icon_name = "person"
+
 admin_site = MyAdminSite()
 admin_site.register(User, UserAdmin)
 
