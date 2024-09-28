@@ -230,12 +230,29 @@ def generar_pdf_pedidos_(request, pedido_ids=None):
     quarter_count = 0
 
     for pedido in pedidos:
-        # Información del cliente y vendedor
-        data_cliente = [
-            [f'Id: # {pedido.venta.id}', f'Nombre del Cliente: {pedido.venta.cliente.nombre}', '', ''],
-            [f'Teléfono: ({pedido.venta.cliente.telefono})', f'Vendedor: {pedido.venta.vendedor}', '', ''],
-            [f"Dirección: {pedido.venta.cliente.direccion}", f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')}", '', '']
-        ]
+        # # Información del cliente y vendedor
+        # data_cliente = [
+        #     [f'Id: # {pedido.venta.id}', f'Nombre del Cliente: {pedido.venta.cliente.nombre}', '', ''],
+        #     [f'Teléfono: ({pedido.venta.cliente.telefono})', f'Vendedor: {pedido.venta.vendedor}', '', ''],
+        #     [f"Dirección: {pedido.venta.cliente.direccion}", f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')}", '', '']
+        # ]
+        elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
+        elements.append(Spacer(1, padding))
+
+        # Información del cliente
+        cliente_info = f"Cliente: {pedido.venta.cliente.nombre_completo()}"
+        direccion = f" Dirección: {pedido.venta.cliente.direccion} "
+        fecha_compra = f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')} "
+        fecha_entrega = f"Fecha de Entrega: {pedido.venta.fecha_entrega.strftime('%Y-%m-%d')}\n"
+        elements.append(Paragraph(cliente_info, styleN))
+        elements.append(Spacer(1, padding))
+        elements.append(Paragraph(direccion, styleN))
+        elements.append(Spacer(1, padding))
+        elements.append(Paragraph(fecha_compra, styleN))
+        elements.append(Spacer(1, padding))
+        elements.append(Paragraph(fecha_entrega, styleN))
+        elements.append(Spacer(1, padding))
+
         data_articulos = [['Artículo', '#', 'Precio', 'Subtotal']]
         
         for articulo_venta in pedido.venta.ventas.all():
@@ -305,88 +322,104 @@ def generar_pdf_pedidos_(request, pedido_ids=None):
     return response
 
 def generar_pdf_pedidos(request, pedido_ids=None):
+    from reportlab.lib.pagesizes import landscape
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.units import cm
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, HRFlowable
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, PageBreak
+    from reportlab.lib.styles import getSampleStyleSheet
     from io import BytesIO
     from django.http import HttpResponse
     from .models import Pedido
-
     if pedido_ids is None:
         pedido_ids = request.GET.get('pedidos_ids').split(',')
-
+        
+    
     buffer = BytesIO()
     elements = []
     styles = getSampleStyleSheet()
-    
-    # Define a new style with larger font size and bold text
-    styleN = ParagraphStyle(
-        'Normal',
-        parent=styles['Normal'],
-        fontSize=30,  # Increase font size
-        fontName='Helvetica'  # Set font to bold
-    )
-    padding = 1 * cm  # Increase padding
+    padding = 0.5 * cm
+    pedidos_count = len(pedido_ids)
+    cantidad_articulos = []
     total_element = []
     for index, pedido_id in enumerate(pedido_ids):
         pedido = Pedido.objects.get(id=pedido_id)
-        # Línea de inicio del ticket
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
-        elements.append(Spacer(1, padding))
+        cantidad_articulos.append(pedido.venta.ventas.count())
+        data_cliente = [
+            ['Compra:', pedido.venta.fecha_compra],
+            ['Entrega:', pedido.venta.fecha_entrega],
+            ['Dirección:', pedido.venta.cliente.direccion],
+            ['Cliente:', pedido.venta.cliente.nombre_completo()],
+        ]
 
-        # Información del cliente
-        cliente_info = f"Cliente: {pedido.venta.cliente.nombre_completo()}"
-        direccion = f" Dirección: {pedido.venta.cliente.direccion} "
-        fecha_compra = f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')} "
-        fecha_entrega = f"Fecha de Entrega: {pedido.venta.fecha_entrega.strftime('%Y-%m-%d')}\n"
-        elements.append(Paragraph(cliente_info, styleN))
-        elements.append(Spacer(1, padding))
-        elements.append(Paragraph(direccion, styleN))
-        elements.append(Spacer(1, padding))
-        elements.append(Paragraph(fecha_compra, styleN))
-        elements.append(Spacer(1, padding))
-        elements.append(Paragraph(fecha_entrega, styleN))
-        elements.append(Spacer(1, padding))
+        # Tabla del cliente
+        tabla_cliente = Table(data_cliente, colWidths=[4 * cm, 4 * cm, 4 * cm,  4 * cm])
+        estilo_tabla_cliente = TableStyle([
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 0), (-1, -1), 7)
+        ])
+        tabla_cliente.setStyle(estilo_tabla_cliente)
 
-        # Línea antes de los artículos
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
-        elements.append(Spacer(1, padding))
-
-        # Información de los artículos
+        # Tabla de artículos
+        data_articulos = [['Articulos', 'Cant', 'Precio/U', 'Total']]
         for articulo_venta in pedido.venta.ventas.all():
-            articulo_info = f"{articulo_venta.articulo.get_articulo_short_name()}" 
-            if len(articulo_info) > 40:
-                articulo_info = articulo_info[:40] + '\n' + articulo_info[40:]
+            nombre_articulo = articulo_venta.articulo.get_articulo_short_name()
+            nombre_articulo_corto = ""
+            nombre_articulo_len = len(nombre_articulo)
+            for i in range(0, nombre_articulo_len, 32):
+                if nombre_articulo_len - i > 32:
+                    nombre_articulo_corto += nombre_articulo[i:i+32] + "\n"
+                else:
+                    nombre_articulo_corto += nombre_articulo[i:i+32] 
                 
-            articulo_info_price = f"<div style='text-align: right;'>({articulo_venta.cantidad} x ${articulo_venta.precio})   ${articulo_venta.total}</div>\n"
-            elements.append(Paragraph(articulo_info, styleN))
-            elements.append(Spacer(1, padding))
-            elements.append(Paragraph(articulo_info_price, styleN))
-            elements.append(Spacer(1, padding))
+            data_articulos.append([
+                nombre_articulo_corto,
+                articulo_venta.cantidad,
+                articulo_venta.precio,
+                articulo_venta.total
+            ])
 
-        # Línea después de los artículos
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
+        tabla_articulos = Table(data_articulos, colWidths=[4 * cm, 1 * cm, 1.5 * cm, 1.5 * cm])
+        estilo_tabla_articulos = TableStyle([
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 7)
+        ])
+        tabla_articulos.setStyle(estilo_tabla_articulos)
+
+        # Tabla del total
+        data_total = [['Total:', pedido.venta.precio_total]]
+        tabla_total = Table(data_total, colWidths=[5 * cm, 3 * cm])
+        estilo_tabla_total = TableStyle([
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            # ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+        ])
+        tabla_total.setStyle(estilo_tabla_total)
+
+        # Añadir tablas a los elementos
+        elements.append(tabla_cliente)
         elements.append(Spacer(1, padding))
-
-        # Total de la venta
-        total_info = f"Total: {pedido.venta.precio_total}\n"
-        elements.append(Paragraph(total_info, styleN))
+        elements.append(tabla_articulos)
         elements.append(Spacer(1, padding))
-
-        # Línea final del ticket
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
+        elements.append(tabla_total)
         elements.append(Spacer(1, padding))
-
         if index < len(pedido_ids) - 1:
             elements.append(PageBreak())
-        total_element.append(len(elements))   
-    # Calculate the height of the page based on the number of elements
-    page_height = (max(total_element)  * cm) # Adjust the multiplier as needed
-    page_size = (letter[0], page_height)
+        total_element.append(len(elements))
+        
+
+    page_height = (max(total_element)  * 1.6* cm)  + 1.5 *cm # Adjust the multiplier as needed
+    page_size = (8*cm, page_height)
 
     # Set margins to zero
     pdf = SimpleDocTemplate(buffer, pagesize=page_size, topMargin=0, bottomMargin=0, leftMargin=0, rightMargin=0)
+
+    # page_height = ((max(cantidad_articulos ) * 1.6* cm) + 1*cm + (80 if max(cantidad_articulos) < 4 else 5))
+    
+    # pdf = SimpleDocTemplate(buffer, pagesize=(8 * cm, page_height), topMargin=0 * cm, bottomMargin=0 * cm)
+
     pdf.build(elements)
 
     pdf_buffer = buffer.getvalue()
@@ -397,6 +430,11 @@ def generar_pdf_pedidos(request, pedido_ids=None):
     response['Content-Disposition'] = f'attachment; filename="pedidos_{fecha_del_dia}.pdf"'
     return response
 
+def add_quarter_page(canvas, doc):
+    canvas.saveState()
+    canvas.translate(0, -doc.height)
+    canvas.restoreState()
+    
 def generar_pdf_pedido(request, pedido_id):
     return generar_pdf_pedidos(request, [pedido_id])
 
