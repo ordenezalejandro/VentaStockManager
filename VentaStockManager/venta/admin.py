@@ -26,6 +26,8 @@ class ArticuloVentaInline(admin.TabularInline):
     empty_value_display = 'Busca un articulo'
     # search_fields = ('codigo', 'codigo_interno', "nombre")
     raw_id_fields = ["articulo"]
+    show_add_another = True  # This line allows adding new Articulo
+
     # autocomplete_fields = ["articulo"]
     
     # prepopulated_fields  = {'precio': ('precio_minorista_2',)}
