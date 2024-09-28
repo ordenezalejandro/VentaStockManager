@@ -366,11 +366,11 @@ def generar_pdf_pedidos(request, pedido_ids=None):
             nombre_articulo = articulo_venta.articulo.get_articulo_short_name()
             nombre_articulo_corto = ""
             nombre_articulo_len = len(nombre_articulo)
-            for i in range(0, nombre_articulo_len, 32):
-                if nombre_articulo_len - i > 32:
-                    nombre_articulo_corto += nombre_articulo[i:i+32] + "\n"
+            for i in range(0, nombre_articulo_len, 30):
+                if nombre_articulo_len - i > 30:
+                    nombre_articulo_corto += nombre_articulo[i:i+30] + "\n"
                 else:
-                    nombre_articulo_corto += nombre_articulo[i:i+32] 
+                    nombre_articulo_corto += nombre_articulo[i:i+30] 
                 
             data_articulos.append([
                 nombre_articulo_corto,
