@@ -362,6 +362,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
 
         # Tabla de artículos
         data_articulos = [['Articulos', 'Cant', 'Precio/U', 'Total']]
+        doble_space = 0
         for articulo_venta in pedido.venta.ventas.all():
             nombre_articulo = articulo_venta.articulo.get_articulo_short_name()
             nombre_articulo_corto = ""
@@ -369,6 +370,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
             for i in range(0, nombre_articulo_len, 29):
                 if nombre_articulo_len - i > 29:
                     nombre_articulo_corto += nombre_articulo[i:i+29] + "\n"
+                    doble_space += 1
                 else:
                     nombre_articulo_corto += nombre_articulo[i:i+29] 
                 
@@ -410,11 +412,11 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         total_element.append(len(elements))
         
 
-    page_height = (max(total_element)  * (1.6)* cm)  + 2 *cm + (len(cantidad_articulos) * 0.2 *cm) # Adjust the multiplier as needed
+    page_height = (max(total_element)  * (1.6)* cm)  + (-2*cm if max(cantidad_articulos) < 7 else 5) + (max(cantidad_articulos) * 0.3 *cm) + (doble_space*cm) # Adjust the multiplier as needed
     page_size = (8*cm, page_height)
 
     # Set margins to zero
-    pdf = SimpleDocTemplate(buffer, pagesize=page_size, topMargin=0, bottomMargin=0, leftMargin=0, rightMargin=0)
+    pdf = SimpleDocTemplate(buffer, pagesize=page_size, topMargin=0, bottomMargin=0, leftMargin=0.5, rightMargin=0.5)
 
     # page_height = ((max(cantidad_articulos ) * 1.6* cm) + 1*cm + (80 if max(cantidad_articulos) < 4 else 5))
     
