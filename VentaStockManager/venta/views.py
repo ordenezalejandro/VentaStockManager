@@ -410,7 +410,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         total_element.append(len(elements))
         
 
-    page_height = (max(total_element)  * 2* cm)  + 4 *cm # Adjust the multiplier as needed
+    page_height = (max(total_element)  * (1.6)* cm)  + 2 *cm + (len(cantidad_articulos) * 0.2 *cm) # Adjust the multiplier as needed
     page_size = (8*cm, page_height)
 
     # Set margins to zero
