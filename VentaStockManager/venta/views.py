@@ -366,11 +366,11 @@ def generar_pdf_pedidos(request, pedido_ids=None):
             nombre_articulo = articulo_venta.articulo.get_articulo_short_name()
             nombre_articulo_corto = ""
             nombre_articulo_len = len(nombre_articulo)
-            for i in range(0, nombre_articulo_len, 30):
-                if nombre_articulo_len - i > 30:
-                    nombre_articulo_corto += nombre_articulo[i:i+30] + "\n"
+            for i in range(0, nombre_articulo_len, 29):
+                if nombre_articulo_len - i > 29:
+                    nombre_articulo_corto += nombre_articulo[i:i+29] + "\n"
                 else:
-                    nombre_articulo_corto += nombre_articulo[i:i+30] 
+                    nombre_articulo_corto += nombre_articulo[i:i+29] 
                 
             data_articulos.append([
                 nombre_articulo_corto,
@@ -410,7 +410,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         total_element.append(len(elements))
         
 
-    page_height = (max(total_element)  * 1.6* cm)  + 1.5 *cm # Adjust the multiplier as needed
+    page_height = (max(total_element)  * 2* cm)  + 4 *cm # Adjust the multiplier as needed
     page_size = (8*cm, page_height)
 
     # Set margins to zero
