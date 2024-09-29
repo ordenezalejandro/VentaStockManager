@@ -8,7 +8,9 @@ from articulo.models import Articulo
 from cliente.models import Cliente
 from compra.models import Proveedor, Compra
 from django.apps import apps
-
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+from django.utils.html import format_html
 
 class MyAdminSite(MaterialAdminSite):
     def get_app_list(self, request, app_label=None):
@@ -33,8 +35,10 @@ UserAdmin.icon_name = "person"
 admin_site = MyAdminSite()
 admin_site.register(User, UserAdmin)
 
-admin_site.site_header = 'Administrador Osvaldo'
-admin_site.index_title = 'Osvaldo Administrador'
+admin_site.site_header =format_html(
+    'Osvaldo Administrator - <span class="text-primary">Lista de precios<button class="btn btn-primary" onclick="window.location.href=\'https://jairodo.pythonanywhere.com/lista_precios\'"><a class="pl-4 ml-4 material-icons" title="Ir a la lista de precios">arrow_forward</a></button><button class="btn btn-secondary" onclick="navigator.clipboard.writeText(\'https://jairodo.pythonanywhere.com/lista_precios\')"><a class="mb-2 material-icons" title="Copiar link lista de precios">content_copy</a></button></span>'
+)
+admin_site.index_title = 'Osvaldo Administrador '
 admin_site.site_title = 'Osvaldo Programs'
 admin_site.register(Venta, VentaAdmin)
 admin_site.register(Pedido, PedidoAdmin)
