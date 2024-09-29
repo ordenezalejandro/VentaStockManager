@@ -36,7 +36,7 @@ admin_site = MyAdminSite()
 admin_site.register(User, UserAdmin)
 
 admin_site.site_header =format_html(
-    'Osvaldo Administrator - <span class="text-primary">Lista de precios<button class="btn btn-primary" onclick="window.location.href=\'https://jairodo.pythonanywhere.com/lista_precios\'"><a class="pl-4 ml-4 material-icons" title="Ir a la lista de precios">arrow_forward</a></button><button class="btn btn-secondary" onclick="navigator.clipboard.writeText(\'https://jairodo.pythonanywhere.com/lista_precios\')"><a class="mb-2 material-icons" title="Copiar link lista de precios">content_copy</a></button></span>'
+    'Osvaldo Administrator - <span class="text-primary">Precios<button class="btn btn-primary" onclick="window.location.href=\'https://jairodo.pythonanywhere.com/lista_precios\'"><a class="pl-4 ml-4 material-icons" title="Ir a la lista de precios">arrow_forward</a></button><button class="btn btn-secondary" onclick="navigator.clipboard.writeText(\'https://jairodo.pythonanywhere.com/lista_precios\')"><a class="mb-2 material-icons" title="Copiar link lista de precios">content_copy</a></button></span>'
 )
 admin_site.index_title = 'Osvaldo Administrador '
 admin_site.site_title = 'Osvaldo Programs'
