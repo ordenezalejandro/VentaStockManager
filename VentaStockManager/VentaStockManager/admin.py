@@ -16,16 +16,18 @@ import logging
 class MyAdminSite(MaterialAdminSite):
     def get_app_list(self, request, app_label=None):
         app_dict = self._build_app_dict(request, app_label)
-        # Ensure app_dict values are dictionaries with a "name" key
-                # Log the app_dict structure for debugging
+        # Log the app_dict structure for debugging
         print(f"app_dict: {app_dict}")
         logging.debug(f"app_dict: {app_dict}")
         
+        valid_apps = []
         for app in app_dict.values():
             if not isinstance(app, dict) or "name" not in app:
-                raise ValueError("Invalid app_dict structure")
-                # continue
-        app_list = sorted(app_dict.values(), key=lambda x: x["name"].lower())
+                logging.error(f"Invalid app_dict structure: {app}")
+                continue
+            valid_apps.append(app)
+        
+        app_list = sorted(valid_apps, key=lambda x: x["name"].lower())
         
         # Add icons to the app list
         for app in app_list:
@@ -39,8 +41,6 @@ from django.contrib.auth.models import User
 UserAdmin.icon_name = "person"
 
 admin_site = MyAdminSite()
-
-
 
 admin_site.site_header = format_html(
     'Osvaldo Administrator - <span class="text-primary">Precios<button class="btn btn-primary" onclick="window.location.href=\'https://jairodo.pythonanywhere.com/lista_precios\'"><a class="pl-4 ml-4 material-icons" title="Ir a la lista de precios">arrow_forward</a></button><button class="btn btn-secondary" onclick="navigator.clipboard.writeText(\'https://jairodo.pythonanywhere.com/lista_precios\')"><a class="mb-2 material-icons" title="Copiar link lista de precios">content_copy</a></button></span>'
