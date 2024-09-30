@@ -165,7 +165,7 @@ Q_CLUSTER = {
     'timeout': 60,
     'queue_limit': 50,
     'bulk': 10,
-    # 'orm': 'default'  # Usar el ORM de Django
+    'orm': 'default'  # Usar el ORM de Django
 }
 
 # Configuración de HSTS (HTTP Strict Transport Security)
