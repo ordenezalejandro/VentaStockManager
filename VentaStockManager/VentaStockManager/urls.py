@@ -16,18 +16,20 @@ Including another URLconf
 """
 # from django.contrib import admin
 from django.urls import path, include
-from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.views.generic.base import RedirectView
 from .admin import admin_site
 
 urlpatterns = [
     path("admin/", admin_site.urls),
     # path('admin/', include('material.admin.urls')),
+    
     path("clientes/", include('cliente.urls')),
     path("", include('compra.urls')),
     path("", include('articulo.urls')),
     path("", include('venta.urls')),
     path("", include('vendedor.urls')),
-    path('login/', auth_views.LoginView.as_view(), name='login')
-    ]
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('', RedirectView.as_view(url='/admin/', permanent=True)),  # Redirigir a admin
+]
 
