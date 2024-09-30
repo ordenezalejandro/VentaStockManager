@@ -18,8 +18,8 @@ class MyAdminSite(MaterialAdminSite):
         # Ensure app_dict values are dictionaries with a "name" key
         for app in app_dict.values():
             if not isinstance(app, dict) or "name" not in app:
-                # raise ValueError("Invalid app_dict structure")
-                continue
+                raise ValueError("Invalid app_dict structure")
+                # continue
         app_list = sorted(app_dict.values(), key=lambda x: x["name"].lower())
         
         # Add icons to the app list
