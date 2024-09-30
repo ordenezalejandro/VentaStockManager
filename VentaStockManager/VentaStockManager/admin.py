@@ -16,6 +16,9 @@ class MyAdminSite(MaterialAdminSite):
     def get_app_list(self, request, app_label=None):
         app_dict = self._build_app_dict(request, app_label)
         # Ensure app_dict values are dictionaries with a "name" key
+                # Log the app_dict structure for debugging
+        logging.debug(f"app_dict: {app_dict}")
+        
         for app in app_dict.values():
             if not isinstance(app, dict) or "name" not in app:
                 raise ValueError("Invalid app_dict structure")
