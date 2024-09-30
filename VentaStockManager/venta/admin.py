@@ -11,15 +11,19 @@ from django import forms
 from django.utils import timezone
 from .views import generar_pdf_pedidos
 from django.contrib import messages
+from .forms import ArticuloVentaInlineFormSet
 
 # import autocomplete_all
 
 # from django.db.models.query import SelectQuerySet
 from django.contrib import admin
 from venta.forms import ArticuloVentaForm, VentaForm
+
+
 class ArticuloVentaInline(admin.TabularInline):
     model = ArticuloVenta
     form = ArticuloVentaForm
+    formset = ArticuloVentaInlineFormSet
     extra = 12
     verbose_name = "Item de venta"
     verbose_name_plural = "Items de ventas"
@@ -27,7 +31,7 @@ class ArticuloVentaInline(admin.TabularInline):
     # search_fields = ('codigo', 'codigo_interno', "nombre")
     raw_id_fields = ["articulo"]
     show_add_another = True  # This line allows adding new Articulo
-
+    autocomplete_fields = ["articulo"]
     # autocomplete_fields = ["articulo"]
     
     # prepopulated_fields  = {'precio': ('precio_minorista_2',)}
@@ -89,7 +93,7 @@ class VentaAdmin(admin.ModelAdmin):
                     total_venta += cantidad * float(precio)  # Convert precio to float
         
         # Update the total price and save again
-        # form.instance.precio_total = total_venta
+        # form.instance.precio_total = total_venta  # Update the total price
         form.instance.save()
         
         messages.success(request, f'Venta exitosa. Total: ${total_venta}')

@@ -16,7 +16,7 @@ class ArticuloAdmin(admin.ModelAdmin):
     icon_name = "local_play"
     model = Articulo
     actions = ['agregar_10_por_ciento_al_precio', 'agregar_5_por_ciento_al_precio', 'agregar_1_por_ciento_al_precio', 'disparar_actualizar_precio_archivo']
-
+    # autocomplete_fields = ['nombre']  # Enable autocomplete for nombre
         
     def total_venta_por_articulo(self, obj):
         total = 0
