@@ -18,6 +18,7 @@ class MyAdminSite(MaterialAdminSite):
         app_dict = self._build_app_dict(request, app_label)
         # Ensure app_dict values are dictionaries with a "name" key
                 # Log the app_dict structure for debugging
+        print(f"app_dict: {app_dict}")
         logging.debug(f"app_dict: {app_dict}")
         
         for app in app_dict.values():
