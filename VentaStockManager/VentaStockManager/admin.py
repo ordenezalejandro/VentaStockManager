@@ -11,6 +11,7 @@ from django.apps import apps
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
+import logging
 
 class MyAdminSite(MaterialAdminSite):
     def get_app_list(self, request, app_label=None):
