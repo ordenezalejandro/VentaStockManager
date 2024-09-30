@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     # 'material.admin.default',
     'whitenoise.runserver_nostatic',    
     'django.contrib.auth',
-    'django.contrib.admin',
+    # 'django.contrib.admin',  # Commented out to avoid duplicate 'admin' label
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
