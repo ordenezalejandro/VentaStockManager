@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',  # Commented out to avoid duplicate 'admin' label
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.mes0sages',
+    'django.contrib.messages',
     #'django.contrib.staticfiles',
     # 'bootstrap5',
     'dal',
