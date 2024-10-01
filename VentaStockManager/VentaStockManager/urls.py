@@ -19,9 +19,17 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
 from .admin import admin_site
-
+from venta.views import redirect_to_ventas
 urlpatterns = [
-    path("admin/", admin_site.urls),
+    
+    path('admin/venta/', redirect_to_ventas, name='redirect_to_ventas'),
+    path('admin/articulo/', RedirectView.as_view(url='/admin/articulo/articulo/', permanent=True), name='redirect_to_articulos'),
+    path('admin/cliente/', RedirectView.as_view(url='/admin/cliente/cliente/', permanent=True), name='redirect_to_clientes'),
+    path('admin/compra/', RedirectView.as_view(url='/admin/compra/compra/', permanent=True), name='redirect_to_compras'),
+    path('admin/vendedor/', RedirectView.as_view(url='/admin/vendedor/vendedor/', permanent=True), name='redirect_to_vendedores'),
+    path('admin/compra/', RedirectView.as_view(url='/admin/compra/compra/', permanent=True), name='redirect_to_compras'),
+    path('admin/vendedor/', RedirectView.as_view(url='/admin/vendedor/vendedor/', permanent=True), name='redirect_to_vendedores'),
+    path("admin/", admin_site.urls),    
     # path('admin/', include('material.admin.urls')),
     
     path("clientes/", include('cliente.urls')),

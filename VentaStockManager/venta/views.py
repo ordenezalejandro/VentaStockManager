@@ -88,6 +88,14 @@ def ventas_por_vendedor(request, id_vendedor):
 
 
 
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.contrib.admin.views.decorators import staff_member_required
+
+@staff_member_required
+def redirect_to_ventas(_):
+    import ipdb
+    return HttpResponseRedirect(reverse('admin:venta_venta_changelist'))
 
 @login_required
 def ventas_recientes_por_vendedor(request, id_vendedor):

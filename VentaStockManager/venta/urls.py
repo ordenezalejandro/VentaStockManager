@@ -1,7 +1,7 @@
 from django.urls import re_path, path
 from django.conf.urls import handler404
 
-from .views import custom_404_view
+from .views import custom_404_view, redirect_to_ventas
 handler404 = custom_404_view
 
 from venta.views import (
@@ -37,7 +37,7 @@ urlpatterns = [
     path('cliente/add/', ClienteCreateView.as_view(), name='cliente_add'),
     path('cliente/<int:pk>/edit/', ClienteUpdateView.as_view(), name='cliente_edit'),
     path('venta/pedido/generar-pdfs/', generar_pdf_pedidos, name='generar_pdf_pedidos'),
-
+    path('admin/venta/', redirect_to_ventas, name='redirect_to_ventas'),
 ]
 # url(r'^/(?P<venta_id>\d+)/detalle/$', views.venta_detalle, name='category-detail'),
 
