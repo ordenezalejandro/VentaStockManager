@@ -16,9 +16,7 @@ import logging
 class MyAdminSite(MaterialAdminSite):
     def get_app_list(self, request, app_label=None):
         app_dict = self._build_app_dict(request, app_label)
-        # Log the app_dict structure for debugging
-        print(f"app_dict: {app_dict}")
-        logging.debug(f"app_dict: {app_dict}")
+
         
         valid_apps = []
         for app in app_dict.values():
