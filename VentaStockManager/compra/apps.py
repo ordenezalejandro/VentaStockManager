@@ -5,3 +5,4 @@ class CompraConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "compra"
     icon_name = "shopping_cart"
+    

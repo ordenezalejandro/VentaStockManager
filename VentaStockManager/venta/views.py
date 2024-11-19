@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect
 from io import BytesIO
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import mm
+from reportlab.lib.units import mm, cm
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 
 from venta.models import Venta, ArticuloVenta, Pedido
 from articulo.models import Articulo
 from vendedor.models import Vendedor
-from .forms import PedidoEstadoForm
+from venta.forms import PedidoEstadoForm
 from django.contrib.auth.decorators import login_required
 from dal import autocomplete
 from django.db import models
@@ -16,12 +16,13 @@ from django.shortcuts import render, get_object_or_404
 from reportlab.lib.pagesizes import letter
 from django.http import HttpResponse
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, PageBreak, Paragraph, Frame, PageTemplate, HRFlowable
+from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from io import BytesIO
 from reportlab.lib import colors
 from django.urls import reverse_lazy
-
-
+from django.views.generic.edit import CreateView, UpdateView
+from factura_config.models import FacturaConfiguration
 
 def custom_404_view(request, exception):
     return render(request, '404.html', status=404)
@@ -94,7 +95,6 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 @staff_member_required
 def redirect_to_ventas(_):
-    import ipdb
     return HttpResponseRedirect(reverse('admin:venta_venta_changelist'))
 
 @login_required
@@ -208,112 +208,175 @@ from io import BytesIO
 from django.http import HttpResponse
 
 def generar_pdf_pedidos_(request, pedido_ids=None):
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    import os
     if not pedido_ids:
-        pedido_ids = request.GET.getlist('ids')
-    pedidos = Pedido.objects.filter(id__in=pedido_ids[0].split(","))
+        pedido_ids = request.GET.get('pedidos_ids', '').split(',')
+    
+    # Ensure pedido_ids is not empty
+    if not pedido_ids or pedido_ids == ['']:
+        return HttpResponse("No pedido IDs provided.", status=400)
+    
+    pedidos = Pedido.objects.filter(id__in=pedido_ids)
+
+    # Get configuration
+    config = FacturaConfiguration.objects.first()
+    if not config:
+        config = FacturaConfiguration()
+    
+    # Register custom font if provided
+    custom_font_name = None
+    if config.custom_font:
+        font_path = config.custom_font.path
+        font_name = os.path.splitext(os.path.basename(font_path))[0]
+        try:
+            pdfmetrics.registerFont(TTFont(font_name, font_path))
+            custom_font_name = font_name
+        except:
+            pass  # Fallback to default font if registration fails
+
+    # Convert color strings to reportlab colors
+    color_map = {
+        'black': colors.black,
+        'blue': colors.blue,
+        'red': colors.red,
+        'green': colors.green,
+        'gray': colors.gray,
+    }
+
+    header_color = color_map.get(config.header_color, colors.black)
+    content_color = color_map.get(config.content_color, colors.black)
+    border_color = color_map.get(config.table_border_color, colors.black)
 
     buffer = BytesIO()
-    pdf = SimpleDocTemplate(buffer, pagesize=A4)
+    page_size = (config.page_width * cm, config.page_height * cm)
+    pdf = SimpleDocTemplate(
+        buffer, 
+        pagesize=page_size,
+        topMargin=config.margin_top * cm,
+        bottomMargin=config.margin_bottom * cm,
+        leftMargin=config.margin_left * cm,
+        rightMargin=config.margin_right * cm
+    )
+    
     elements = []
     styles = getSampleStyleSheet()
-    frame_width = (A4[0] - 30 * mm) / 2  # Adjusted for margin
-    frame_height = (A4[1] - 30 * mm) / 2  # Adjusted for margin
-    frames = [] 
-    padding = 1 * mm  # Padding entre tablas
+    frame_width = (page_size[0] - (config.margin_left + config.margin_right) * cm) / 2
+    frame_height = (page_size[1] - (config.margin_top + config.margin_bottom) * cm) / 2
+    frames = []
+    padding = 1 * mm
 
     # Define frames
     for i in range(2):
         for j in range(2):
             frames.append(Frame(
-                10 * mm + i * frame_width,
-                A4[1] - 10 * mm - (j + 1) * frame_height,
+                config.margin_left * cm + i * frame_width,
+                page_size[1] - config.margin_top * cm - (j + 1) * frame_height,
                 frame_width - 10 * mm,
                 frame_height - 10 * mm,
                 id=f'frame_{i}_{j}'
             ))
 
-    # Add page template
     pdf.addPageTemplates([PageTemplate(id='FourFrames', frames=frames)])
-
     quarter_count = 0
 
     for pedido in pedidos:
-        # # Información del cliente y vendedor
-        # data_cliente = [
-        #     [f'Id: # {pedido.venta.id}', f'Nombre del Cliente: {pedido.venta.cliente.nombre}', '', ''],
-        #     [f'Teléfono: ({pedido.venta.cliente.telefono})', f'Vendedor: {pedido.venta.vendedor}', '', ''],
-        #     [f"Dirección: {pedido.venta.cliente.direccion}", f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')}", '', '']
-        # ]
-        elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
+        elements.append(HRFlowable(width="100%", thickness=config.table_border_width, color=border_color))
         elements.append(Spacer(1, padding))
+
+        # Cliente info styling
+        styleN = styles['Normal']
+        styleN.fontSize = config.font_size_content
+        styleN.fontName = custom_font_name or config.content_font
+        styleN.textColor = content_color
 
         # Información del cliente
         cliente_info = f"Cliente: {pedido.venta.cliente.nombre_completo()}"
         direccion = f" Dirección: {pedido.venta.cliente.direccion} "
         fecha_compra = f"Fecha de Compra: {pedido.venta.fecha_compra.strftime('%Y-%m-%d')} "
         fecha_entrega = f"Fecha de Entrega: {pedido.venta.fecha_entrega.strftime('%Y-%m-%d')}\n"
-        elements.append(Paragraph(cliente_info, styleN))
-        elements.append(Spacer(1, padding))
-        elements.append(Paragraph(direccion, styleN))
-        elements.append(Spacer(1, padding))
-        elements.append(Paragraph(fecha_compra, styleN))
-        elements.append(Spacer(1, padding))
-        elements.append(Paragraph(fecha_entrega, styleN))
-        elements.append(Spacer(1, padding))
+        
+        for info in [cliente_info, direccion, fecha_compra, fecha_entrega]:
+            elements.append(Paragraph(info, styleN))
+            elements.append(Spacer(1, padding))
 
         data_articulos = [['Artículo', '#', 'Precio', 'Subtotal']]
         
         for articulo_venta in pedido.venta.ventas.all():
-            articulo_nombre = articulo_venta.articulo.get_articulo_short_name()
-            if len(articulo_nombre) > 20:  # Truncar nombres largos
-                articulo_nombre = articulo_nombre[:17] + '...'
+            nombre_articulo = articulo_venta.articulo.get_articulo_short_name()
+            nombre_articulo_corto = ""
+            max_width = config.column_width_article * cm  # Maximum width in points
+            font_name = config.content_font
+            font_size = config.font_size_content
+
+            # Split the article name into words
+            words = nombre_articulo.split()
+            current_line = ""
+
+            for word in words:
+                # Calculate the width of the current line with the new word
+                line_with_word = f"{current_line} {word}".strip()
+                line_width = stringWidth(line_with_word, font_name, font_size)
+
+                if line_width <= max_width:
+                    # If the line with the new word fits, add the word to the current line
+                    current_line = line_with_word
+                else:
+                    # If the line with the new word doesn't fit, add the current line to the result
+                    nombre_articulo_corto += current_line + "\n"
+                    current_line = word  # Start a new line with the current word
+
+            # Add the last line to the result
+            nombre_articulo_corto += current_line
+
             data_articulos.append([
-                articulo_nombre,
+                nombre_articulo_corto,
                 articulo_venta.cantidad,
                 articulo_venta.precio,
                 articulo_venta.total
             ])
         
-        # Completar las filas si hay menos de 12 artículos
         while len(data_articulos) < 13:
             data_articulos.append(['', '', '', ''])
 
-        # Tabla del cliente
-        tabla_cliente = Table(data_cliente, colWidths=[frame_width/4]*4)
-        estilo_tabla_cliente = TableStyle([
-            ('SPAN', (0, 0), (1, 0)),  # Combina las dos primeras celdas en la primera fila
-            ('SPAN', (0, 1), (1, 1)),  # Combina las dos primeras celdas en la segunda fila
-            ('SPAN', (0, 2), (1, 2)),  # Combina las dos primeras celdas en la tercera fila
-            ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('FONTSIZE', (0, 0), (-1, -1), 8)
+        # Tabla de artículos con nuevas configuraciones
+        tabla_articulos = Table(data_articulos, colWidths=[
+            config.column_width_article * cm,
+            config.column_width_quantity * cm,
+            config.column_width_price * cm,
+            config.column_width_total * cm
         ])
-        tabla_cliente.setStyle(estilo_tabla_cliente)
-
-        # Tabla de artículos
-        tabla_articulos = Table(data_articulos, colWidths=[frame_width/4]*4)
-        estilo_tabla_articulos = TableStyle([
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('FONTSIZE', (0, 0), (-1, -1), 8)
+        
+        content_style = TableStyle([
+            ('GRID', (0, 0), (-1, -1), config.table_border_width, border_color),
+            ('FONTNAME', (0, 0), (-1, -1), custom_font_name or config.content_font),
+            ('FONTSIZE', (0, 0), (-1, -1), config.font_size_content),
+            ('TEXTCOLOR', (0, 0), (-1, -1), content_color),
         ])
-        tabla_articulos.setStyle(estilo_tabla_articulos)
+        tabla_articulos.setStyle(content_style)
 
         # Tabla del total
         data_total = [['Total:', '', '', pedido.venta.precio_total]]
-        tabla_total = Table(data_total, colWidths=[frame_width/4]*4)
-        estilo_tabla_total = TableStyle([
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8),
+        tabla_total = Table(data_total, colWidths=[
+            config.column_width_article * cm,
+            config.column_width_quantity * cm,
+            config.column_width_price * cm,
+            config.column_width_total * cm
+        ])
+        
+        total_style = TableStyle([
+            ('GRID', (0, 0), (-1, -1), config.table_border_width, border_color),
+            ('FONTNAME', (0, 0), (-1, -1), custom_font_name or config.header_font),
+            ('FONTSIZE', (0, 0), (-1, -1), config.font_size_total),
+            ('TEXTCOLOR', (0, 0), (-1, -1), header_color),
             ('ALIGN', (3, 0), (3, 0), 'RIGHT'),
         ])
-        tabla_total.setStyle(estilo_tabla_total)
+        tabla_total.setStyle(total_style)
 
-        # Añadir tablas a los elementos
-        elements.append(tabla_cliente)
         elements.append(tabla_articulos)
         elements.append(tabla_total)
-        elements.append(Spacer(1, padding))  # Agregar padding entre tablas
+        elements.append(Spacer(1, padding))
         
         quarter_count += 1
         
@@ -329,6 +392,25 @@ def generar_pdf_pedidos_(request, pedido_ids=None):
     response['Content-Disposition'] = 'attachment; filename="pedidos.pdf"'
     return response
 
+def split_text_to_fit_width(text, max_width, font_name, font_size):
+    """Splits text into lines that fit within the specified width."""
+    words = text.split()
+    current_line = ""
+    result = ""
+
+    for word in words:
+        line_with_word = f"{current_line} {word}".strip()
+        line_width = stringWidth(line_with_word, font_name, font_size)
+
+        if line_width <= max_width:
+            current_line = line_with_word
+        else:
+            result += current_line + "\n"
+            current_line = word
+
+    result += current_line
+    return result
+# the older
 def generar_pdf_pedidos(request, pedido_ids=None):
     from reportlab.lib.pagesizes import landscape
     from reportlab.lib.pagesizes import letter
@@ -350,6 +432,9 @@ def generar_pdf_pedidos(request, pedido_ids=None):
     pedidos_count = len(pedido_ids)
     cantidad_articulos = []
     total_element = []
+    config = FacturaConfiguration.objects.first()
+    if not config:
+        config = FacturaConfiguration()
     for index, pedido_id in enumerate(pedido_ids):
         pedido = Pedido.objects.get(id=pedido_id)
         cantidad_articulos.append(pedido.venta.ventas.count())
@@ -361,10 +446,10 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         ]
 
         # Tabla del cliente
-        tabla_cliente = Table(data_cliente, colWidths=[4 * cm, 4 * cm, 4 * cm,  4 * cm])
+        tabla_cliente = Table(data_cliente, colWidths=[4* cm, 4 * cm, 4 * cm,  4 * cm])
         estilo_tabla_cliente = TableStyle([
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('FONTSIZE', (0, 0), (-1, -1), 7)
+            ('GRID', (0, 0), (-1, -1), 1, config.header_color),
+            ('FONTSIZE', (0, 0), (-1, -1), config.font_size_header)
         ])
         tabla_cliente.setStyle(estilo_tabla_cliente)
 
@@ -373,27 +458,57 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         doble_space = 0
         for articulo_venta in pedido.venta.ventas.all():
             nombre_articulo = articulo_venta.articulo.get_articulo_short_name()
-            nombre_articulo_corto = ""
-            nombre_articulo_len = len(nombre_articulo)
-            for i in range(0, nombre_articulo_len, 29):
-                if nombre_articulo_len - i > 29:
-                    nombre_articulo_corto += nombre_articulo[i:i+29] + "\n"
-                    doble_space += 1
-                else:
-                    nombre_articulo_corto += nombre_articulo[i:i+29] 
+            nombre_articulo_corto = split_text_to_fit_width(
+                nombre_articulo,
+                config.column_width_article * cm,
+                config.content_font,
+                config.font_size_content
+            )
+
+            # Example usage for price
+            precio_text = str(articulo_venta.precio)
+            precio_corto = split_text_to_fit_width(
+                precio_text,
+                config.column_width_price * cm,
+                config.content_font,
+                config.font_size_content
+            )
+
+            # Example usage for total
+            total_text = str(articulo_venta.total)
+            total_corto = split_text_to_fit_width(
+                total_text,
+                config.column_width_total * cm,
+                config.content_font,
+                config.font_size_content
+            )
+
+
+            # nombre_articulo_len = len(nombre_articulo)
+            # for i in range(0, nombre_articulo_len, 29):
+            #     if nombre_articulo_len - i > 29:
+            #         nombre_articulo_corto += nombre_articulo[i:i+29] + "\n"
+            #         doble_space += 1
+            #     else:
+            #         nombre_articulo_corto += nombre_articulo[i:i+29] 
                 
             data_articulos.append([
                 nombre_articulo_corto,
                 articulo_venta.cantidad,
-                articulo_venta.precio,
-                articulo_venta.total
+                precio_corto,
+                total_corto
             ])
 
-        tabla_articulos = Table(data_articulos, colWidths=[4 * cm, 1 * cm, 1.5 * cm, 1.5 * cm])
+        tabla_articulos = Table(data_articulos, colWidths=[
+            config.column_width_article * cm,
+            config.column_width_price * cm,
+            config.column_width_price * cm,
+            config.column_width_total * cm])
+        
         estilo_tabla_articulos = TableStyle([
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 7)
+            ('GRID', (0, 0), (-1, -1), 1, config.table_border_color),
+            ('FONTNAME', (0, 0), (-1, -1), config.content_font),
+            ('FONTSIZE', (0, 0), (-1, -1), config.font_size_content)
         ])
         tabla_articulos.setStyle(estilo_tabla_articulos)
 
@@ -401,9 +516,9 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         data_total = [['Total:', pedido.venta.precio_total]]
         tabla_total = Table(data_total, colWidths=[5 * cm, 3 * cm])
         estilo_tabla_total = TableStyle([
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 1, config.content_color),
+            ('FONTNAME', (0, 0), (-1, -1), config.content_font),
+            ('FONTSIZE', (0, 0), (-1, -1), config.font_size_total),
             # ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
         ])
         tabla_total.setStyle(estilo_tabla_total)
@@ -420,11 +535,16 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         total_element.append(len(elements))
         
 
-    page_height = (max(total_element)  * (1.6)* cm)  + (-2*cm if max(cantidad_articulos) < 7 else 5) + (max(cantidad_articulos) * 0.3 *cm) + (doble_space*cm) # Adjust the multiplier as needed
-    page_size = (8*cm, page_height)
+    page_height = (max(total_element)  * (1.6+config.font_size_content/10)* cm)  + (-2*cm if max(cantidad_articulos) < 7 else 5) + (max(cantidad_articulos) * 0.3 *cm) + (doble_space*cm) # Adjust the multiplier as needed
+    page_size = (config.page_width * cm, page_height)
 
     # Set margins to zero
-    pdf = SimpleDocTemplate(buffer, pagesize=page_size, topMargin=0, bottomMargin=0, leftMargin=0.5, rightMargin=0.5)
+    pdf = SimpleDocTemplate(
+        buffer, pagesize=page_size,
+        topMargin=config.margin_top,
+        bottomMargin=config.margin_bottom,
+        leftMargin=config.margin_bottom,
+        rightMargin=config.margin_right)
 
     # page_height = ((max(cantidad_articulos ) * 1.6* cm) + 1*cm + (80 if max(cantidad_articulos) < 4 else 5))
     

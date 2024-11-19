@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'vendedor.apps.VendedorConfig',
     'compra.apps.CompraConfig',
     'django_q',
+    'factura_config.apps.FacturaConfigConfig',
 ]
 
 MIDDLEWARE = [
@@ -96,7 +97,11 @@ DATABASES = {
         'USER': 'jairoDO',
         'PASSWORD': '05v4ld0!',
         'HOST': 'jairoDO.mysql.pythonanywhere-services.com',
-        'PORT': '3306'
+        'PORT': '3306',
+        'OPTIONS': {
+                'timeout': 20,  # Increase the timeout to 20 seconds
+            
+        }
     }
 }
 # DATABASES = {

@@ -7,17 +7,16 @@ from django.urls import reverse
 from django.contrib import admin
 from django.urls import path
 from django.http import HttpResponseRedirect
-from django import forms
 from django.utils import timezone
-from .views import generar_pdf_pedidos
+from venta.views import generar_pdf_pedidos
 from django.contrib import messages
 from .forms import ArticuloVentaInlineFormSet
-
+from venta.forms import ArticuloVentaForm
 # import autocomplete_all
 
 # from django.db.models.query import SelectQuerySet
 from django.contrib import admin
-from venta.forms import ArticuloVentaForm, VentaForm
+from venta.forms import   VentaForm
 
 
 class ArticuloVentaInline(admin.TabularInline):
@@ -50,6 +49,8 @@ class ArticuloVentaInline(admin.TabularInline):
     fields = ("articulo", "cantidad" , "precio", "precio_total")
     
     precio_total.short_description = "Total"
+    def has_delete_permission(self, request, obj=None):
+        return True
     
     # def formfield_overrides(self, request, form):
     #     overrides = super().formfield_overrides(request, form)        
@@ -83,17 +84,21 @@ class VentaAdmin(admin.ModelAdmin):
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
         
-        # Calculate total from the inline formset data
         total_venta = 0
         for formset in formsets:
             for inline_form in formset.forms:
-                if inline_form.cleaned_data and not inline_form.cleaned_data.get('DELETE', False):
-                    cantidad = inline_form.cleaned_data['cantidad']
-                    precio = inline_form.cleaned_data['precio']
-                    total_venta += cantidad * float(precio)  # Convert precio to float
+                if inline_form.cleaned_data:
+                    import ipdb;ipdb.set_trace()
+                    
+                    if inline_form.cleaned_data.get('DELETE', False):
+                        # Eliminar el objeto si está marcado para eliminación
+                        inline_form.instance.delete()
+                    else:
+                        cantidad = inline_form.cleaned_data['cantidad']
+                        precio = inline_form.cleaned_data['precio']
+                        total_venta += cantidad * float(precio)
         
-        # Update the total price and save again
-        # form.instance.precio_total = total_venta  # Update the total price
+        form.instance.precio_total = total_venta
         form.instance.save()
         
         messages.success(request, f'Venta exitosa. Total: ${total_venta}')

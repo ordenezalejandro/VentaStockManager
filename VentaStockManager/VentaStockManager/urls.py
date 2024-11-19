@@ -29,6 +29,7 @@ urlpatterns = [
     path('admin/vendedor/', RedirectView.as_view(url='/admin/vendedor/vendedor/', permanent=True), name='redirect_to_vendedores'),
     path('admin/compra/', RedirectView.as_view(url='/admin/compra/compra/', permanent=True), name='redirect_to_compras'),
     path('admin/vendedor/', RedirectView.as_view(url='/admin/vendedor/vendedor/', permanent=True), name='redirect_to_vendedores'),
+    path('admin/factura_config/factura_configuration/', RedirectView.as_view(url='/admin/factura_config/facturaconfiguration/', permanent=True), name='redirect_to_factura_config'),
     path("admin/", admin_site.urls),    
     # path('admin/', include('material.admin.urls')),
     

@@ -10,8 +10,6 @@ from  cliente.models import Cliente
 from django.urls import reverse
 from django.forms.models import BaseInlineFormSet
 
-# from django_addanother.widgets import AddAnotherWidgetWrapper
-
 
 from django import forms
 import logging
@@ -25,16 +23,19 @@ class VentaForm(forms.ModelForm):
                         attrs={'data-placeholder': 'Buscar Cliente', 'empty_label': 'No_seleccionado'})
 ,
         }
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):        
+        from VentaStockManager.admin import admin_site  # Local import
+
         super(VentaForm, self).__init__(*args, **kwargs)
         self.fields['cliente'].widget = RelatedFieldWidgetWrapper(
             self.fields['cliente'].widget,
             Venta._meta.get_field('cliente').remote_field,
-            admin.site,
+            admin_site=admin_site,
             can_add_related=True,
             can_change_related=True,
-            can_delete_related=False
+            can_delete_related=True
         )   
+
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
     #     if 'cliente' in self.fields:
@@ -53,24 +54,36 @@ class VentaForm(forms.ModelForm):
         }
 
 class ArticuloVentaInlineFormSet(BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._deleted_objects = []
+
     def clean(self):
-        super().clean()
         for form in self.forms:
-            if form.cleaned_data.get('DELETE', False):
-                continue  # Skip validation for forms marked for deletion
+            if not hasattr(form, 'cleaned_data'):
+                continue
+
+            # Skip validation for forms marked for deletion
+            if form.cleaned_data.get('DELETE', False) or form.cleaned_data == {}:
+                logging.info(f"Skipping validation for form {form.prefix} as it is marked for deletion.")
+                continue
+
+            # Add any additional validation logic here if needed
+            if not form.cleaned_data.get('articulo'):
+                form.add_error('articulo', 'This field is required.')
+            if not form.cleaned_data.get('cantidad'):
+                form.add_error('cantidad', 'This field is required.')
+            if not form.cleaned_data.get('precio'):
+                form.add_error('precio', 'This field is required.')
+        return super().clean()
 
     @property
-    def media(self):
-        logging.debug("Constructing media for ArticuloVentaInlineFormSet")
-        media = super().media
-        logging.debug(f"Media: {media}")
-        return media
+    def deleted_objects(self):
+        return self._deleted_objects
 
-    def _construct_form(self, i, **kwargs):
-        logging.debug(f"Constructing form {i} with kwargs: {kwargs}")
-        form = super()._construct_form(i, **kwargs)
-        logging.debug(f"Constructed form {i}: {form}")
-        return form
+    @deleted_objects.setter
+    def deleted_objects(self, value):
+        self._deleted_objects = value
 
 class ArticuloVentaForm(forms.ModelForm):
     class Meta:
@@ -83,36 +96,45 @@ class ArticuloVentaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ArticuloVentaForm, self).__init__(*args, **kwargs)
+        from VentaStockManager.admin import admin_site  # Local import
         if 'articulo' in self.fields:
             self.fields['articulo'].widget = RelatedFieldWidgetWrapper(
                 self.fields['articulo'].widget,
                 ArticuloVenta._meta.get_field('articulo').remote_field,
-                admin.site,
+                admin_site=admin_site,
                 can_add_related=True,
-                can_change_related=False,
-                can_delete_related=False
+                can_change_related=True,
+                can_delete_related=True
             )
         logging.debug(f"Initialized ArticuloVentaForm with fields: {self.fields}")
 
     def clean(self):
-        if self.data.get(f'{self.prefix}-DELETE', 'off') == 'on'or self.data.get('id') is None:
+        cleaned_data = super().clean()
+        logging.debug(f"Data received for cleaning: {self.data}")
+        # Check if the form is marked for deletion
+        if self.fields['DELETE'] or self.cleaned_data == {}:
             logging.info(f"Skipping validation for {self.prefix} as it is marked for deletion.")
             # Set required fields to False to skip validation
             self.fields['articulo'].required = False
             self.fields['cantidad'].required = False
             self.fields['precio'].required = False
-            return self.cleaned_data  # Skip further validation if marked for deletion
+            return self.cleaned_data
         
-        cleaned_data = super().clean()
-        logging.debug(f"Cleaned data: {cleaned_data}")
-        # Add your custom validation logic here if needed
+        # Ensure all required fields are present
+        if not cleaned_data.get('articulo'):
+            self.add_error('articulo', 'This field is required.')
+        if not cleaned_data.get('cantidad'):
+            self.add_error('cantidad', 'This field is required.')
+        if not cleaned_data.get('precio'):
+            self.add_error('precio', 'This field is required.')
+
         return cleaned_data
 
     def is_valid(self):
-        if self.data.get(f'{self.prefix}-DELETE', 'off') == 'on' or self.data.get('id') is None:
+        # Check if the form is marked for deletion
+        if self.data.get('DELETE') or self.cleaned_data == {}:
             logging.info(f"Form {self.prefix} is marked for deletion, skipping validation.")
-            valid = super().is_valid()
-            return True  # Consider the form valid if marked for deletion
+            return True
         valid = super().is_valid()
         if not valid:
             logging.error(f"Form errors for {self.prefix}: {self.errors}")
@@ -120,6 +142,20 @@ class ArticuloVentaForm(forms.ModelForm):
             logging.debug(f"Form valid for {self.prefix}: {valid}")
         return valid
 
+    def save(self, commit=True):
+        # Skip saving if marked for deletion
+        if self.cleaned_data.get('DELETE', False) or self.cleaned_data == {}:
+            logging.info(f"Skipping save for {self.prefix} as it is marked for deletion.")
+            return None
+        if self.is_valid():
+            instance = super().save(commit=False)
+            if commit:
+                instance.save()
+            return instance
+        else:
+            logging.error(f"Cannot save form {self.prefix} due to errors: {self.errors}")
+            return None
+    
 class PedidoEstadoForm(forms.ModelForm):
     class Meta:
         model = Pedido

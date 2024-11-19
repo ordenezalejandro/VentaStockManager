@@ -1,4 +1,3 @@
-
 let get_price_from_articulo_option = node => {
     let option_selected = node.selectedOptions[0].textContent;
     let precio_minorista = option_selected.split("|")[3].trim().slice(5);
@@ -119,6 +118,17 @@ document.addEventListener("DOMContentLoaded", function() {
         // fila.querySelector('.field-precio_total p').textContent = total.toFixed(2);
     }
 
+    function agregarEventosANuevoInline(nuevoInline) {
+        let selectArticulo = nuevoInline.querySelector("select[id^='id_ventas-'][id$='-articulo']");
+        let inputCantidad = nuevoInline.querySelector("input[id$='-cantidad']");
+        let inputPrecio = nuevoInline.querySelector("input[id$='-precio']");
+
+        selectArticulo.addEventListener('change', manejarCambioArticulo);
+        inputCantidad.addEventListener('change', manejarCambioCantidad);
+        inputPrecio.addEventListener('change', manejarCambioPrecio);
+    }
+
+    
     function actualizarTotalGlobal() {
         let sumTotal = Array.from(document.querySelectorAll('.field-precio_total p'))
             .reduce((acc, el) => acc + parseFloat(el.textContent || 0), 0);
@@ -158,16 +168,35 @@ document.addEventListener("DOMContentLoaded", function() {
 
     }
 
-
-    function agregarEventosANuevoInline(nuevoInline) {
-        let selectArticulo = nuevoInline.querySelector("select[id^='id_ventas-'][id$='-articulo']");
-        let inputCantidad = nuevoInline.querySelector("input[id$='-cantidad']");
-        let inputPrecio = nuevoInline.querySelector("input[id$='-precio']");
-
-        selectArticulo.addEventListener('change', manejarCambioArticulo);
-        inputCantidad.addEventListener('change', manejarCambioCantidad);
-        inputPrecio.addEventListener('change', manejarCambioPrecio);
+    function manejarEliminacionArticulo(event) {
+        let fila = event.target.closest('tr');
+        alert('Por el momento no esta funciondo borrar si necsita ' +
+              'cambiar porfavor agregelo  y resta al total despues :(');
+        if (fila) {
+            
+            
+            // Marcar el formulario para eliminación
+            let deleteInput = fila.querySelector('input[name$="-DELETE"]');
+            fila.querySelectorAll('input, select').forEach(element => {
+                element.removeAttribute('required');
+                    // element.classList.remove('is-invalid');
+                });
+            if (deleteInput) {
+                deleteInput.checked = true;
+            }
+            fila.style.display = 'none'; // Ocultar la fila en lugar de eliminarla
+            // fila.remove();
+            update_precio_total();
+        }
     }
+
+    // Add event listeners for delete buttons
+    document.querySelectorAll('.delete-button-class').forEach(button => {
+        button.addEventListener('click', manejarEliminacionArticulo);
+    });
+    document.querySelectorAll('.delete-inline-row').forEach(icon => {
+        icon.addEventListener('click', manejarEliminacionArticulo);
+    });
 
     // Agregar eventos a todos los elementos existentes y actualizar totales
     document.querySelectorAll('tr[id^="ventas-"]').forEach(fila => {
@@ -186,9 +215,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     if (node.classList && node.classList.contains('dynamic-ventas')) {
                         agregarEventosANuevoInline(node);
                         actualizarTotalFila(node);
-                        let selectArticuloNuevo = node.querySelector("select[id^='id_ventas-'][id$='-articulo']");
-                        if (selectArticuloNuevo) {
-                            selectArticuloNuevo.addEventListener('change', manejarCambioArticulo);
+                        let deleteButton = node.querySelector('.delete-button-class');
+                        if (deleteButton) {
+                            deleteButton.addEventListener('click', manejarEliminacionArticulo);
                         }
                         document.querySelectorAll("select[id^='id_ventas']").forEach(
                             item => {

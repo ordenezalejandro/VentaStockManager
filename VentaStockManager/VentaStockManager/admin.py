@@ -12,6 +12,9 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
 import logging
+from factura_config.models import FacturaConfiguration
+from factura_config.admin import FacturaConfigurationAdmin
+
 
 class MyAdminSite(MaterialAdminSite):
     def get_app_list(self, request, app_label=None):
@@ -53,3 +56,4 @@ admin_site.register(Articulo, ArticuloAdmin)
 admin_site.register(Cliente, ClienteAdmin)
 admin_site.register(Proveedor, ProvedorAdmin)
 admin_site.register(Compra, CompraAdmin)
+admin_site.register(FacturaConfiguration, FacturaConfigurationAdmin)

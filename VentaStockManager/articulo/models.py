@@ -46,8 +46,7 @@ class Articulo(models.Model):
             random_int = [str(random.randint(0, 10) for i in range(3))]
             return ''.join(iniciales + random_int)
 
-
-
-
+    class Meta:
+        ordering = ['codigo']
             
   

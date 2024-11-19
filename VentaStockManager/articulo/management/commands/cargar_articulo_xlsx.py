@@ -94,6 +94,7 @@ class Command(BaseCommand):
         wb = openpyxl.load_workbook(ruta_archivo)
         sheet = wb.active
         for i, row in enumerate(sheet.iter_rows(min_row=4, values_only=True)):
+
             if not row[0] or not row[1] or not row[3] or not row[3] or (row[3]  is str and row[3].replace('$','') == ''):  # Si la primera celda está vacía, saltar la
                 if row[1]:
                     self.stdout.write(f'esta fila no se proceso fila {i+4} row {row[0]} {row[1]}')
@@ -113,7 +114,6 @@ class Command(BaseCommand):
                 if not all([nombre, codigo_interno, precio_minorista]):
                     self.stdout.write(self.style.ERROR(f'Fila {i+1} no se agregó: nombre, código interno o precio minorista es None.'))            
             except Exception as e:
-
                 self.stdout.write(self.style.ERROR(f'Error al procesar la fila {i+1}: {str(e)}'))
                 self.stdout.write(self.style.ERROR(traceback.format_exc()))
                 continue
@@ -137,6 +137,7 @@ class Command(BaseCommand):
             if articulo.codigo is None:
                 articulo.codigo = codigo_interno
             articulo.stock = 100
+
             articulo.save()
             
     def generar_codigo_interno(self, nombre):

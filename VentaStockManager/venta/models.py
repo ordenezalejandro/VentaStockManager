@@ -38,6 +38,12 @@ class Venta(models.Model):
             return 0
         return sum([articulo.get_precio_total() for articulo in self.ventas.all()])
 
+
+    @precio_total.setter
+    def precio_total(self, value):
+        self._precio_total = value
+        
+        
     def generar_link(self):
         return format_html("<a href='/venta/{}/'>Ver venta</a>", self.id)
     

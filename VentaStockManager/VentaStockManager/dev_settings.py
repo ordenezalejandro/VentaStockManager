@@ -23,6 +23,8 @@ INSTALLED_APPS = [
     'articulo.apps.ArticuloConfig',
     'vendedor.apps.VendedorConfig',
     'compra.apps.CompraConfig',
+    'factura_config.apps.FacturaConfigConfig',
+
 ]
 
 DEBUG = True
@@ -30,5 +32,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'OPTIONS': {
+                'timeout': 20,  # Increase timeout to 20 seconds
+            }
     }
 }
