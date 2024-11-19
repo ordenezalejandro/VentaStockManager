@@ -170,7 +170,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function manejarEliminacionArticulo(event) {
         let fila = event.target.closest('tr');
-        
+        alert('Por el momento no esta funciondo borrar si necsita ' +
+              'cambiar porfavor agregelo  y resta al total despues :(');
         if (fila) {
             
             
@@ -178,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let deleteInput = fila.querySelector('input[name$="-DELETE"]');
             fila.querySelectorAll('input, select').forEach(element => {
                 element.removeAttribute('required');
-                    // element.classList.remove('is-invalid');
+                    element.classList.remove('is-invalid');
                 });
             if (deleteInput) {
                 deleteInput.checked = true;

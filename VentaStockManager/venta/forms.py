@@ -54,36 +54,89 @@ class VentaForm(forms.ModelForm):
         }
 
 class ArticuloVentaInlineFormSet(BaseInlineFormSet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._deleted_objects = []
-
     def clean(self):
+        """
+        Validate the formset as a whole.
+        """
+        # No realizar validaciones para formularios marcados para eliminar
         for form in self.forms:
             if not hasattr(form, 'cleaned_data'):
                 continue
-
-            # Skip validation for forms marked for deletion
-            if form.cleaned_data.get('DELETE', False) or form.cleaned_data == {}:
-                logging.info(f"Skipping validation for form {form.prefix} as it is marked for deletion.")
+            if form.cleaned_data.get('DELETE'):
                 continue
-
-            # Add any additional validation logic here if needed
-            if not form.cleaned_data.get('articulo'):
-                form.add_error('articulo', 'This field is required.')
-            if not form.cleaned_data.get('cantidad'):
-                form.add_error('cantidad', 'This field is required.')
-            if not form.cleaned_data.get('precio'):
-                form.add_error('precio', 'This field is required.')
         return super().clean()
+    
+    
+    def save_new(self, form, commit=True):
+        """¬
+        Save and return a new model instance for the given form.
+        """
+        if not hasattr(form, 'cleaned_data'):
+            return None
+            
+        if form.cleaned_data.get('DELETE'):
+            return None
+            
+        # Check if the form has any actual data
+        has_data = any(
+            form.cleaned_data.get(field) 
+            for field in ['articulo', 'cantidad', 'precio']
+        )
+        
+        if not has_data:
+            return None
+            
+        instance = super().save_new(form, commit=False)
+        if commit and instance:
+            instance.save()
+        return instance
 
-    @property
-    def deleted_objects(self):
-        return self._deleted_objects
+    def save(self, commit=True):
+        """
+        Save model instances for every form, adding and changing instances
+        as necessary, and return the list of instances.
+        """
+        if not hasattr(self, 'cleaned_data'):
+            return []
 
-    @deleted_objects.setter
-    def deleted_objects(self, value):
-        self._deleted_objects = value
+        # Reset tracking lists
+        self.deleted_objects = []
+        self.saved_forms = []
+        self.changed_objects = []
+        self.new_objects = []
+        
+        instances = []
+        
+        # Handle deletions and changes
+        for form in self.forms:
+            if not hasattr(form, 'cleaned_data'):
+                continue
+                
+            if self.can_delete and form.cleaned_data.get('DELETE'):
+                if form.instance.pk:
+                    self.deleted_objects.append(form.instance)
+                    if commit:
+                        form.instance.delete()
+                continue
+            
+            if form.has_changed():
+                if form.instance.pk is None:
+                    # New instance
+                    instance = self.save_new(form, commit=commit)
+                    if instance:
+                        self.new_objects.append(instance)
+                        instances.append(instance)
+                else:
+                    # Changed instance
+                    instance = form.save(commit=commit)
+                    if instance:
+                        self.changed_objects.append((instance, form.changed_data))
+                        instances.append(instance)
+                
+                if instance:
+                    self.saved_forms.append(form)
+
+        return instances
 
 class ArticuloVentaForm(forms.ModelForm):
     class Meta:
@@ -110,52 +163,48 @@ class ArticuloVentaForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        logging.debug(f"Data received for cleaning: {self.data}")
-        # Check if the form is marked for deletion
-        if self.fields['DELETE'] or self.cleaned_data == {}:
-            logging.info(f"Skipping validation for {self.prefix} as it is marked for deletion.")
-            # Set required fields to False to skip validation
-            self.fields['articulo'].required = False
-            self.fields['cantidad'].required = False
-            self.fields['precio'].required = False
-            return self.cleaned_data
         
-        # Ensure all required fields are present
-        if not cleaned_data.get('articulo'):
-            self.add_error('articulo', 'This field is required.')
-        if not cleaned_data.get('cantidad'):
-            self.add_error('cantidad', 'This field is required.')
-        if not cleaned_data.get('precio'):
-            self.add_error('precio', 'This field is required.')
-
+        # Solo validar si hay datos en el formulario
+        if any(self.data.get(f'{self.prefix}-{field}') for field in ['articulo', 'cantidad', 'precio']):
+            # Validar campos requeridos
+            for field in ['articulo', 'cantidad', 'precio']:
+                if not cleaned_data.get(field):
+                    self.add_error(field, 'Este campo es requerido.')
+            
+            # Validar cantidad positiva
+            if cleaned_data.get('cantidad') is not None and cleaned_data['cantidad'] <= 0:
+                self.add_error('cantidad', 'La cantidad debe ser mayor que 0')
+        
         return cleaned_data
 
     def is_valid(self):
-        # Check if the form is marked for deletion
-        if self.data.get('DELETE') or self.cleaned_data == {}:
-            logging.info(f"Form {self.prefix} is marked for deletion, skipping validation.")
+        # Verificar si el formulario está vacío
+        is_empty = not any(self.data.get(f'{self.prefix}-{field}') 
+                          for field in ['articulo', 'cantidad', 'precio'])
+        
+        if is_empty:
             return True
-        valid = super().is_valid()
-        if not valid:
-            logging.error(f"Form errors for {self.prefix}: {self.errors}")
-        else:
-            logging.debug(f"Form valid for {self.prefix}: {valid}")
-        return valid
+        
+        return super().is_valid()
 
     def save(self, commit=True):
-        # Skip saving if marked for deletion
-        if self.cleaned_data.get('DELETE', False) or self.cleaned_data == {}:
-            logging.info(f"Skipping save for {self.prefix} as it is marked for deletion.")
+        # Verificar si hay datos para guardar
+        has_data = any(self.data.get(f'{self.prefix}-{field}') 
+                      for field in ['articulo', 'cantidad', 'precio'])
+        
+        if not has_data:
             return None
-        if self.is_valid():
+
+        try:
             instance = super().save(commit=False)
             if commit:
                 instance.save()
+                logging.info(f"Guardado exitoso de ArticuloVenta: {instance.pk}")
             return instance
-        else:
-            logging.error(f"Cannot save form {self.prefix} due to errors: {self.errors}")
-            return None
-    
+        except Exception as e:
+            logging.error(f"Error al guardar ArticuloVenta: {str(e)}")
+            raise
+
 class PedidoEstadoForm(forms.ModelForm):
     class Meta:
         model = Pedido

@@ -12,6 +12,8 @@ from venta.views import generar_pdf_pedidos
 from django.contrib import messages
 from .forms import ArticuloVentaInlineFormSet
 from venta.forms import ArticuloVentaForm
+import logging
+
 # import autocomplete_all
 
 # from django.db.models.query import SelectQuerySet
@@ -24,23 +26,23 @@ class ArticuloVentaInline(admin.TabularInline):
     form = ArticuloVentaForm
     formset = ArticuloVentaInlineFormSet
     extra = 12
+    min_num = 0
+    max_num = None
+    validate_min = False
+    validate_max = False
+    can_delete = True
     verbose_name = "Item de venta"
     verbose_name_plural = "Items de ventas"
     empty_value_display = 'Busca un articulo'
-    # search_fields = ('codigo', 'codigo_interno', "nombre")
     raw_id_fields = ["articulo"]
-    show_add_another = True  # This line allows adding new Articulo
+    show_add_another = True
+    show_change_link = True
     autocomplete_fields = ["articulo"]
-    # autocomplete_fields = ["articulo"]
     
-    # prepopulated_fields  = {'precio': ('precio_minorista_2',)}
-    
-    # def formfield_overrides(self, request, form):
-    #     overrides = super().formfield_overrides(request, form)
-    #     if form.model == ArticuloVenta:
-    #         overrides["articulo"] = {"widget": forms.Select(attrs={"style": "width: 200px"})}
-    #     return overrides
+    fields = ("articulo", "cantidad", "precio", "precio_total")
+    readonly_fields = ("precio_total",)
 
+    
     def precio_total(self, obj):
         if obj.cantidad is None or obj.price is None:
             return 0
@@ -52,6 +54,12 @@ class ArticuloVentaInline(admin.TabularInline):
     def has_delete_permission(self, request, obj=None):
         return True
     
+    def clean(self):
+        if not self.cleaned_data.get('DELETE', False):
+            cleaned_data = super().clean()
+        if self.instance.pk is None and not any(cleaned_data.values()):
+            return None
+        return cleaned_data
     # def formfield_overrides(self, request, form):
     #     overrides = super().formfield_overrides(request, form)        
     #     if form.model == ArticuloVenta:
@@ -65,6 +73,11 @@ class ArticuloVentaInline(admin.TabularInline):
     #readonly_fields = ('precio_minorista', 'precio_mayorista')(self, request, queryset)
     class Media:
         js = ('js/articulo_venta_admins.js',)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "articulo":
+            kwargs["queryset"] = Articulo.objects.filter(stock__gt=0)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 class VentaAdmin(admin.ModelAdmin):
     form = VentaForm
@@ -81,27 +94,44 @@ class VentaAdmin(admin.ModelAdmin):
         # Save the main object first to get an ID
         super().save_model(request, obj, form, change)
 
+
+    
     def save_related(self, request, form, formsets, change):
-        super().save_related(request, form, formsets, change)
-        
-        total_venta = 0
-        for formset in formsets:
-            for inline_form in formset.forms:
-                if inline_form.cleaned_data:
-                    import ipdb;ipdb.set_trace()
+        """
+        Save related objects and calculate total.
+        """
+        try:
+            total_venta = 0
+            
+            # Save formsets
+            for formset in formsets:
+                # Validate and clean formset data before saving
+                if formset.is_valid():
+                    instances = formset.save(commit=False)
                     
-                    if inline_form.cleaned_data.get('DELETE', False):
-                        # Eliminar el objeto si está marcado para eliminación
-                        inline_form.instance.delete()
-                    else:
-                        cantidad = inline_form.cleaned_data['cantidad']
-                        precio = inline_form.cleaned_data['precio']
-                        total_venta += cantidad * float(precio)
-        
-        form.instance.precio_total = total_venta
-        form.instance.save()
-        
-        messages.success(request, f'Venta exitosa. Total: ${total_venta}')
+                    # Process each instance
+                    for instance in instances:
+                        if instance.articulo_id and instance.cantidad and instance.precio:
+                            instance.venta = form.instance
+                            instance.save()
+                            
+                            # Calculate running total
+                            precio_limpio = float(str(instance.precio).replace("'", "").replace(",", ""))
+                            total_venta += instance.cantidad * precio_limpio
+                    
+                    # Handle deletions
+                    for obj in formset.deleted_objects:
+                        obj.delete()
+            
+            # Update total sale price
+            form.instance.precio_total = total_venta
+            form.instance.save()
+            
+            messages.success(request, f'Venta actualizada. Total: ${total_venta:,.2f}')
+        except Exception as e:
+            logging.error(f"Error in save_related: {str(e)}")
+            messages.error(request, f"Error al guardar la venta: {str(e)}")
+            raise
     
     def cantidad_articulos_vendidos(self, obj):
         return obj.articulos_vendidos.count()
@@ -151,6 +181,22 @@ class VentaAdmin(admin.ModelAdmin):
         if 'precio_total' in form.base_fields:
             form.base_fields['precio_total'].widget.attrs['id'] = 'id_precio_total'
         return form
+
+    def save_formset(self, request, form, formset, change):
+        try:
+            instances = formset.save(commit=False)
+            for instance in instances:
+                if instance.articulo and instance.cantidad and instance.precio:
+                    instance.venta = form.instance
+                    instance.save()
+            
+            # Handle deletions
+            for obj in formset.deleted_objects:
+                obj.delete()
+            
+        except Exception as e:
+            messages.error(request, str(e))
+            raise
 
 # admin_site.site.register(Venta, VentaAdmin)
 

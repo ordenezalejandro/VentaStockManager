@@ -449,6 +449,7 @@ def generar_pdf_pedidos(request, pedido_ids=None):
         tabla_cliente = Table(data_cliente, colWidths=[4* cm, 4 * cm, 4 * cm,  4 * cm])
         estilo_tabla_cliente = TableStyle([
             ('GRID', (0, 0), (-1, -1), 1, config.header_color),
+            ('FONTNAME', (0, 0), (-1, -1), config.header_font),
             ('FONTSIZE', (0, 0), (-1, -1), config.font_size_header)
         ])
         tabla_cliente.setStyle(estilo_tabla_cliente)

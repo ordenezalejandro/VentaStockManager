@@ -60,9 +60,10 @@ class ArticuloVenta(models.Model):
     precio = models.CharField(max_length=255)
     
     def save(self, *args, **kwargs):
-        # Update stock of the related ArticuloCompraπ
-        self.articulo.stock -= self.cantidad  # Assuming a stock field in ArticuloCompra
-        self.articulo.save()
+        # Check if articulo exists before updating stock
+        if self.articulo:
+            self.articulo.stock -= self.cantidad
+            self.articulo.save()
         super().save(*args, **kwargs)
 
     def get_precio_total(self):
@@ -84,7 +85,10 @@ class ArticuloVenta(models.Model):
             # Handle the case where conversion to Decimal fails
             return Decimal(0)
     def __str__(self):
-        return f"{self.cantidad} unidades de {self.articulo} en la venta {self.venta}"
+                # return f"{self.cantidad} unidades de {self.articulo} en la venta {self.venta}"
+        articulo_str = str(self.articulo) if self.articulo else "No article"
+        venta_str = str(self.venta) if self.venta else "No sale"
+        return f"{self.cantidad} unidades de {articulo_str} en la venta {venta_str}"
     
 
 class Pedido(models.Model):
