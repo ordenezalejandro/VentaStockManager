@@ -96,7 +96,17 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function manejarCantidad(fila){
-        actualizarTotalFila(fila)
+        let cantidadInput = fila.querySelector('input[id$="-cantidad"]');
+        let cantidad = parseFloat(cantidadInput.value) || 0;
+        
+        // Ensure the quantity is not set to zero unless explicitly intended
+        if (cantidad <= 0) {
+            alert("La cantidad debe ser mayor que cero.");
+            cantidadInput.value = 1; // Set a default value if needed
+            cantidad = 1;
+        }
+
+        actualizarTotalFila(fila);
         update_precio_total();
     }
 

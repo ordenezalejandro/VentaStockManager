@@ -13,6 +13,8 @@ from django.contrib import messages
 from .forms import ArticuloVentaInlineFormSet
 from venta.forms import ArticuloVentaForm
 import logging
+from django.core import validators
+from django.core.exceptions import ValidationError
 
 # import autocomplete_all
 
@@ -55,10 +57,11 @@ class ArticuloVentaInline(admin.TabularInline):
         return True
     
     def clean(self):
+        cleaned_data = super().clean()
         if not self.cleaned_data.get('DELETE', False):
-            cleaned_data = super().clean()
-        if self.instance.pk is None and not any(cleaned_data.values()):
-            return None
+            cantidad = cleaned_data.get('cantidad')
+            if cantidad is None or cantidad <= 0:
+                raise ValidationError("La cantidad debe ser mayor que cero.")
         return cleaned_data
     # def formfield_overrides(self, request, form):
     #     overrides = super().formfield_overrides(request, form)        
