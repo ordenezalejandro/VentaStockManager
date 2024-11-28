@@ -84,6 +84,7 @@ class ArticuloVentaInline(admin.TabularInline):
 
 class VentaAdmin(admin.ModelAdmin):
     form = VentaForm
+    ordering = ('-fecha_compra',)
     list_display = ['fecha_compra', 'fecha_entrega', 'cliente', 'vendedor', 'total_venta_por_articulo']
     list_filter = ['fecha_compra', 'fecha_entrega']
     icon_name = "monetization_on"
@@ -206,6 +207,7 @@ class VentaAdmin(admin.ModelAdmin):
 class PedidoAdmin(admin.ModelAdmin):
     
     readonly_fields = ('venta','mostrar_articulos')
+    ordering = ('-venta__fecha_compra',)
     list_display = ['id', 'venta_fecha_compra', 'venta_fecha_entrega', 'venta_cliente', 'venta_vendedor', 'total_venta_por_articulo', 'cantidad_articulos_vendidos', 'descargar_pdf']
     list_filter = ['estado', 'venta__fecha_compra', 'venta__fecha_entrega']  
     icon_name = "library_books"
