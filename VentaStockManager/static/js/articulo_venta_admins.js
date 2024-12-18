@@ -50,11 +50,23 @@ const calcular_precio_total = ()=> {
 };
 
 const get_indice = (select_id, select_name='-articulo') => {
-    if (select_id && select_id.length > 'id_ventas-'.length + select_name.length) {
-        return select_id.slice('id_ventas-'.length, -`${select_name}`.length);
+    // Verificar si select_id está definido
+    if (select_id) {
+        // Intentar extraer el índice usando el formato esperado
+        if (select_id.length > 'id_ventas-'.length + select_name.length) {
+            return select_id.slice('id_ventas-'.length, -`${select_name}`.length);
+        }
+        
+        // Intentar extraer el índice usando una expresión regular como alternativa
+        const regex = /id_ventas-(\d+)-articulo/;
+        const match = select_id.match(regex);
+        if (match) {
+            return match[1]; // Retornar el índice encontrado
+        }
     }
+    
     console.error("Invalid select_id:", select_id);
-    return null;
+    return null; // Retornar null si el select_id es inválido
 }
 
 let get_price_node = indice => {
