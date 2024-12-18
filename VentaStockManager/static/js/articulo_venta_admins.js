@@ -81,10 +81,18 @@ let get_cantidad_node = indice => {
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll("select[id^='id_ventas']").forEach(
         item => {
-            item.onchange = function(){
+            item.addEventListener('change', function() {
                 let select_id = this.dataset['select2Id'];
                 let indice = get_indice(select_id);
-                let cantidad = document.querySelector(`#id_ventas-${indice}-cantidad`).value;
+                
+                // Check if the cantidad input exists before accessing its value
+                let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
+                if (!cantidadNode) {
+                    console.error(`Cantidad input not found for indice: ${indice}`);
+                    return; // Exit the function if the input does not exist
+                }
+                
+                let cantidad = cantidadNode.value;
                 let price_node = get_price_node(indice);
 
                 let articulo_venta = select_to_articulo_venta(item);
@@ -100,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
                 update_precio_total();
             
-            }
+            }, { passive: true });
         }
     );
     
@@ -236,7 +244,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         }
                         document.querySelectorAll("select[id^='id_ventas']").forEach(
                             item => {
-                                item.onchange = function(){
+                                item.addEventListener('change', function() {
                                     let select_id = this.dataset['select2Id'];
                                     let indice = get_indice(select_id);
                                     let cantidad = document.querySelector(`#id_ventas-${indice}-cantidad`).value;
@@ -255,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                     }
                                     update_precio_total();
                                 
-                                }
+                                }, { passive: true });
                             }
                         );
                     }   
