@@ -178,11 +178,22 @@ document.addEventListener("DOMContentLoaded", function() {
         let precioNode = fila.querySelector('input[id$="-precio"]');
         
         // Asignar el precio correcto basado en la cantidad y el umbral
-        let precio = cantidad > articuloVenta.umbral ? articuloVenta.precio_mayorista : articuloVenta.precio_minorista;
-        
+        let precio;
+        if (cantidad > articuloVenta.umbral) {
+            precio = parseFloat(articuloVenta.precio_mayorista);
+        } else {
+            precio = parseFloat(articuloVenta.precio_minorista);
+        }
+
+        // Verificar que el precio se haya establecido correctamente
+        if (isNaN(precio)) {
+            console.error("Invalid price calculated:", precio);
+            return; // Salir si el precio es inválido
+        }
+
         // Establecer el precio en el nodo correspondiente
         precioNode.value = precio; // Asegúrate de que esto esté configurando el valor correctamente
-        precioNode.innerHTML = "<p style='color:blue'>" + precio + "</p>"; // Esto puede no ser necesario si solo necesitas el valor
+        precioNode.innerHTML = "<p style='color:blue'>" + precio.toFixed(2) + "</p>"; // Mostrar el precio en el formato correcto
 
         // Actualizar el total de la fila
         actualizarTotalFila(fila);
