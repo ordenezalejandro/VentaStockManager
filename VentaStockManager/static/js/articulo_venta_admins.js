@@ -176,10 +176,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
         let cantidad = parseFloat(fila.querySelector('input[id$="-cantidad"]').value) || 0;
         let precioNode = fila.querySelector('input[id$="-precio"]');
+        
+        // Asignar el precio correcto basado en la cantidad y el umbral
         let precio = cantidad > articuloVenta.umbral ? articuloVenta.precio_mayorista : articuloVenta.precio_minorista;
         
-        precioNode.value = precio;
-        precioNode.innerHTML = "<p style='color:blue'>" + precio + "</p>";
+        // Establecer el precio en el nodo correspondiente
+        precioNode.value = precio; // Asegúrate de que esto esté configurando el valor correctamente
+        precioNode.innerHTML = "<p style='color:blue'>" + precio + "</p>"; // Esto puede no ser necesario si solo necesitas el valor
+
+        // Actualizar el total de la fila
         actualizarTotalFila(fila);
         update_precio_total();
     }
