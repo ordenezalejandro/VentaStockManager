@@ -69,11 +69,11 @@ const get_indice = (select_id, select_name='-articulo') => {
 
 
 let get_price_node = indice => {
-    return document.querySelector('#id_ventas-'+indice+'-precio');
+    return document.querySelector('#id_ventas-' + indice + '-precio');
 }
 
 let get_cantidad_node = indice => {
-    return document.querySelector('#id_ventas-'+indice+'-cantidad');    
+    return document.querySelector('#id_ventas-' + indice + '-cantidad');
 }
 // }
 
@@ -167,14 +167,21 @@ document.addEventListener("DOMContentLoaded", function() {
         let select = event.params.data.element; 
         let fila = select.closest('tr');
         let articuloVenta = select_to_articulo_venta(select);
+        
+        // Verificar si articuloVenta es válido
+        if (!articuloVenta) {
+            console.error("Invalid articuloVenta:", articuloVenta);
+            return; // Salir si el artículo no es válido
+        }
+
         let cantidad = parseFloat(fila.querySelector('input[id$="-cantidad"]').value) || 0;
         let precioNode = fila.querySelector('input[id$="-precio"]');
         let precio = cantidad > articuloVenta.umbral ? articuloVenta.precio_mayorista : articuloVenta.precio_minorista;
+        
         precioNode.value = precio;
         precioNode.innerHTML = "<p style='color:blue'>" + precio + "</p>";
         actualizarTotalFila(fila);
         update_precio_total();
-
     }
 
     function manejarCambioPrecio(event) {
