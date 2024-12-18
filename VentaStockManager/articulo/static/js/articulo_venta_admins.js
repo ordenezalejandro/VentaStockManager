@@ -48,8 +48,12 @@ const calcular_precio_total = ()=> {
 };
 
 const get_indice = (select_id, select_name='-articulo') => {
-    return select_id.slice('id_ventas-'.length, -`${select_name}`.length)
-};
+    if (select_id && select_id.length > 'id_ventas-'.length + select_name.length) {
+        return select_id.slice('id_ventas-'.length, -`${select_name}`.length);
+    }
+    console.error("Invalid select_id:", select_id);
+    return null;
+}
 
 let get_price_node = indice => {
     return document.querySelector('#id_ventas-'+indice+'-precio');
