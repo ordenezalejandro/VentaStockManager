@@ -13,8 +13,8 @@ let select_to_articulo_venta = (node, text=null) => {
     } else {
         option_selected = node.selectedOptions[0].textContent;
     }
-    let row = option_selected.split("|");
-    if(row.length >= 6 ){
+    let row = option_selected.split("|")
+    if(row.length >= 5 ){
         return {
             codigo: row[0].trim(),
             codigo_interno: row[1].trim(),
@@ -24,9 +24,7 @@ let select_to_articulo_venta = (node, text=null) => {
             umbral: row[5].trim().slice(7)
         };
     } else {
-        console.error("Invalid article selection:", option_selected);
-        alert("Por favor, seleccione un artículo válido");
-        return null;
+        return null
     }
 };
 
@@ -69,6 +67,7 @@ const get_indice = (select_id, select_name='-articulo') => {
     return null; // Retornar null si el select_id es inválido
 }
 
+
 let get_price_node = indice => {
     return document.querySelector('#id_ventas-'+indice+'-precio');
 }
@@ -85,17 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
             item.onchange = function(){
                 let select_id = this.dataset['select2Id'];
                 let indice = get_indice(select_id);
-                let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
-                
-                // Check if cantidadNode is found
-                if (!cantidadNode) {
-                    console.error("Cantidad node not found for indice:", indice);
-                    console.error("Select ID:", select_id);
-                    console.error("Calculated Indice:", indice);
-                    return; // Exit the function if the node is not found
-                }
-                
-                let cantidad = cantidadNode.value;
+                let cantidad = document.querySelector(`#id_ventas-${indice}-cantidad`).value;
                 let price_node = get_price_node(indice);
 
                 let articulo_venta = select_to_articulo_venta(item);
@@ -124,17 +113,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function manejarCantidad(fila){
-        let cantidadInput = fila.querySelector('input[id$="-cantidad"]');
-        let cantidad = parseFloat(cantidadInput.value) || 0;
-        
-        // Ensure the quantity is not set to zero unless explicitly intended
-        if (cantidad <= 0) {
-            alert("La cantidad debe ser mayor que cero.");
-            cantidadInput.value = 1; // Set a default value if needed
-            cantidad = 1;
-        }
-
-        actualizarTotalFila(fila);
+        actualizarTotalFila(fila)
         update_precio_total();
     }
 
@@ -208,7 +187,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function manejarEliminacionArticulo(event) {
         let fila = event.target.closest('tr');
-        
         if (fila) {
             
             
@@ -261,17 +239,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 item.onchange = function(){
                                     let select_id = this.dataset['select2Id'];
                                     let indice = get_indice(select_id);
-                                    let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
-                                    
-                                    // Check if cantidadNode is found
-                                    if (!cantidadNode) {
-                                        console.error("Cantidad node not found for indice:", indice);
-                                        console.error("Select ID:", select_id);
-                                        console.error("Calculated Indice:", indice);
-                                        return; // Exit the function if the node is not found
-                                    }
-                                    
-                                    let cantidad = cantidadNode.value;
+                                    let cantidad = document.querySelector(`#id_ventas-${indice}-cantidad`).value;
                                     let price_node = get_price_node(indice);
                     
                                     let articulo_venta = select_to_articulo_venta(item);
