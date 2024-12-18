@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
                 update_precio_total();
             
-            }, { passive: true });
+            }
         }
     );
     
@@ -244,12 +244,20 @@ document.addEventListener("DOMContentLoaded", function() {
                         }
                         document.querySelectorAll("select[id^='id_ventas']").forEach(
                             item => {
-                                item.addEventListener('change', function() {
+                                item.onchange = function() {
                                     let select_id = this.dataset['select2Id'];
                                     let indice = get_indice(select_id);
-                                    let cantidad = document.querySelector(`#id_ventas-${indice}-cantidad`).value;
+                                    
+                                    // Check if the cantidad input exists before accessing its value
+                                    let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
+                                    if (!cantidadNode) {
+                                        console.error(`Cantidad input not found for indice: ${indice}`);
+                                        return; // Exit the function if the input does not exist
+                                    }
+                                    
+                                    let cantidad = cantidadNode.value;
                                     let price_node = get_price_node(indice);
-                    
+                                    
                                     let articulo_venta = select_to_articulo_venta(item);
                                     let total = document.querySelector(`tr#ventas-${indice} td.field-precio_total`)
                     
@@ -263,7 +271,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                     }
                                     update_precio_total();
                                 
-                                }, { passive: true });
+                                }
                             }
                         );
                     }   
