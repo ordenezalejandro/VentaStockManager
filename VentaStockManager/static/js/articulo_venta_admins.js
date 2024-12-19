@@ -126,6 +126,54 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    // Manejar el evento input para la cantidad
+    document.querySelectorAll("input[id^='id_ventas-'][id$='-cantidad']").forEach(item => {
+        item.oninput = function() {
+            let cantidadNode = this; // Obtener el input de cantidad
+            let select_id = this.id.replace('-cantidad', '-articulo'); // Obtener el ID del select correspondiente
+            let articuloSelect = document.querySelector(`#${select_id}`);
+            let indice = select_id.split('-')[1]; // Extraer el índice
+            let price_node = document.querySelector(`#id_ventas-${indice}-precio`);
+            let totalNode = document.querySelector(`#ventas-${indice} .field-precio_total p`);
+
+            // Verificar si el select de artículo existe
+            if (!articuloSelect) {
+                console.error(`Articulo select not found for indice: ${indice}`);
+                return; // Salir si el select no existe
+            }
+
+            let cantidad = parseFloat(cantidadNode.value) || 0; // Asegurarse de que sea un número
+            let articulo_venta = select_to_articulo_venta(articuloSelect); // Obtener el artículo seleccionado
+
+            // Verificar si articulo_venta es válido
+            if (!articulo_venta) {
+                console.error("Invalid articulo_venta:", articulo_venta);
+                return; // Salir si el artículo no es válido
+            }
+
+            // Lógica para establecer precios y actualizar totales
+            let precio;
+            if (cantidad > articulo_venta.umbral) {
+                precio = parseFloat(articulo_venta.precio_mayorista);
+            } else {
+                precio = parseFloat(articulo_venta.precio_minorista);
+            }
+
+            // Verificar que el precio se haya establecido correctamente
+            if (isNaN(precio)) {
+                console.error("Invalid price calculated:", precio);
+                return; // Salir si el precio es inválido
+            }
+
+            // Establecer el precio en el nodo correspondiente
+            price_node.value = precio.toFixed(2); // Asegúrate de que esto esté configurando el valor correctamente
+            totalNode.textContent = (cantidad * precio).toFixed(2); // Actualizar el total
+
+            // Actualizar el precio total global
+            update_precio_total();
+        }
+    });
+
     // Función para actualizar el precio total global
     const update_precio_total = () => {
         const precio_total_element = document.querySelector("div.readonly");
@@ -142,6 +190,106 @@ document.addEventListener("DOMContentLoaded", function() {
             }, 0
         );
     };
+
+    function manejarPrecio(fila){
+        let cantidad = parseFloat(fila.querySelector('input[id$="-cantidad"]').value) || 0;
+        let precio_node = fila.querySelector('input[id$="-precio"]');
+        let precio = parseFloat(precio_node.value) || 0;
+        let total = cantidad*precio;
+        fila.querySelector('.field-precio_total p').textContent = total.toFixed(2);
+    }
+
+    function manejarCantidad(fila){
+        actualizarTotalFila(fila)
+        update_precio_total();
+    }
+
+    function actualizarTotalFila(fila) {
+        let cantidad = parseFloat(fila.querySelector('input[id$="-cantidad"]').value) || 0;
+        let precio_node = fila.querySelector('input[id$="-precio"]');
+        let precio = parseFloat(precio_node.value) || 0;
+        let selectArticulo = fila.querySelector("select[id^='id_ventas-'][id$='-articulo']");
+        let articuloVenta = select_to_articulo_venta(selectArticulo);
+        if (articuloVenta === null){
+            return;
+        }
+        let umbral = articuloVenta.umbral;
+        let precio_value = cantidad > umbral ? articuloVenta.precio_mayorista : articuloVenta.precio_minorista;
+        precio_node.value = precio_value;
+        let total = cantidad*precio_value;
+        fila.querySelector('.field-precio_total p').textContent =  total.toFixed(2) ;
+        // let total = cantidad * precio;
+        // fila.querySelector('.field-precio_total p').textContent = total.toFixed(2);
+    }
+
+    function agregarEventosANuevoInline(nuevoInline) {
+        let selectArticulo = nuevoInline.querySelector("select[id^='id_ventas-'][id$='-articulo']");
+        let inputCantidad = nuevoInline.querySelector("input[id$='-cantidad']");
+        let inputPrecio = nuevoInline.querySelector("input[id$='-precio']");
+
+        selectArticulo.addEventListener('change', manejarCambioArticulo);
+        inputCantidad.addEventListener('change', manejarCambioCantidad);
+        inputPrecio.addEventListener('change', manejarCambioPrecio);
+    }
+
+    
+    function actualizarTotalGlobal() {
+        let sumTotal = Array.from(document.querySelectorAll('.field-precio_total p'))
+            .reduce((acc, el) => acc + parseFloat(el.textContent || 0), 0);
+        let total_p = document.querySelector('div.readonly');
+        if (total_p) {
+            total_p.innerHTML= `<br><strong> ${sumTotal.toFixed(2)}</strong>` ;
+        }
+    }
+
+    function manejarCambioArticulo(event) {
+        let select = event.params.data.element; 
+        let fila = select.closest('tr');
+        let articuloVenta = select_to_articulo_venta(select);
+        
+        // Verificar si articuloVenta es válido
+        if (!articuloVenta) {
+            console.error("Invalid articuloVenta:", articuloVenta);
+            return; // Salir si el artículo no es válido
+        }
+
+            // Lógica para establecer precios y actualizar totales
+            let precio;
+            if (cantidad > articulo_venta.umbral) {
+                precio = parseFloat(articulo_venta.precio_mayorista);
+            } else {
+                precio = parseFloat(articulo_venta.precio_minorista);
+            }
+
+            // Verificar que el precio se haya establecido correctamente
+            if (isNaN(precio)) {
+                console.error("Invalid price calculated:", precio);
+                return; // Salir si el precio es inválido
+            }
+
+            // Establecer el precio en el nodo correspondiente
+            price_node.value = precio.toFixed(2); // Asegúrate de que esto esté configurando el valor correctamente
+            totalNode.textContent = (cantidad * precio).toFixed(2); // Actualizar el total
+
+            // Actualizar el precio total global
+            update_precio_total();
+        }
+    }
+
+    // Add event listeners for delete buttons
+    document.querySelectorAll('.delete-button-class').forEach(button => {
+        button.addEventListener('click', manejarEliminacionArticulo);
+    });
+    document.querySelectorAll('.delete-inline-row').forEach(icon => {
+        icon.addEventListener('click', manejarEliminacionArticulo);
+    });
+
+    // Agregar eventos a todos los elementos existentes y actualizar totales
+    document.querySelectorAll('tr[id^="ventas-"]').forEach(fila => {
+        agregarEventosANuevoInline(fila);
+        manejarPrecio(fila);
+        // actualizarTotalFila(fila);
+    });
 
     const inlineGroup = document.querySelector('.inline-group');
     if (inlineGroup) {
