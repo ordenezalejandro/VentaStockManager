@@ -351,10 +351,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("Guardando fila:", fila.id, "Cantidad:", cantidad, "Precio:", precio);
         });
 
-        if (!esValido) {
-            event.preventDefault(); // Evita que el formulario se envíe si no es válido
-            alert("Por favor, complete todos los campos obligatorios y asegúrese de que las cantidades sean mayores que cero.");
-        }
+       
     });
 
     function handleSelectionChange() {
