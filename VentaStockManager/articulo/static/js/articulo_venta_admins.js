@@ -81,25 +81,31 @@ let get_cantidad_node = indice => {
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll("select[id^='id_ventas']").forEach(
         item => {
-            item.onchange = function(){
+            item.onchange = function() {
                 let select_id = this.dataset['select2Id'];
                 let indice = get_indice(select_id);
-                let cantidad = document.querySelector(`#id_ventas-${indice}-cantidad`).value;
+                let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
                 let price_node = get_price_node(indice);
 
+                if (!cantidadNode || !price_node) {
+                    console.error("Element not found for indice:", indice);
+                    return;
+                }
+
+                let cantidad = cantidadNode.value;
                 let articulo_venta = select_to_articulo_venta(item);
                 let total = document.querySelector(`tr#ventas-${indice} td.field-precio_total`);
-                if (price_node.textContent == ''){
-                    if(cantidad > articulo_venta.umbral) {
+
+                if (articulo_venta && price_node.textContent == '') {
+                    if (cantidad > articulo_venta.umbral) {
                         price_node.setAttribute("value", articulo_venta.precio_mayorista);
-                        total.innerHTML =  "<p style='color:blue'>" + String(parseFloat(cantidad)*parseFloat(price_node.textContent)) + "</p>";
+                        total.innerHTML = "<p style='color:blue'>" + String(parseFloat(cantidad) * parseFloat(price_node.textContent)) + "</p>";
                     } else {
                         price_node.setAttribute("value", articulo_venta.precio_minorista);
-                        total.innerHTML = "<p style='color:blue'>" + String(parseFloat(cantidad)*parseFloat(articulo_venta.precio_minorista)) + "</p>";
+                        total.innerHTML = "<p style='color:blue'>" + String(parseFloat(cantidad) * parseFloat(articulo_venta.precio_minorista)) + "</p>";
                     }
                 }
                 update_precio_total();
-            
             }
         }
     );
@@ -271,4 +277,58 @@ document.addEventListener("DOMContentLoaded", function() {
             subtree: true
         });
     }
+
+    function validarFormulario() {
+        let esValido = true;
+        document.querySelectorAll('tr[id^="ventas-"]').forEach(fila => {
+            let cantidadNode = fila.querySelector('input[id$="-cantidad"]');
+            let selectArticulo = fila.querySelector("select[id^='id_ventas-'][id$='-articulo']");
+            let precioNode = fila.querySelector('input[id$="-precio"]');
+
+            if (!cantidadNode || !selectArticulo || !precioNode) {
+                console.error("Missing required fields in row:", fila);
+                esValido = false;
+                return;
+            }
+
+            let cantidad = parseFloat(cantidadNode.value) || 0;
+            if (cantidad <= 0) {
+                console.error("Cantidad debe ser mayor que cero en fila:", fila);
+                esValido = false;
+            }
+
+            if (!selectArticulo.value) {
+                console.error("Artículo no seleccionado en fila:", fila);
+                esValido = false;
+            }
+
+            if (!precioNode.value) {
+                console.error("Precio no establecido en fila:", fila);
+                esValido = false;
+            }
+        });
+
+        return esValido;
+    }
+
+    document.querySelector('#guardar-button').addEventListener('click', function(event) {
+        if (!validarFormulario()) {
+            event.preventDefault(); // Evita que el formulario se envíe si no es válido
+            alert("Por favor, complete todos los campos obligatorios y asegúrese de que las cantidades sean mayores que cero.");
+        } else {
+            // Asegúrate de que los valores estén actualizados
+            document.querySelectorAll('tr[id^="ventas-"]').forEach(fila => {
+                let cantidadNode = fila.querySelector('input[id$="-cantidad"]');
+                let precioNode = fila.querySelector('input[id$="-precio"]');
+                let totalNode = fila.querySelector('.field-precio_total p');
+
+                if (cantidadNode && precioNode && totalNode) {
+                    let cantidad = parseFloat(cantidadNode.value) || 0;
+                    let precio = parseFloat(precioNode.value) || 0;
+                    let total = cantidad * precio;
+                    totalNode.textContent = total.toFixed(2);
+                }
+            });
+        }
+    });
 });

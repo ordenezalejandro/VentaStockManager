@@ -81,7 +81,7 @@ let get_cantidad_node = indice => {
 document.addEventListener("DOMContentLoaded", function() {
     // Manejar el evento onchange para cada select de artículo
     document.querySelectorAll("select[id^='id_ventas-'][id$='-articulo']").forEach(item => {
-        item.onchange = function() {
+        item.addEventListener('change', function() {
             let select_id = this.id; // Obtener el ID del select
             let indice = select_id.split('-')[1]; // Extraer el índice
             let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
