@@ -342,6 +342,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
+        
         let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
         let price_node = get_price_node(indice);
 
