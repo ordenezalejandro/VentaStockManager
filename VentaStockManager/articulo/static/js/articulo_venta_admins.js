@@ -81,8 +81,15 @@ let get_cantidad_node = indice => {
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll("select[id^='id_ventas']").forEach(item => {
         item.onchange = function() {
-            let select_id = this.dataset['select2Id'];
+            let select_id = this.dataset['select2Id'] || '0';
+            console.log("select_id:", select_id);
+
             let indice = get_indice(select_id);
+            if (!indice) {
+                console.error("Element not found for indice:", indice);
+                return;
+            }
+
             let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
             let price_node = get_price_node(indice);
 
