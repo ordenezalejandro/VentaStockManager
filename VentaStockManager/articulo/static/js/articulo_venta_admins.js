@@ -351,7 +351,9 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("Guardando fila:", fila.id, "Cantidad:", cantidad, "Precio:", precio);
         });
 
-       
+        // if (!esValido) {
+        //     event.preventDefault(); // Evita que el formulario se envíe si no es válido
+        // }
     });
 
     function handleSelectionChange() {
