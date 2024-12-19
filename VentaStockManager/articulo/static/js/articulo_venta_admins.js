@@ -93,6 +93,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
             let price_node = get_price_node(indice);
 
+            
             if (!cantidadNode || !price_node) {
                 console.error("Element not found for indice:", indice);
                 return;
