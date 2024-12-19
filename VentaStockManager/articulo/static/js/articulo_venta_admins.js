@@ -81,7 +81,7 @@ let get_cantidad_node = indice => {
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll("select[id^='id_ventas']").forEach(item => {
         item.onchange = function() {
-            let select_id = this.dataset['select2Id'] || '0';
+            let select_id = this.dataset['select2Id'] || '1';
             console.log("select_id:", select_id);
 
             let indice = get_indice(select_id);
@@ -93,11 +93,13 @@ document.addEventListener("DOMContentLoaded", function() {
             let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
             let price_node = get_price_node(indice);
 
-            
             if (!cantidadNode || !price_node) {
                 console.error("Element not found for indice:", indice);
                 return;
             }
+
+            // Simula un evento de cambio en el campo de cantidad
+            cantidadNode.dispatchEvent(new Event('change'));
 
             let cantidad = cantidadNode.value;
             let articulo_venta = select_to_articulo_venta(item);
