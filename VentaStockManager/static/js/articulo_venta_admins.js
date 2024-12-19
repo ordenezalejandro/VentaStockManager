@@ -81,33 +81,39 @@ let get_cantidad_node = indice => {
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll("select[id^='id_ventas']").forEach(
         item => {
-            item.addEventListener('change', function() {
+            item.onchange = function() {
                 let select_id = this.dataset['select2Id'];
                 let indice = get_indice(select_id);
-                
-                // Check if the cantidad input exists before accessing its value
                 let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
-                if (!cantidadNode) {
-                    console.error(`Cantidad input not found for indice: ${indice}`);
-                    return; // Exit the function if the input does not exist
-                }
-                
-                let cantidad = cantidadNode.value;
                 let price_node = get_price_node(indice);
-
-                let articulo_venta = select_to_articulo_venta(item);
                 let total = document.querySelector(`tr#ventas-${indice} td.field-precio_total`);
-                if (price_node.textContent == ''){
-                    if(cantidad > articulo_venta.umbral) {
-                        price_node.setAttribute("value", articulo_venta.precio_mayorista);
-                        total.innerHTML =  "<p style='color:blue'>" + String(parseFloat(cantidad)*parseFloat(price_node.textContent)) + "</p>";
-                    } else {
-                        price_node.setAttribute("value", articulo_venta.precio_minorista);
-                        total.innerHTML = "<p style='color:blue'>" + String(parseFloat(cantidad)*parseFloat(articulo_venta.precio_minorista)) + "</p>";
+
+                try {
+                    // Verificar si cantidadNode existe
+                    if (!cantidadNode) {
+                        throw new Error(`Cantidad input not found for indice: ${indice}`);
                     }
+
+                    let cantidad = cantidadNode.value;
+                    let articulo_venta = select_to_articulo_venta(item);
+
+                    // Lógica para establecer precios y actualizar totales
+                    if (articulo_venta) {
+                        if (cantidad > articulo_venta.umbral) {
+                            price_node.setAttribute("value", articulo_venta.precio_mayorista);
+                            total.innerHTML = "<p style='color:blue'>" + String(parseFloat(cantidad) * parseFloat(articulo_venta.precio_mayorista)) + "</p>";
+                        } else {
+                            price_node.setAttribute("value", articulo_venta.precio_minorista);
+                            total.innerHTML = "<p style='color:blue'>" + String(parseFloat(cantidad) * parseFloat(articulo_venta.precio_minorista)) + "</p>";
+                        }
+                    } else {
+                        console.error("Invalid articulo_venta:", articulo_venta);
+                    }
+
+                    update_precio_total();
+                } catch (error) {
+                    console.error(error.message);
                 }
-                update_precio_total();
-            
             }
         }
     );
