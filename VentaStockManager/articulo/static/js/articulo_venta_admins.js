@@ -290,30 +290,33 @@ document.addEventListener("DOMContentLoaded", function() {
     function validarFormulario() {
         let esValido = true;
         document.querySelectorAll('tr[id^="ventas-"]').forEach(fila => {
+            // Skip validation for deleted rows
+            let deleteInput = fila.querySelector('input[name$="-DELETE"]');
+            if (deleteInput && deleteInput.checked) {
+                return;
+            }
+
             let cantidadNode = fila.querySelector('input[id$="-cantidad"]');
             let selectArticulo = fila.querySelector("select[id^='id_ventas-'][id$='-articulo']");
             let precioNode = fila.querySelector('input[id$="-precio"]');
 
             if (!cantidadNode || !selectArticulo || !precioNode) {
-                console.error("Missing required fields in row:", fila);
-                esValido = false;
                 return;
             }
 
             let cantidad = parseFloat(cantidadNode.value) || 0;
             if (cantidad <= 0) {
-                console.error("Cantidad debe ser mayor que cero en fila:", fila);
+                cantidadNode.classList.add('is-invalid');
                 esValido = false;
+            } else {
+                cantidadNode.classList.remove('is-invalid');
             }
 
             if (!selectArticulo.value) {
-                console.error("Artículo no seleccionado en fila:", fila);
+                selectArticulo.classList.add('is-invalid');
                 esValido = false;
-            }
-
-            if (!precioNode.value) {
-                console.error("Precio no establecido en fila:", fila);
-                esValido = false;
+            } else {
+                selectArticulo.classList.remove('is-invalid');
             }
         });
 
@@ -321,40 +324,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     const guardarButton = document.querySelector('button[name="_save"]');
-
-    guardarButton.addEventListener('click', function(event) {
-        let esValido = true;
-
-        document.querySelectorAll("tr[id^='ventas-']").forEach(fila => {
-            let cantidadNode = fila.querySelector('input[id$="-cantidad"]');
-            let precioNode = fila.querySelector('input[id$="-precio"]');
-
-            if (!cantidadNode || !precioNode) {
-                console.error("Faltan campos requeridos en la fila:", fila.id);
-                esValido = false;
-                return;
+    if (guardarButton) {
+        guardarButton.addEventListener('click', function(event) {
+            if (!validarFormulario()) {
+                event.preventDefault(); // Prevent form submission if validation fails
             }
-
-            let cantidad = parseFloat(cantidadNode.value) || 0;
-            let precio = parseFloat(precioNode.value) || 0;
-
-            if (cantidad <= 0) {
-                console.error("La cantidad debe ser mayor que cero en la fila:", fila.id);
-                esValido = false;
-            }
-
-            if (!precio) {
-                console.error("El precio no está establecido en la fila:", fila.id);
-                esValido = false;
-            }
-
-            console.log("Guardando fila:", fila.id, "Cantidad:", cantidad, "Precio:", precio);
         });
-
-        // if (!esValido) {
-        //     event.preventDefault(); // Evita que el formulario se envíe si no es válido
-        // }
-    });
+    }
 
     function handleSelectionChange() {
         let select_id = this.dataset['select2Id'] || '1';
