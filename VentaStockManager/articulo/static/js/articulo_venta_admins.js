@@ -81,7 +81,7 @@ let get_cantidad_node = indice => {
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll("select[id^='id_ventas']").forEach(item => {
         item.onchange = function() {
-            let select_id = this.dataset['select2Id'] || '1';
+            let select_id = this.dataset['select2Id'] || '0';
             console.log("select_id:", select_id);
 
             let indice = get_indice(select_id);
@@ -355,5 +355,32 @@ document.addEventListener("DOMContentLoaded", function() {
             event.preventDefault(); // Evita que el formulario se envíe si no es válido
             alert("Por favor, complete todos los campos obligatorios y asegúrese de que las cantidades sean mayores que cero.");
         }
+    });
+
+    function handleSelectionChange() {
+        let select_id = this.dataset['select2Id'] || '1';
+        console.log("select_id:", select_id);
+
+        let indice = get_indice(select_id);
+        if (!indice) {
+            console.error("Element not found for indice:", indice);
+            return;
+        }
+
+        let cantidadNode = document.querySelector(`#id_ventas-${indice}-cantidad`);
+        let price_node = get_price_node(indice);
+
+        if (!cantidadNode || !price_node) {
+            console.error("Element not found for indice:", indice);
+            return;
+        }
+
+        // Simula un evento de cambio en el campo de cantidad
+        cantidadNode.dispatchEvent(new Event('change'));
+    }
+
+    document.querySelectorAll("select[id^='id_ventas']").forEach(item => {
+        item.onchange = handleSelectionChange;
+        item.onclick = handleSelectionChange; // Si necesitas que el click también lo maneje
     });
 });
