@@ -610,3 +610,602 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+// Envolver todo el código en una función de inicialización
+function initializeVentaManager() {
+    // Esperar a que Select2 esté completamente cargado
+    if (typeof $.fn.select2 === 'undefined') {
+        console.warn('Select2 no está cargado. Esperando...');
+        setTimeout(initializeVentaManager, 100);
+        return;
+    }
+
+    // Configuración de Select2
+    $("select[id^='id_ventas']").select2({
+        language: 'es',
+        width: '100%'
+    }).on('select2:select', function(e) {
+        handleSelectionChange.call(this, e);
+    });
+
+    // Manejar cambios de selección
+    function handleSelectionChange(event) {
+        try {
+            const select_id = this.id || this.dataset?.select2Id || event?.target?.id || '';
+            console.log('Manejando cambio de selección:', { select_id });
+
+            const indice = get_indice(select_id);
+            if (!indice) {
+                console.log('Índice no válido para:', select_id);
+                return;
+            }
+
+            const fila = document.querySelector(`tr#ventas-${indice}`);
+            if (!fila) {
+                console.log('No se encontró la fila para el índice:', indice);
+                return;
+            }
+
+            actualizarTotalFila(fila);
+            update_precio_total();
+        } catch (error) {
+            console.error('Error en handleSelectionChange:', error);
+        }
+    }
+
+    // Mejorar la función get_indice
+    function get_indice(select_id) {
+        if (!select_id || select_id === '0') {
+            return null;
+        }
+
+        try {
+            // Si es un elemento Select2
+            if (select_id.startsWith('select2-')) {
+                const element = document.querySelector(`[data-select2-id="${select_id}"]`);
+                if (element) {
+                    select_id = element.id;
+                }
+            }
+
+            // Patrones de búsqueda
+            const patterns = [
+                /id_ventas-(\d+)-articulo/,
+                /ventas-(\d+)/,
+                /\d+/
+            ];
+
+            for (let pattern of patterns) {
+                const match = select_id.match(pattern);
+                if (match) {
+                    return match[1];
+                }
+            }
+        } catch (error) {
+            console.error('Error al obtener índice:', error);
+        }
+
+        return null;
+    }
+
+    // Asegurarse de que el botón de guardar existe
+    const guardarBtn = document.querySelector('#guardar-venta');
+    if (guardarBtn) {
+        guardarBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (typeof limpiarFilasVacias === 'function') {
+                limpiarFilasVacias();
+            }
+            if (typeof validarFormulario === 'function' && validarFormulario()) {
+                this.closest('form').submit();
+            }
+        });
+    }
+}
+
+// Iniciar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    // Esperar un momento para asegurarse de que Select2 esté cargado
+    setTimeout(initializeVentaManager, 100);
+});
+
+// Asegurarse de que jQuery está disponible
+if (typeof jQuery === 'undefined') {
+    console.error('jQuery no está cargado. El formulario no funcionará correctamente.');
+}
+
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
+    return false;
+};
+
+// Función para logging mejorado
+function debugLog(message, data = null) {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] ${message}`, data ? data : '');
+}
+
+// Función de inicialización principal
+function initializeVentaManager() {
+    debugLog('Iniciando inicialización...');
+
+    // Verificar dependencias
+    if (typeof jQuery === 'undefined') {
+        debugLog('ERROR: jQuery no está cargado');
+        return;
+    }
+
+    if (typeof $.fn.select2 === 'undefined') {
+        debugLog('ERROR: Select2 no está cargado');
+        return;
+    }
+
+    debugLog('Dependencias verificadas correctamente');
+
+    // Inicializar Select2
+    try {
+        $("select[id^='id_ventas']").select2({
+            language: 'es',
+            width: '100%',
+            debug: true // Habilitar modo debug de Select2
+        });
+        debugLog('Select2 inicializado correctamente');
+    } catch (error) {
+        debugLog('Error al inicializar Select2:', error);
+    }
+
+    // Mejorar get_indice con más logging
+    function get_indice(select_id) {
+        debugLog('Intentando obtener índice para:', select_id);
+
+        if (!select_id || select_id === '0') {
+            debugLog('select_id inválido:', select_id);
+            return null;
+        }
+
+        try {
+            if (select_id.startsWith('select2-')) {
+                const element = document.querySelector(`[data-select2-id="${select_id}"]`);
+                if (element) {
+                    select_id = element.id;
+                    debugLog('ID convertido de Select2:', select_id);
+                }
+            }
+
+            const patterns = [
+                /id_ventas-(\d+)-articulo/,
+                /ventas-(\d+)/,
+                /\d+/
+            ];
+
+            for (let pattern of patterns) {
+                const match = select_id.match(pattern);
+                if (match) {
+                    debugLog('Índice encontrado:', match[1]);
+                    return match[1];
+                }
+            }
+        } catch (error) {
+            debugLog('Error al procesar índice:', error);
+        }
+
+        debugLog('No se pudo extraer índice de:', select_id);
+        return null;
+    }
+
+    // Mejorar handleSelectionChange
+    function handleSelectionChange(event) {
+        debugLog('Evento de cambio detectado:', event);
+
+        try {
+            const select_id = this.id || this.dataset?.select2Id || event?.target?.id || '';
+            debugLog('ID del select:', select_id);
+
+            const indice = get_indice(select_id);
+            if (!indice) {
+                debugLog('No se pudo obtener índice válido');
+                return;
+            }
+
+            const fila = document.querySelector(`tr#ventas-${indice}`);
+            if (!fila) {
+                debugLog('No se encontró la fila:', `tr#ventas-${indice}`);
+                return;
+            }
+
+            debugLog('Actualizando fila:', indice);
+            actualizarTotalFila(fila);
+            update_precio_total();
+        } catch (error) {
+            debugLog('Error en handleSelectionChange:', error);
+        }
+    }
+
+    // Agregar event listeners de manera segura
+    function addSafeEventListener(selector, event, handler) {
+        const element = document.querySelector(selector);
+        if (element) {
+            debugLog(`Agregando evento ${event} a:`, selector);
+            element.addEventListener(event, handler);
+        } else {
+            debugLog(`Elemento no encontrado:`, selector);
+        }
+    }
+
+    // Inicializar eventos cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        debugLog('DOM cargado, inicializando eventos...');
+
+        // Agregar eventos a los selects existentes
+        document.querySelectorAll("select[id^='id_ventas']").forEach(select => {
+            debugLog('Agregando eventos a select:', select.id);
+            select.addEventListener('change', handleSelectionChange);
+        });
+
+        // Agregar evento al botón de guardar
+        addSafeEventListener('#guardar-venta', 'click', function(e) {
+            e.preventDefault();
+            debugLog('Botón guardar clickeado');
+            
+            if (typeof limpiarFilasVacias === 'function') {
+                limpiarFilasVacias();
+            }
+            
+            if (typeof validarFormulario === 'function' && validarFormulario()) {
+                debugLog('Enviando formulario...');
+                this.closest('form').submit();
+            }
+        });
+
+        debugLog('Inicialización completada');
+    });
+}
+
+// Iniciar con retraso para asegurar que todas las dependencias estén cargadas
+setTimeout(() => {
+    debugLog('Iniciando con retraso...');
+    initializeVentaManager();
+}, 500);
+
+// Manejador global de errores
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    debugLog('Error global detectado:', {
+        mensaje: msg,
+        url: url,
+        linea: lineNo,
+        columna: columnNo,
+        error: error
+    });
+    return false;
+};
+
+// Estado global para tracking
+let isInitialized = false;
+let initAttempts = 0;
+const MAX_INIT_ATTEMPTS = 5;
+
+// Función de logging mejorada
+function debugLog(message, data = null) {
+    console.log(`[${new Date().toISOString()}] ${message}`, data || '');
+}
+
+// Función para verificar si los elementos necesarios están presentes
+function checkRequiredElements() {
+    const selects = document.querySelectorAll("select[id^='id_ventas']");
+    const guardarBtn = document.querySelector('#guardar-venta');
+    
+    debugLog('Elementos encontrados:', {
+        'selects': selects.length,
+        'guardarBtn': !!guardarBtn
+    });
+    
+    return selects.length > 0 || guardarBtn;
+}
+
+// Función principal de inicialización
+function initializeVentaManager() {
+    if (isInitialized) {
+        debugLog('Ya inicializado, saltando...');
+        return;
+    }
+
+    debugLog('Intentando inicializar...', { attempt: initAttempts + 1 });
+
+    // Verificar dependencias
+    if (!window.jQuery || !window.jQuery.fn.select2) {
+        debugLog('Dependencias no cargadas, reintentando...');
+        if (initAttempts < MAX_INIT_ATTEMPTS) {
+            initAttempts++;
+            setTimeout(initializeVentaManager, 500);
+        }
+        return;
+    }
+
+    // Verificar si los elementos necesarios están presentes
+    if (!checkRequiredElements()) {
+        debugLog('Elementos requeridos no encontrados, reintentando...');
+        if (initAttempts < MAX_INIT_ATTEMPTS) {
+            initAttempts++;
+            setTimeout(initializeVentaManager, 500);
+        }
+        return;
+    }
+
+    try {
+        // Inicializar Select2
+        jQuery("select[id^='id_ventas']").each(function() {
+            const $select = jQuery(this);
+            debugLog('Inicializando Select2 para:', this.id);
+            
+            $select.select2({
+                language: 'es',
+                width: '100%',
+                debug: true
+            }).on('select2:select change', function(e) {
+                handleSelectionChange.call(this, e);
+            });
+        });
+
+        // Manejar el botón guardar
+        const guardarBtn = document.querySelector('#guardar-venta');
+        if (guardarBtn) {
+            debugLog('Configurando botón guardar');
+            guardarBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                debugLog('Botón guardar clickeado');
+                if (typeof limpiarFilasVacias === 'function') {
+                    limpiarFilasVacias();
+                }
+                if (typeof validarFormulario === 'function' && validarFormulario()) {
+                    this.closest('form').submit();
+                }
+            });
+        }
+
+        isInitialized = true;
+        debugLog('Inicialización completada exitosamente');
+
+    } catch (error) {
+        debugLog('Error durante la inicialización:', error);
+    }
+}
+
+// Función mejorada para obtener índice
+function get_indice(select_id) {
+    debugLog('Obteniendo índice para:', select_id);
+    
+    if (!select_id || select_id === '0') {
+        debugLog('ID inválido:', select_id);
+        return null;
+    }
+
+    // Limpiar el ID si viene de Select2
+    if (select_id.startsWith('select2-')) {
+        const element = document.querySelector(`[data-select2-id="${select_id}"]`);
+        if (element) {
+            select_id = element.id;
+            debugLog('ID limpio:', select_id);
+        }
+    }
+
+    // Extraer el índice usando diferentes patrones
+    const patterns = [
+        /id_ventas-(\d+)-articulo/,
+        /ventas-(\d+)/,
+        /\d+/
+    ];
+
+    for (let pattern of patterns) {
+        const match = select_id.match(pattern);
+        if (match) {
+            debugLog('Índice encontrado:', match[1]);
+            return match[1];
+        }
+    }
+
+    debugLog('No se pudo extraer índice');
+    return null;
+}
+
+// Función mejorada para manejar cambios
+function handleSelectionChange(event) {
+    debugLog('Manejando cambio:', { 
+        eventType: event.type,
+        target: event.target.id 
+    });
+
+    const select_id = this.id || this.dataset?.select2Id || event?.target?.id;
+    const indice = get_indice(select_id);
+
+    if (!indice) {
+        debugLog('Índice no válido, ignorando evento');
+        return;
+    }
+
+    const fila = document.querySelector(`tr#ventas-${indice}`);
+    if (!fila) {
+        debugLog('Fila no encontrada:', `tr#ventas-${indice}`);
+        return;
+    }
+
+    debugLog('Actualizando fila:', indice);
+    if (typeof actualizarTotalFila === 'function') {
+        actualizarTotalFila(fila);
+    }
+    if (typeof update_precio_total === 'function') {
+        update_precio_total();
+    }
+}
+
+// Iniciar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    debugLog('DOM cargado, iniciando...');
+    setTimeout(initializeVentaManager, 100);
+});
+
+// Backup en caso de que DOMContentLoaded ya haya pasado
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    debugLog('DOM ya cargado, iniciando inmediatamente...');
+    setTimeout(initializeVentaManager, 100);
+}
+
+// Configuración global de Select2
+const select2Config = {
+    language: 'es',
+    width: '100%',
+    placeholder: 'Buscar Artículo',
+    allowClear: true,
+    minimumInputLength: 2,
+    ajax: {
+        delay: 250,
+        url: '/api/articulos/search/',
+        dataType: 'json',
+        data: function(params) {
+            return {
+                q: params.term
+            };
+        },
+        processResults: function(data) {
+            return {
+                results: data.map(item => ({
+                    id: item.id,
+                    text: `${item.codigo} - ${item.nombre} | Min $${item.precio_minorista} | May $${item.precio_mayorista}`
+                }))
+            };
+        }
+    }
+};
+
+// Función para inicializar Select2 en un elemento específico
+function initializeSelect2ForElement(element) {
+    debugLog('Inicializando Select2 para:', element.id);
+    $(element).select2(select2Config).on('select2:select change', handleSelectionChange);
+}
+
+// Función para agregar nueva fila
+function agregarNuevaFila() {
+    debugLog('Agregando nueva fila');
+    
+    const totalFilas = document.querySelectorAll('tr[id^="ventas-"]').length;
+    const nuevaFila = document.querySelector('#empty-form tr').cloneNode(true);
+    const nuevoIndice = totalFilas;
+    
+    nuevaFila.id = `ventas-${nuevoIndice}`;
+    nuevaFila.innerHTML = nuevaFila.innerHTML.replace(/__prefix__/g, nuevoIndice);
+    
+    document.querySelector('#ventas-table tbody').appendChild(nuevaFila);
+    
+    // Inicializar Select2 en la nueva fila
+    const nuevoSelect = nuevaFila.querySelector('select[id^="id_ventas"]');
+    if (nuevoSelect) {
+        initializeSelect2ForElement(nuevoSelect);
+    }
+    
+    // Actualizar el contador de formas
+    const totalFormsInput = document.querySelector('#id_ventas-TOTAL_FORMS');
+    if (totalFormsInput) {
+        totalFormsInput.value = totalFilas + 1;
+    }
+    
+    debugLog('Nueva fila agregada con índice:', nuevoIndice);
+}
+
+// Función para inicializar todos los Select2 existentes
+function initializeAllSelect2() {
+    debugLog('Inicializando todos los Select2');
+    
+    document.querySelectorAll('select[id^="id_ventas"]').forEach(select => {
+        if (!$(select).data('select2')) {  // Verificar si ya está inicializado
+            initializeSelect2ForElement(select);
+        }
+    });
+}
+
+// Función principal de inicialización
+function initializeVentaManager() {
+    if (typeof $ === 'undefined' || typeof $.fn.select2 === 'undefined') {
+        debugLog('Dependencias no cargadas, reintentando...');
+        setTimeout(initializeVentaManager, 100);
+        return;
+    }
+
+    debugLog('Iniciando configuración del administrador de ventas');
+
+    // Inicializar Select2 en elementos existentes
+    initializeAllSelect2();
+
+    // Configurar botón de agregar
+    const addButton = document.querySelector('.add-row');
+    if (addButton) {
+        addButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            agregarNuevaFila();
+        });
+    }
+
+    // Configurar botón de guardar
+    const guardarBtn = document.querySelector('#guardar-venta');
+    if (guardarBtn) {
+        guardarBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (validarFormulario()) {
+                limpiarFilasVacias();
+                this.closest('form').submit();
+            }
+        });
+    }
+
+    debugLog('Configuración completada');
+}
+
+// Función mejorada de validación
+function validarFormulario() {
+    let isValid = true;
+    const filas = document.querySelectorAll('tr[id^="ventas-"]');
+    
+    filas.forEach(fila => {
+        const select = fila.querySelector('select[id^="id_ventas"]');
+        const cantidad = fila.querySelector('input[id$="-cantidad"]');
+        
+        if (select && cantidad) {
+            const selectValue = select.value;
+            const cantidadValue = cantidad.value;
+            
+            if (!selectValue || selectValue === '') {
+                mostrarError(select, 'Debe seleccionar un artículo');
+                isValid = false;
+            }
+            
+            if (!cantidadValue || cantidadValue <= 0) {
+                mostrarError(cantidad, 'La cantidad debe ser mayor a 0');
+                isValid = false;
+            }
+        }
+    });
+    
+    return isValid;
+}
+
+// Función para mostrar errores
+function mostrarError(element, message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    errorDiv.style.color = 'red';
+    
+    // Remover mensaje de error anterior si existe
+    const existingError = element.parentNode.querySelector('.error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    element.parentNode.appendChild(errorDiv);
+}
+
+// Iniciar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', initializeVentaManager);
+
+// Por si el DOM ya está cargado
+if (document.readyState === 'complete') {
+    initializeVentaManager();
+}
