@@ -878,3 +878,173 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
     });
     return false;
 };
+
+// Estado global para tracking
+let isInitialized = false;
+let initAttempts = 0;
+const MAX_INIT_ATTEMPTS = 5;
+
+// Función de logging mejorada
+function debugLog(message, data = null) {
+    console.log(`[${new Date().toISOString()}] ${message}`, data || '');
+}
+
+// Función para verificar si los elementos necesarios están presentes
+function checkRequiredElements() {
+    const selects = document.querySelectorAll("select[id^='id_ventas']");
+    const guardarBtn = document.querySelector('#guardar-venta');
+    
+    debugLog('Elementos encontrados:', {
+        'selects': selects.length,
+        'guardarBtn': !!guardarBtn
+    });
+    
+    return selects.length > 0 || guardarBtn;
+}
+
+// Función principal de inicialización
+function initializeVentaManager() {
+    if (isInitialized) {
+        debugLog('Ya inicializado, saltando...');
+        return;
+    }
+
+    debugLog('Intentando inicializar...', { attempt: initAttempts + 1 });
+
+    // Verificar dependencias
+    if (!window.jQuery || !window.jQuery.fn.select2) {
+        debugLog('Dependencias no cargadas, reintentando...');
+        if (initAttempts < MAX_INIT_ATTEMPTS) {
+            initAttempts++;
+            setTimeout(initializeVentaManager, 500);
+        }
+        return;
+    }
+
+    // Verificar si los elementos necesarios están presentes
+    if (!checkRequiredElements()) {
+        debugLog('Elementos requeridos no encontrados, reintentando...');
+        if (initAttempts < MAX_INIT_ATTEMPTS) {
+            initAttempts++;
+            setTimeout(initializeVentaManager, 500);
+        }
+        return;
+    }
+
+    try {
+        // Inicializar Select2
+        jQuery("select[id^='id_ventas']").each(function() {
+            const $select = jQuery(this);
+            debugLog('Inicializando Select2 para:', this.id);
+            
+            $select.select2({
+                language: 'es',
+                width: '100%',
+                debug: true
+            }).on('select2:select change', function(e) {
+                handleSelectionChange.call(this, e);
+            });
+        });
+
+        // Manejar el botón guardar
+        const guardarBtn = document.querySelector('#guardar-venta');
+        if (guardarBtn) {
+            debugLog('Configurando botón guardar');
+            guardarBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                debugLog('Botón guardar clickeado');
+                if (typeof limpiarFilasVacias === 'function') {
+                    limpiarFilasVacias();
+                }
+                if (typeof validarFormulario === 'function' && validarFormulario()) {
+                    this.closest('form').submit();
+                }
+            });
+        }
+
+        isInitialized = true;
+        debugLog('Inicialización completada exitosamente');
+
+    } catch (error) {
+        debugLog('Error durante la inicialización:', error);
+    }
+}
+
+// Función mejorada para obtener índice
+function get_indice(select_id) {
+    debugLog('Obteniendo índice para:', select_id);
+    
+    if (!select_id || select_id === '0') {
+        debugLog('ID inválido:', select_id);
+        return null;
+    }
+
+    // Limpiar el ID si viene de Select2
+    if (select_id.startsWith('select2-')) {
+        const element = document.querySelector(`[data-select2-id="${select_id}"]`);
+        if (element) {
+            select_id = element.id;
+            debugLog('ID limpio:', select_id);
+        }
+    }
+
+    // Extraer el índice usando diferentes patrones
+    const patterns = [
+        /id_ventas-(\d+)-articulo/,
+        /ventas-(\d+)/,
+        /\d+/
+    ];
+
+    for (let pattern of patterns) {
+        const match = select_id.match(pattern);
+        if (match) {
+            debugLog('Índice encontrado:', match[1]);
+            return match[1];
+        }
+    }
+
+    debugLog('No se pudo extraer índice');
+    return null;
+}
+
+// Función mejorada para manejar cambios
+function handleSelectionChange(event) {
+    debugLog('Manejando cambio:', { 
+        eventType: event.type,
+        target: event.target.id 
+    });
+
+    const select_id = this.id || this.dataset?.select2Id || event?.target?.id;
+    const indice = get_indice(select_id);
+
+    if (!indice) {
+        debugLog('Índice no válido, ignorando evento');
+        return;
+    }
+
+    const fila = document.querySelector(`tr#ventas-${indice}`);
+    if (!fila) {
+        debugLog('Fila no encontrada:', `tr#ventas-${indice}`);
+        return;
+    }
+
+    debugLog('Actualizando fila:', indice);
+    if (typeof actualizarTotalFila === 'function') {
+        actualizarTotalFila(fila);
+    }
+    if (typeof update_precio_total === 'function') {
+        update_precio_total();
+    }
+}
+
+// Iniciar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    debugLog('DOM cargado, iniciando...');
+    setTimeout(initializeVentaManager, 100);
+});
+
+// Backup en caso de que DOMContentLoaded ya haya pasado
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    debugLog('DOM ya cargado, iniciando inmediatamente...');
+    setTimeout(initializeVentaManager, 100);
+}

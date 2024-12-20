@@ -195,3 +195,4 @@ STATICFILES_FINDERS = [
 # Configurar tipos MIME
 import mimetypes
 mimetypes.add_type("text/javascript", ".js", True)
+mimetypes.add_type("application/javascript", ".js", True)
