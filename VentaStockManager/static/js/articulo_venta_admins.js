@@ -289,36 +289,128 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function validarFormulario() {
         let esValido = true;
-        document.querySelectorAll('tr[id^="ventas-"]').forEach(fila => {
-            // Skip validation for deleted rows
-            let deleteInput = fila.querySelector('input[name$="-DELETE"]');
-            if (deleteInput && deleteInput.checked) {
-                return;
-            }
+        let debugInfo = {
+            timestamp: new Date().toISOString(),
+            errores: [],
+            estadoFilas: [],
+            elementosNoEncontrados: [],
+            datosFormulario: {}
+        };
 
-            let cantidadNode = fila.querySelector('input[id$="-cantidad"]');
-            let selectArticulo = fila.querySelector("select[id^='id_ventas-'][id$='-articulo']");
-            let precioNode = fila.querySelector('input[id$="-precio"]');
-
-            if (!cantidadNode || !selectArticulo || !precioNode) {
-                return;
-            }
-
-            let cantidad = parseFloat(cantidadNode.value) || 0;
-            if (cantidad <= 0) {
-                cantidadNode.classList.add('is-invalid');
-                esValido = false;
-            } else {
-                cantidadNode.classList.remove('is-invalid');
-            }
-
-            if (!selectArticulo.value) {
-                selectArticulo.classList.add('is-invalid');
-                esValido = false;
-            } else {
-                selectArticulo.classList.remove('is-invalid');
-            }
+        // Get only visible rows that aren't marked for deletion
+        const filasActivas = Array.from(document.querySelectorAll('tr[id^="ventas-"]')).filter(fila => {
+            const deleteInput = fila.querySelector('input[name$="-DELETE"]');
+            const visible = !(deleteInput && deleteInput.checked) && fila.style.display !== 'none';
+            
+            debugInfo.estadoFilas.push({
+                filaId: fila.id,
+                visible: visible,
+                marcadaParaEliminar: deleteInput?.checked || false,
+                display: fila.style.display
+            });
+            
+            return visible;
         });
+
+        if (filasActivas.length === 0) {
+            debugInfo.errores.push('No hay filas activas para validar');
+            console.warn('Debug Info:', JSON.stringify(debugInfo, null, 2));
+            return false;
+        }
+
+        filasActivas.forEach((fila, index) => {
+            const filaDebug = {
+                index: index,
+                filaId: fila.id,
+                elementos: {},
+                valores: {}
+            };
+
+            const cantidadNode = fila.querySelector('input[id$="-cantidad"]');
+            const selectArticulo = fila.querySelector("select[id^='id_ventas-'][id$='-articulo']");
+            const precioNode = fila.querySelector('input[id$="-precio"]');
+
+            // Verificar existencia de elementos
+            if (!cantidadNode || !selectArticulo || !precioNode) {
+                const elementosFaltantes = {
+                    cantidad: !cantidadNode,
+                    articulo: !selectArticulo,
+                    precio: !precioNode
+                };
+                debugInfo.elementosNoEncontrados.push({
+                    fila: index,
+                    elementosFaltantes
+                });
+                esValido = false;
+                return;
+            }
+
+            // Recopilar valores actuales
+            const cantidad = parseFloat(cantidadNode.value);
+            const articuloValue = selectArticulo.value;
+            const precio = parseFloat(precioNode.value);
+
+            filaDebug.elementos = {
+                cantidadId: cantidadNode.id,
+                selectId: selectArticulo.id,
+                precioId: precioNode.id
+            };
+
+            filaDebug.valores = {
+                cantidad: {
+                    raw: cantidadNode.value,
+                    parsed: cantidad,
+                    valid: !isNaN(cantidad) && cantidad > 0
+                },
+                articulo: {
+                    value: articuloValue,
+                    text: selectArticulo.selectedOptions[0]?.text || '',
+                    valid: Boolean(articuloValue)
+                },
+                precio: {
+                    raw: precioNode.value,
+                    parsed: precio,
+                    valid: !isNaN(precio) && precio > 0
+                }
+            };
+
+            // Validaciones
+            if (isNaN(cantidad) || cantidad <= 0) {
+                cantidadNode.classList.add('is-invalid');
+                debugInfo.errores.push(`Fila ${index + 1}: Cantidad inválida (${cantidadNode.value})`);
+                esValido = false;
+            }
+
+            if (!articuloValue) {
+                selectArticulo.classList.add('is-invalid');
+                debugInfo.errores.push(`Fila ${index + 1}: Artículo no seleccionado`);
+                esValido = false;
+            }
+
+            if (isNaN(precio) || precio <= 0) {
+                precioNode.classList.add('is-invalid');
+                debugInfo.errores.push(`Fila ${index + 1}: Precio inválido (${precioNode.value})`);
+                esValido = false;
+            }
+
+            debugInfo.datosFormulario[`fila_${index}`] = filaDebug;
+        });
+
+        if (!esValido) {
+            // Imprimir información de debug en consola
+            console.error('=== DEBUG INFORMACIÓN DE VALIDACIÓN ===');
+            console.error(JSON.stringify(debugInfo, null, 2));
+            
+            // Mostrar alerta al usuario
+            alert('Se encontraron errores en el formulario. Ver consola para más detalles.');
+            
+            // Opcional: Enviar a un servicio de logging
+            try {
+                localStorage.setItem('ultimoErrorValidacion', JSON.stringify(debugInfo));
+            } catch (e) {
+                console.warn('No se pudo guardar información de debug en localStorage');
+            }
+        }
 
         return esValido;
     }
