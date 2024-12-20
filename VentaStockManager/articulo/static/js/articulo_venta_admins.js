@@ -610,3 +610,111 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+// Envolver todo el código en una función de inicialización
+function initializeVentaManager() {
+    // Esperar a que Select2 esté completamente cargado
+    if (typeof $.fn.select2 === 'undefined') {
+        console.warn('Select2 no está cargado. Esperando...');
+        setTimeout(initializeVentaManager, 100);
+        return;
+    }
+
+    // Configuración de Select2
+    $("select[id^='id_ventas']").select2({
+        language: 'es',
+        width: '100%'
+    }).on('select2:select', function(e) {
+        handleSelectionChange.call(this, e);
+    });
+
+    // Manejar cambios de selección
+    function handleSelectionChange(event) {
+        try {
+            const select_id = this.id || this.dataset?.select2Id || event?.target?.id || '';
+            console.log('Manejando cambio de selección:', { select_id });
+
+            const indice = get_indice(select_id);
+            if (!indice) {
+                console.log('Índice no válido para:', select_id);
+                return;
+            }
+
+            const fila = document.querySelector(`tr#ventas-${indice}`);
+            if (!fila) {
+                console.log('No se encontró la fila para el índice:', indice);
+                return;
+            }
+
+            actualizarTotalFila(fila);
+            update_precio_total();
+        } catch (error) {
+            console.error('Error en handleSelectionChange:', error);
+        }
+    }
+
+    // Mejorar la función get_indice
+    function get_indice(select_id) {
+        if (!select_id || select_id === '0') {
+            return null;
+        }
+
+        try {
+            // Si es un elemento Select2
+            if (select_id.startsWith('select2-')) {
+                const element = document.querySelector(`[data-select2-id="${select_id}"]`);
+                if (element) {
+                    select_id = element.id;
+                }
+            }
+
+            // Patrones de búsqueda
+            const patterns = [
+                /id_ventas-(\d+)-articulo/,
+                /ventas-(\d+)/,
+                /\d+/
+            ];
+
+            for (let pattern of patterns) {
+                const match = select_id.match(pattern);
+                if (match) {
+                    return match[1];
+                }
+            }
+        } catch (error) {
+            console.error('Error al obtener índice:', error);
+        }
+
+        return null;
+    }
+
+    // Asegurarse de que el botón de guardar existe
+    const guardarBtn = document.querySelector('#guardar-venta');
+    if (guardarBtn) {
+        guardarBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (typeof limpiarFilasVacias === 'function') {
+                limpiarFilasVacias();
+            }
+            if (typeof validarFormulario === 'function' && validarFormulario()) {
+                this.closest('form').submit();
+            }
+        });
+    }
+}
+
+// Iniciar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    // Esperar un momento para asegurarse de que Select2 esté cargado
+    setTimeout(initializeVentaManager, 100);
+});
+
+// Asegurarse de que jQuery está disponible
+if (typeof jQuery === 'undefined') {
+    console.error('jQuery no está cargado. El formulario no funcionará correctamente.');
+}
+
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
+    return false;
+};
