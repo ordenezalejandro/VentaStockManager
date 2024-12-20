@@ -317,110 +317,152 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function validarFormulario() {
-        let esValido = true;
-        let debugInfo = {
-            timestamp: new Date().toISOString(),
-            errores: [],
-            filasInvalidas: []
-        };
+        console.log('Iniciando validación...');
+        
+        // 1. Identificar filas que realmente necesitan validación
+        const filasRelevantes = Array.from(document.querySelectorAll('tr[id^="ventas-"]'))
+            .filter(fila => {
+                // Ignorar fila template y filas marcadas para eliminar
+                if (fila.id === 'ventas-empty' || fila.id.includes('__prefix__')) return false;
+                const deleteInput = fila.querySelector('input[name$="-DELETE"]');
+                if (deleteInput?.checked) return false;
 
-        // 1. Primero, identificar solo las filas que tienen datos
-        const todasLasFilas = document.querySelectorAll('tr[id^="ventas-"]');
-        const filasActivas = Array.from(todasLasFilas).filter(fila => {
-            // Ignorar la fila template
-            if (fila.id === 'ventas-empty' || fila.id.includes('__prefix__')) {
-                return false;
-            }
+                // Solo validar filas que tengan un artículo seleccionado
+                const articulo = fila.querySelector('select[id$="-articulo"]')?.value;
+                return Boolean(articulo);
+            });
 
-            const deleteInput = fila.querySelector('input[name$="-DELETE"]');
-            if (deleteInput?.checked) {
-                return false;
-            }
+        console.log(`Filas a validar: ${filasRelevantes.length}`);
 
-            // Verificar si la fila tiene algún dato
-            const articulo = fila.querySelector('select[id$="-articulo"]')?.value;
-            const cantidad = fila.querySelector('input[id$="-cantidad"]')?.value;
+        let errores = [];
+        let filasConError = new Set();
+
+        // 2. Validar cada fila relevante
+        filasRelevantes.forEach(fila => {
+            const filaId = fila.id;
+            const indice = filaId.match(/\d+/)[0];
             
-            // Solo considerar filas que tengan al menos un artículo seleccionado o cantidad
-            return articulo || (cantidad && cantidad !== '1');
-        });
-
-        debugInfo.totalFilas = todasLasFilas.length;
-        debugInfo.filasActivas = filasActivas.length;
-
-        // 2. Validar solo las filas activas
-        filasActivas.forEach((fila, index) => {
-            const filaInfo = {
-                id: fila.id,
-                index: index,
-                errores: []
-            };
-
-            const cantidadInput = fila.querySelector('input[id$="-cantidad"]');
+            // Obtener elementos
             const selectArticulo = fila.querySelector('select[id$="-articulo"]');
             const precioInput = fila.querySelector('input[id$="-precio"]');
 
-            // Validar cantidad
-            const cantidad = parseFloat(cantidadInput?.value || '0');
-            if (!cantidad || cantidad <= 0) {
-                filaInfo.errores.push('Cantidad inválida');
-                cantidadInput?.classList.add('is-invalid');
-            }
+            // Limpiar clases de error previas
+            [selectArticulo, precioInput].forEach(elem => {
+                if (elem) elem.classList.remove('is-invalid');
+            });
 
-            // Validar artículo
+            // Validar artículo (principal validación)
             if (!selectArticulo?.value) {
-                filaInfo.errores.push('Artículo no seleccionado');
-                selectArticulo?.classList.add('is-invalid');
+                selectArticulo.classList.add('is-invalid');
+                errores.push(`Fila ${indice}: Debe seleccionar un artículo`);
+                filasConError.add(filaId);
             }
 
-            // Validar precio
-            const precio = parseFloat(precioInput?.value || '0');
-            if (!precio || precio <= 0) {
-                filaInfo.errores.push('Precio inválido');
-                precioInput?.classList.add('is-invalid');
-            }
-
-            if (filaInfo.errores.length > 0) {
-                esValido = false;
-                debugInfo.filasInvalidas.push(filaInfo);
-                debugInfo.errores.push(`Fila ${fila.id}: ${filaInfo.errores.join(', ')}`);
+            // Validar precio solo si hay artículo seleccionado
+            if (selectArticulo?.value && precioInput) {
+                const precio = parseFloat(precioInput.value);
+                if (isNaN(precio) || precio <= 0) {
+                    precioInput.classList.add('is-invalid');
+                    errores.push(`Fila ${indice}: Precio debe ser mayor a 0`);
+                    filasConError.add(filaId);
+                }
             }
         });
 
-        // 3. Si no hay filas activas pero hay filas con datos parciales, mostrar error
-        if (filasActivas.length === 0 && todasLasFilas.length > 1) {
-            debugInfo.errores.push('No hay filas completas para procesar');
-            esValido = false;
-        }
-
-        if (!esValido) {
-            console.log('Intentando corregir datos...');
-            if (intentarCorregirDatos(debugInfo.filasInvalidas)) {
-                return false; // El modal manejará el submit si se aceptan las correcciones
-            }
-            
-            // Si no se pudieron hacer correcciones automáticas, mostrar errores
-            console.error('No se pudieron corregir automáticamente todos los errores');
-            alert('Hay errores que requieren corrección manual:\n' + debugInfo.errores.join('\n'));
+        // 3. Mostrar resultados
+        if (errores.length > 0) {
+            console.log('Errores encontrados:', errores);
+            mostrarErrores(errores);
             return false;
         }
 
+        // 4. Validar que haya al menos una fila válida
+        if (filasRelevantes.length === 0) {
+            mostrarErrores(['Debe seleccionar al menos un artículo']);
+            return false;
+        }
+
+        console.log('Validación exitosa');
         return true;
     }
 
-    // Función auxiliar para limpiar filas vacías antes de enviar
+    function mostrarErrores(errores) {
+        // Crear mensaje de error
+        const mensajeError = document.createElement('div');
+        mensajeError.className = 'alert alert-danger alert-dismissible fade show';
+        mensajeError.innerHTML = `
+            <h4>Por favor corrija los siguientes errores:</h4>
+            <ul>
+                ${errores.map(error => `<li>${error}</li>`).join('')}
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        // Insertar mensaje en el DOM
+        const form = document.querySelector('form');
+        const existingAlert = form.querySelector('.alert');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+        form.insertBefore(mensajeError, form.firstChild);
+
+        // Scroll al primer error
+        const primerElementoConError = document.querySelector('.is-invalid');
+        if (primerElementoConError) {
+            primerElementoConError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
     function limpiarFilasVacias() {
         document.querySelectorAll('tr[id^="ventas-"]').forEach(fila => {
-            if (fila.id === 'ventas-empty') return;
+            if (fila.id === 'ventas-empty' || fila.id.includes('__prefix__')) return;
 
             const articulo = fila.querySelector('select[id$="-articulo"]')?.value;
-            const cantidad = fila.querySelector('input[id$="-cantidad"]')?.value;
             
-            if (!articulo && (!cantidad || cantidad === '1')) {
+            // Si no hay artículo seleccionado, marcar para eliminar
+            if (!articulo) {
                 const deleteInput = fila.querySelector('input[name$="-DELETE"]');
-                if (deleteInput) deleteInput.checked = true;
+                if (deleteInput) {
+                    deleteInput.checked = true;
+                    fila.style.opacity = '0.5';
+                }
             }
         });
+    }
+
+    // Validación en tiempo real solo para artículos y precios
+    document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('change', (e) => {
+            const target = e.target;
+            
+            // Solo validar cambios en selects de artículos y campos de precio
+            if (target.matches('select[id$="-articulo"], input[id$="-precio"]')) {
+                const fila = target.closest('tr');
+                if (fila) {
+                    validarFila(fila);
+                }
+            }
+        });
+    });
+
+    function validarFila(fila) {
+        const selectArticulo = fila.querySelector('select[id$="-articulo"]');
+        const precioInput = fila.querySelector('input[id$="-precio"]');
+
+        // Limpiar errores previos
+        [selectArticulo, precioInput].forEach(elem => {
+            if (elem) elem.classList.remove('is-invalid');
+        });
+
+        // Solo validar si hay artículo seleccionado
+        if (selectArticulo?.value) {
+            if (precioInput) {
+                const precio = parseFloat(precioInput.value);
+                if (isNaN(precio) || precio <= 0) {
+                    precioInput.classList.add('is-invalid');
+                }
+            }
+        }
     }
 
     // Modificar el evento de guardar
