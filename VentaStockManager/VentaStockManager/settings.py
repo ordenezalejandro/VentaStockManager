@@ -97,11 +97,7 @@ DATABASES = {
         'USER': 'jairoDO',
         'PASSWORD': '05v4ld0!',
         'HOST': 'jairoDO.mysql.pythonanywhere-services.com',
-        'PORT': '3306',
-        'OPTIONS': {
-                'timeout': 20,  # Increase the timeout to 20 seconds
-            
-        }
+        'PORT': '3306'
     }
 }
 # DATABASES = {
