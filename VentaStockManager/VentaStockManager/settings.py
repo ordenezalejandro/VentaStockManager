@@ -190,3 +190,12 @@ try:
         from VentaStockManager.dev_settings import *
 except EnvError:
     pass
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
+
+# Configurar tipos MIME
+import mimetypes
+mimetypes.add_type("text/javascript", ".js", True)
